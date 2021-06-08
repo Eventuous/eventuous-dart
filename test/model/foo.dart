@@ -3,12 +3,12 @@ import 'package:eventuate/eventuate.dart';
 typedef JsonMap = Map<String, dynamic>;
 
 class FooId extends AggregateId {
-  FooId(String id) : super(id);
+  FooId([String? id]) : super(id);
 }
 
 class Foo extends Aggregate<JsonMap> {
-  Foo(
-    String id, [
+  Foo([
+    String? id,
     FooState? state,
   ]) : super(FooId(id), state ?? FooState());
 
