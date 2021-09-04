@@ -1,4 +1,4 @@
-import 'package:eventuate/eventuate.dart';
+import 'package:eventuous/eventuous.dart';
 
 /// Class implementing naming convention for event streams
 class StreamName {

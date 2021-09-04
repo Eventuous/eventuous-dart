@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:eventuate/eventuate.dart';
+import 'package:eventuous/eventuous.dart';
 import 'package:meta/meta.dart';
 
 /// [AggregateStore] store loads [AggregateState] from [AggregateStateStore].

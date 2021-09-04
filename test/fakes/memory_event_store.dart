@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:eventuate/eventuate.dart';
+import 'package:eventuous/eventuous.dart';
 
 class MemoryEventStore extends EventStore {
   final _global = <StreamEvent>[];

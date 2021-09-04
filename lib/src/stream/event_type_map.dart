@@ -1,4 +1,4 @@
-import 'package:eventuate/eventuate.dart';
+import 'package:eventuous/eventuous.dart';
 
 class DomainEventTypeMap {
   static final Map<Type, String> _map = <Type, String>{};

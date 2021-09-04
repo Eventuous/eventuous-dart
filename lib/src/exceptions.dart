@@ -1,4 +1,4 @@
-import 'package:eventuate/eventuate.dart';
+import 'package:eventuous/eventuous.dart';
 
 class StreamException implements Exception {
   StreamException(this.message);

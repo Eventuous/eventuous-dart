@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:eventuate/eventuate.dart';
+import 'package:eventuous/eventuous.dart';
 
 abstract class EventSerializer<T> {
   String get contentType;

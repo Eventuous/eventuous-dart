@@ -1,4 +1,4 @@
-import 'package:eventuate/eventuate.dart';
+import 'package:eventuous/eventuous.dart';
 
 typedef EventHandlerCallback<S extends Event<T>, T> = AggregateState<T>
     Function(S, T);

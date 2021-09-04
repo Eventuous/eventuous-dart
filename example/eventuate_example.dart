@@ -1,4 +1,4 @@
-// import 'package:eventuate/eventuate.dart';
+// import 'package:eventuous/eventuous.dart';
 //
 // void main() {
 //   var awesome = Awesome();

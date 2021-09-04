@@ -1,4 +1,4 @@
-import 'package:eventuate/eventuate.dart';
+import 'package:eventuous/eventuous.dart';
 import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 

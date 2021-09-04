@@ -1,6 +1,6 @@
-name: eventuate
-description: A starting point for Dart libraries or applications.
-version: 1.0.0
+name: eventuous
+description: A lightweight and open-souce Event Sourcing library for Dart.
+version: 0.0.1
 # homepage: https://www.example.com
 
 environment:

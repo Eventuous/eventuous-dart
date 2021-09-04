@@ -1,6 +1,6 @@
 import 'dart:collection';
 
-import 'package:eventuate/eventuate.dart';
+import 'package:eventuous/eventuous.dart';
 import 'package:meta/meta.dart';
 
 /// [Aggregate] instance creator method. If [state] is

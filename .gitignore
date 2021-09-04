@@ -10,6 +10,6 @@ build/
 pubspec.lock
 
 ## Intellij spescific files
-/eventuate.iml
-/eventuate.ipr
-/eventuate.iws
+/eventuous.iml
+/eventuous.ipr
+/eventuous.iws
