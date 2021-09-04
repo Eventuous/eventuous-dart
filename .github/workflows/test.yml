@@ -38,11 +38,11 @@ jobs:
       - name: Run tests
         run: dart test -j 1 --reporter=expanded --coverage="coverage"
 
-#      # Collect coverage
-#      - name: Collect coverage
-#        run: format_coverage --lcov --in=coverage --out=coverage.lcov --packages=.packages --report-on=lib
-#
-#      # Publish coverage
-#      - uses: codecov/codecov-action@v1.0.2
-#        with:
-#          token: ${{ secrets.CODECOV_TOKEN }}
+      # Collect coverage
+      - name: Collect coverage
+        run: format_coverage --lcov --in=coverage --out=coverage.lcov --packages=.packages --report-on=lib
+
+      # Publish coverage
+      - uses: codecov/codecov-action@v1.0.2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
