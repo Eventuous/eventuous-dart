@@ -1,8 +1,8 @@
 name: eventuous
 version: 0.0.1-prerelease
 homepage: https://eventuous.dev
-repository: https://github.com/Eventuous/eventuous-dart
 description: A lightweight and open-souce Event Sourcing library for Dart.
+repository: https://github.com/Eventuous/eventuous-dart
 environment: 
   sdk: '>=2.13.0 <3.0.0'
 dependencies: 
