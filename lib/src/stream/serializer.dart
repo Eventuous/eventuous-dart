@@ -8,6 +8,9 @@ abstract class EventSerializer<T> {
   /// Serialize [event] into data.
   List<int> encode(Event<T> event);
 
+  /// Serialize [metadata] into data.
+  List<int> encodeMetaData(Metadata event);
+
   /// Deserialize [data] into a [Event] of given [type]
   Event<T> decode(List<int> bytes, String type);
 }
@@ -19,6 +22,11 @@ class DefaultEventSerializer<T> extends EventSerializer<T> {
   @override
   List<int> encode(Event<T> event) {
     return utf8.encode(json.encode(event.data));
+  }
+
+  @override
+  List<int> encodeMetaData(Metadata data) {
+    return utf8.encode(json.encode(data));
   }
 
   @override

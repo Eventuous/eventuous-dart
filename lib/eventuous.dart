@@ -17,6 +17,7 @@ export 'src/stream/event_handler.dart';
 export 'src/stream/event_store.dart';
 export 'src/stream/event_store_result.dart';
 export 'src/stream/event_type_map.dart';
+export 'src/stream/metadata.dart';
 export 'src/stream/serializer.dart';
 export 'src/stream/stream_event.dart';
 export 'src/stream/stream_name.dart';
