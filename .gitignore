@@ -8,3 +8,8 @@ build/
 # Omit committing pubspec.lock for library packages; see
 # https://dart.dev/guides/libraries/private-files#pubspeclock.
 pubspec.lock
+
+## Intellij spescific files
+/eventuate.iml
+/eventuate.ipr
+/eventuate.iws
