@@ -24,4 +24,4 @@ the [.NET version](https://github.com/Eventuous/eventuous/).
 
 Please file feature requests and bugs at the [issue tracker][tracker].
 
-[tracker]: https://github.com/DISCOOS/eventuous/issues
+[tracker]: https://github.com/Eventuous/eventuous-dart/issues
