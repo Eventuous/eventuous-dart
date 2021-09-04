@@ -1,4 +1,7 @@
-# Eventuous
+[![Pub](https://img.shields.io/pub/v/eventuous.svg)](https://pub.dev/packages/eventuous)
+[![Dart](https://github.com/Eventuous/eventuous-dart/actions/workflows/test.yml/badge.svg)](https://github.com/DISCOOS/eventstore-client-dart/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/Eventuous/eventuous-dart/branch/master/graph/badge.svg?token=HAHS8DUBHM)](https://codecov.io/gh/DISCOOS/eventstore-client-dart)
+
 
 A lightweight Event Sourcing library for Dart, which is:
 - Very volatile
