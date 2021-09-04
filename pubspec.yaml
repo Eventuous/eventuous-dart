@@ -1,6 +1,6 @@
 name: eventuous
 description: A lightweight and open-souce Event Sourcing library for Dart.
-version: 0.0.1
+version: 0.0.1-prerelease
 # homepage: https://www.example.com
 
 environment:
