@@ -1,20 +1,7 @@
 import 'dart:async';
 
-import 'package:eventuate/src/version.dart';
+import 'package:eventuate/eventuate.dart';
 import 'package:meta/meta.dart';
-
-import 'aggregate.dart';
-import 'aggregate_state.dart';
-import 'aggregate_state_store.dart';
-import 'aggregate_state_type_map.dart';
-import 'aggregate_type_map.dart';
-import 'domain_event.dart';
-import 'event_store.dart';
-import 'exceptions.dart';
-import 'serializer.dart';
-import 'stream_event.dart';
-import 'stream_name.dart';
-import 'domain_event_type_map.dart';
 
 /// [AggregateStore] store loads [AggregateState] from [AggregateStateStore].
 ///
@@ -72,7 +59,7 @@ class AggregateStore<V, S extends AggregateState<V>, T extends Aggregate<V>> {
   /// [AggregateStateStore] loading [AggregateState]s
   final AggregateStateStore<V, S>? _stateStore;
 
-  /// [EventSerializer] for serializing and deserializing [DomainEvent]s
+  /// [EventSerializer] for serializing and deserializing [Event]s
   late final EventSerializer<V> _serializer;
 
   /// [AggregateCreator] implementation. If [state] is not given,
@@ -130,7 +117,7 @@ class AggregateStore<V, S extends AggregateState<V>, T extends Aggregate<V>> {
         : await _stateStore!.load(StreamName.fromId(id));
   }
 
-  DomainEvent<V> _toDomainEvent(StreamEvent event) {
+  Event<V> _toDomainEvent(StreamEvent event) {
     return _serializer.decode(
       event.data,
       event.name,
@@ -161,7 +148,7 @@ class AggregateStore<V, S extends AggregateState<V>, T extends Aggregate<V>> {
     }
   }
 
-  StreamEvent toStreamEvent(DomainEvent<V> event) {
+  StreamEvent toStreamEvent(Event<V> event) {
     return StreamEvent(
       DomainEventTypeMap.getTypeNameFromEvent(event),
       _serializer.encode(event),

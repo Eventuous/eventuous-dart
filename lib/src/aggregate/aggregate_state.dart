@@ -1,8 +1,5 @@
 import 'package:eventuate/eventuate.dart';
 
-import 'domain_event.dart';
-import 'event_handler.dart';
-
 part 'aggregate_state_result.dart';
 
 /// New [AggregateState] instance creator method.
@@ -20,7 +17,7 @@ abstract class AggregateState<T> {
   }) : _version = version;
 
   // ignore: prefer_collection_literals
-  final _handlers = TypedEventHandlerMap<DomainEvent<T>, T>();
+  final _handlers = EventHandlerMap<Event<T>, T>();
 
   /// Get state value of type [T]
   final T value;
@@ -30,12 +27,12 @@ abstract class AggregateState<T> {
   int get version => _version;
   int _version;
 
-  /// Handle [DomainEvent].
+  /// Handle [Event].
   /// Returns [value] after event is handled.
   /// If given [event] is not handled by this
   /// state, original [value] is returned.
   ///
-  AggregateState<T> when(DomainEvent<T> event) {
+  AggregateState<T> when(Event<T> event) {
     final eventType = event.runtimeType;
     if (!_handlers.containsKey(eventType)) {
       return this;
@@ -44,8 +41,8 @@ abstract class AggregateState<T> {
   }
 
   /// Register handler for given event
-  void on<S extends DomainEvent<T>>(
-    EventHandlerCallback<DomainEvent<T>, T> handler,
+  void on<S extends Event<T>>(
+    EventHandlerCallback<Event<T>, T> handler,
   ) {
     if (_handlers.containsKey(typeOf<S>())) {
       throw ArgumentError('Duplicate handler for event type ${typeOf<S>()}');

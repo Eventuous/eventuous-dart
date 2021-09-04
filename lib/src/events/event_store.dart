@@ -1,7 +1,4 @@
-import 'package:eventuate/src/version.dart';
-
-import 'event_store_result.dart';
-import 'stream_event.dart';
+import 'package:eventuate/eventuate.dart';
 
 /// Store of [StreamEvent]s used by [AggregateStore].
 abstract class EventStore {

@@ -31,8 +31,7 @@ class AggregateStateTypeMap {
   static String getTypeName<S, T extends AggregateState<S>>() =>
       _map[typeOf<T>()]!;
   static String getTypeNameFromType(Type type) => _map[type]!;
-  static String getTypeNameFromEvent(DomainEvent event) =>
-      _map[event.runtimeType]!;
+  static String getTypeNameFromEvent(Event event) => _map[event.runtimeType]!;
 
   static Type getType(String typeName) => _reverseMap[typeName]!;
 

@@ -17,7 +17,7 @@ class AggregateTypeMap {
     _creators[type] = creator;
   }
 
-  /// Create [DomainEvent] with type [name] from given [data]
+  /// Create [Event] with type [name] from given [data]
   static T createFromName<S, T extends Aggregate<S>>(
     String name,
     String id, [
@@ -25,7 +25,7 @@ class AggregateTypeMap {
   ]) =>
       _creators[_reverseMap[name]!]!(id, state) as T;
 
-  /// Create [DomainEvent] of [type] from given [data]
+  /// Create [Event] of [type] from given [data]
   static T create<S, T extends Aggregate<S>>(
     String id, [
     AggregateState<S>? state,
@@ -34,8 +34,7 @@ class AggregateTypeMap {
 
   static String getTypeName<S, T extends Aggregate<S>>() => _map[typeOf<T>()]!;
   static String getTypeNameFromType(Type type) => _map[type]!;
-  static String getTypeNameFromEvent(DomainEvent event) =>
-      _map[event.runtimeType]!;
+  static String getTypeNameFromEvent(Event event) => _map[event.runtimeType]!;
 
   static Type getType(String typeName) => _reverseMap[typeName]!;
 

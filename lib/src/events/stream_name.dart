@@ -1,8 +1,5 @@
 import 'package:eventuate/eventuate.dart';
 
-import 'aggregate.dart';
-import 'extensions.dart';
-
 /// Class implementing naming convention for event streams
 class StreamName {
   StreamName(this.value);

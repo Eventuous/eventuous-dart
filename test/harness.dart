@@ -3,7 +3,7 @@ import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 
 import 'model/foo.dart';
-import 'memory_event_store.dart';
+import 'fakes/memory_event_store.dart';
 
 class TestHarness {
   TestHarness() {

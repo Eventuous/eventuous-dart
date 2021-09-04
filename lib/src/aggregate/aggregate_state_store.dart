@@ -1,6 +1,4 @@
-import 'stream_name.dart';
-import 'aggregate_state.dart';
-import 'aggregate_state_type_map.dart';
+import 'package:eventuate/eventuate.dart';
 
 /// [AggregateStateStore] store loads [AggregateState] from any source.
 ///

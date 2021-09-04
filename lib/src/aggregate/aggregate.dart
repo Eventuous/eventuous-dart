@@ -1,12 +1,7 @@
 import 'dart:collection';
 
 import 'package:eventuate/eventuate.dart';
-import 'package:eventuate/src/aggregate_id.dart';
 import 'package:meta/meta.dart';
-
-import 'aggregate_state.dart';
-import 'domain_event.dart';
-import 'exceptions.dart';
 
 /// [Aggregate] instance creator method. If [state] is
 /// not given, a new [AggregateState] instance must be
@@ -37,13 +32,13 @@ abstract class Aggregate<T> {
   ///
   final AggregateId id;
 
-  /// [AggregateState] before first [DomainEvent]
+  /// [AggregateState] before first [Event]
   /// applied locally. Is always equal to [_original]
   /// after [load].
   AggregateState<T> get current => _current;
   late AggregateState<T> _original;
 
-  /// [AggregateState] after last [DomainEvent]
+  /// [AggregateState] after last [Event]
   /// applied or folded onto it. Is always equal to
   /// [_original] after creation, [load], [commit]
   /// and [rollback].
@@ -67,10 +62,10 @@ abstract class Aggregate<T> {
   int get currentVersion => _current.version;
 
   /// Get list of pending changes made by
-  /// [DomainEvent]s applied locally.
+  /// [Event]s applied locally.
   ///
-  DomainEventList<T> get changes => UnmodifiableListView(_changes);
-  final _changes = <DomainEvent<T>>[];
+  EventList<T> get changes => UnmodifiableListView(_changes);
+  final _changes = <Event<T>>[];
 
   /// Check if local [changes] exists
   bool get isChanged => _changes.isNotEmpty;
@@ -79,7 +74,7 @@ abstract class Aggregate<T> {
   /// If aggregate is already loaded or
   /// changed, an DomainException is thrown.
   ///
-  AggregateStateResult<T> load(Iterable<DomainEvent<T>> events) {
+  AggregateStateResult<T> load(Iterable<Event<T>> events) {
     if (currentVersion > -1) {
       throw DomainException(
         '$runtimeType is already ${isChanged ? 'created' : 'loaded'}',
@@ -97,7 +92,7 @@ abstract class Aggregate<T> {
 
   /// Fold given [event] on [current] state.
   ///
-  AggregateStateResult<T> fold(DomainEvent<T> event) {
+  AggregateStateResult<T> fold(Event<T> event) {
     final previous = _current;
     _current = previous.when(event);
     return AggregateStateResult.from(
@@ -110,7 +105,7 @@ abstract class Aggregate<T> {
   /// If successful the event is added to
   /// [changes] and [current] version is
   /// incremented by 1.
-  AggregateStateResult<T> apply(DomainEvent<T> event) {
+  AggregateStateResult<T> apply(Event<T> event) {
     final previous = _current;
     _current = previous.when(event);
     _changes.add(event);

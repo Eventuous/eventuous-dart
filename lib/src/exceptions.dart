@@ -1,8 +1,5 @@
 import 'package:eventuate/eventuate.dart';
 
-import 'aggregate.dart';
-import 'stream_name.dart';
-
 class StreamException implements Exception {
   StreamException(this.message);
   final String message;
@@ -42,4 +39,19 @@ class AggregateExists<T extends Aggregate> extends DomainException {
           'Aggregate ${typeOf<T>()} $id exists already '
           'in stream ${StreamName.fromId<T>(id)}',
         );
+}
+
+/// The [ArgumentException] is thrown when an argument
+///  is null when it shouldn't be.
+class ArgumentNullOrEmptyException implements Exception {
+  ArgumentNullOrEmptyException(this.name, this.isNull);
+  final String name;
+  final bool isNull;
+  bool get isEmpty => !isNull;
+  String get message => 'Argument $name is ${isNull ? 'null' : 'empty'}';
+
+  @override
+  String toString() {
+    return '$runtimeType{name: $name, message: $message}';
+  }
 }

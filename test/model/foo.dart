@@ -24,11 +24,11 @@ class FooState extends AggregateState<JsonMap> {
   }
 }
 
-class FooCreated extends DomainEvent<JsonMap> {
+class FooCreated extends Event<JsonMap> {
   FooCreated(JsonMap data) : super(data);
 }
 
-class FooUpdated extends DomainEvent<JsonMap> {
+class FooUpdated extends Event<JsonMap> {
   FooUpdated(JsonMap data) : super(data);
 }
 
