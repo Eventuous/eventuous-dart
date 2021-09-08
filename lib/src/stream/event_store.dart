@@ -3,31 +3,29 @@ import 'package:eventuous/eventuous.dart';
 /// Store of [StreamEvent]s used by [AggregateStore].
 abstract class EventStore {
   Future<Iterable<StreamEvent>> readEvents(
-    String stream,
-    StreamReadPosition start,
-    int count,
-  ) =>
-      readStream(stream, start).take(count).toList();
+    StreamName name,
+    StreamReadPosition start, [
+    int count = Max,
+  ]);
 
   Future<Iterable<StreamEvent>> readEventsBackwards(
-    String stream,
-    StreamReadPosition start,
-    int count,
-  ) =>
-      readStreamBackwards(stream, start).take(count).toList();
+    StreamName name, [
+    int count = Max,
+  ]);
 
   Stream<StreamEvent> readStream(
-    String stream,
-    StreamReadPosition start,
-  );
+    StreamName name,
+    StreamReadPosition start, [
+    int count = Max,
+  ]);
 
   Stream<StreamEvent> readStreamBackwards(
-    String stream,
-    StreamReadPosition start,
-  );
+    StreamName name, [
+    int count = Max,
+  ]);
 
   Future<AppendEventsResult> appendEvents(
-    String stream,
+    StreamName name,
     Iterable<StreamEvent> events,
     ExpectedStreamVersion expected,
   );

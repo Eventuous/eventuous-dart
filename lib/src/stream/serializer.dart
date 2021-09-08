@@ -2,26 +2,27 @@ import 'dart:convert';
 
 import 'package:eventuous/eventuous.dart';
 
-abstract class EventSerializer<T> {
+abstract class EventSerializer<TEvent extends Object> {
   String get contentType;
 
   /// Serialize [event] into data.
-  List<int> encode(Event<T> event);
+  List<int> encode(TEvent event);
 
   /// Serialize [metadata] into data.
   List<int> encodeMetaData(Metadata event);
 
   /// Deserialize [data] into a [Event] of given [type]
-  Event<T> decode(List<int> bytes, String type);
+  TEvent decode(List<int> bytes, String type);
 }
 
-class DefaultEventSerializer<T> extends EventSerializer<T> {
+class DefaultEventSerializer<TData extends Object, TEvent extends Object>
+    extends EventSerializer<TEvent> {
   @override
   String get contentType => 'application/json';
 
   @override
-  List<int> encode(Event<T> event) {
-    return utf8.encode(json.encode(event.data));
+  List<int> encode(TEvent event) {
+    return utf8.encode(json.encode(event));
   }
 
   @override
@@ -30,8 +31,8 @@ class DefaultEventSerializer<T> extends EventSerializer<T> {
   }
 
   @override
-  Event<T> decode(List<int> bytes, String eventType) {
-    return DomainEventTypeMap.createFromName<T>(
+  TEvent decode(List<int> bytes, String eventType) {
+    return EventType.create<TData, TEvent>(
       eventType,
       json.decode(utf8.decode(bytes)),
     );

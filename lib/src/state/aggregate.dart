@@ -1,50 +1,57 @@
+import 'dart:async';
 import 'dart:collection';
 
 import 'package:eventuous/eventuous.dart';
 import 'package:meta/meta.dart';
 
+part 'aggregate_store.dart';
+
 /// [Aggregate] instance creator method. If [state] is
 /// not given, a new [AggregateState] instance must be
 /// created.
-typedef AggregateCreator<S, T extends Aggregate<S>> = T Function(
-  String id, [
-  AggregateState<S>? state,
-]);
+typedef AggregateCreator<
+        TEvent extends Object,
+        TValue extends Object,
+        TId extends AggregateId,
+        TState extends AggregateState<TValue>,
+        TAggregate extends Aggregate<TEvent, TValue, TId, TState>>
+    = TAggregate Function(TId id, [TState? state]);
 
 /// Base class for implementing a model within a specific domain
 ///
-/// Type parameter [T] - [AggregateState.value] type
+/// Type parameter [TState] - [AggregateState.value] type
 ///
-abstract class Aggregate<T> {
+abstract class Aggregate<TEvent extends Object, TValue extends Object,
+    TId extends AggregateId, TState extends AggregateState<TValue>> {
   /// Default constructor that set [initial] state.
   /// Must be called by subclasses.
   ///
   @mustCallSuper
   Aggregate(
     this.id,
-    AggregateState<T> original,
+    TState original,
   ) {
     _current = original;
     _original = original;
   }
 
-  /// Get unique [AggregateId]
+  /// Get unique [AggregateId] of type [TId]
   ///
-  final AggregateId id;
+  final TId id;
 
   /// [AggregateState] before first [Event]
-  /// applied locally. Is always equal to [_original]
+  /// applied locally. Is always equal to [original]
   /// after [load].
-  AggregateState<T> get current => _current;
-  late AggregateState<T> _original;
+  TState get current => _current;
+  late TState _current;
 
   /// [AggregateState] after last [Event]
   /// applied or folded onto it. Is always equal to
-  /// [_original] after creation, [load], [commit]
+  /// [original] after creation, [load], [commit]
   /// and [rollback].
   ///
-  AggregateState<T> get original => _original;
-  late AggregateState<T> _current;
+  TState get original => _original;
+  late TState _original;
 
   /// The aggregate version got from [AggregateStore]
   /// on last [load]. Used for optimistic concurrency
@@ -57,15 +64,20 @@ abstract class Aggregate<T> {
   /// incremented each time an event is [fold]ed
   /// onto the state. If [currentVersion] is
   /// greater than [originalVersion] this implies
-  /// that [changes] are made locally.
+  /// that there are [changes] made locally.
   ///
   int get currentVersion => _current.version;
+
+  /// Get [ExpectedStreamVersion] on next [AggregateStore.save]
+  ExpectedStreamVersion get expectedVersion => ExpectedStreamVersion(
+        originalVersion,
+      );
 
   /// Get list of pending changes made by
   /// [Event]s applied locally.
   ///
-  EventList<T> get changes => UnmodifiableListView(_changes);
-  final _changes = <Event<T>>[];
+  EventList<TEvent> get changes => UnmodifiableListView(_changes);
+  final _changes = <TEvent>[];
 
   /// Check if local [changes] exists
   bool get isChanged => _changes.isNotEmpty;
@@ -74,7 +86,8 @@ abstract class Aggregate<T> {
   /// If aggregate is already loaded or
   /// changed, an DomainException is thrown.
   ///
-  AggregateStateResult<T> load(Iterable<Event<T>> events) {
+  AggregateStateResult<TEvent, TValue, TId, TState> load(
+      Iterable<TValue> events) {
     if (currentVersion > -1) {
       throw DomainException(
         '$runtimeType is already ${isChanged ? 'created' : 'loaded'}',
@@ -84,7 +97,7 @@ abstract class Aggregate<T> {
       _original,
       (previous, event) => previous.when(event),
     );
-    return AggregateStateResult.from(
+    return AggregateStateResult.fromDiff(
       current: _current,
       previous: _original,
     );
@@ -92,10 +105,10 @@ abstract class Aggregate<T> {
 
   /// Fold given [event] on [current] state.
   ///
-  AggregateStateResult<T> fold(Event<T> event) {
+  AggregateStateResult<TEvent, TValue, TId, TState> fold(TEvent event) {
     final previous = _current;
     _current = previous.when(event);
-    return AggregateStateResult.from(
+    return AggregateStateResult.fromDiff(
       current: _current,
       previous: previous,
     );
@@ -105,11 +118,11 @@ abstract class Aggregate<T> {
   /// If successful the event is added to
   /// [changes] and [current] version is
   /// incremented by 1.
-  AggregateStateResult<T> apply(Event<T> event) {
+  AggregateStateResult<TEvent, TValue, TId, TState> apply(TEvent event) {
     final previous = _current;
     _current = previous.when(event);
     _changes.add(event);
-    return AggregateStateResult.from(
+    return AggregateStateResult.fromDiff(
       current: _current,
       previous: previous,
     );
@@ -117,11 +130,11 @@ abstract class Aggregate<T> {
 
   /// Commit local [changes] to [original] state.
   @protected
-  AggregateStateResult<T> commit() {
+  AggregateStateResult<TEvent, TValue, TId, TState> commit() {
     _changes.clear();
     final previous = _original;
     _original = _current;
-    return AggregateStateResult.from(
+    return AggregateStateResult.fromDiff(
       current: _current,
       previous: previous,
     );
@@ -129,11 +142,19 @@ abstract class Aggregate<T> {
 
   /// Rollback local [changes] to [original] state.
   @protected
-  AggregateStateResult<T> rollback() {
-    _changes.clear();
+  AggregateStateResult<TEvent, TValue, TId, TState> rollback() {
+    if (_original.expectedVersion == ExpectedStreamVersion.noStream) {
+      _changes.clear();
+    } else {
+      final diff = _current.version - _original.version;
+      _changes.removeRange(
+        _changes.length - diff,
+        _changes.length,
+      );
+    }
     final previous = _current;
     _current = _original;
-    return AggregateStateResult.from(
+    return AggregateStateResult.fromDiff(
       current: _current,
       previous: previous,
     );
@@ -144,7 +165,7 @@ abstract class Aggregate<T> {
   @protected
   void ensureExists() {
     if (currentVersion == -1) {
-      throw DomainException("$runtimeType doesn't exist: $id");
+      throw AggregateNotFoundException(runtimeType, id);
     }
   }
 
@@ -153,7 +174,7 @@ abstract class Aggregate<T> {
   @protected
   void ensureDoesntExists() {
     if (currentVersion > -1) {
-      throw DomainException('$runtimeType already exist: $id');
+      throw AggregateExistsException(runtimeType, id);
     }
   }
 }

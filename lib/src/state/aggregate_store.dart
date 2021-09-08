@@ -1,7 +1,4 @@
-import 'dart:async';
-
-import 'package:eventuous/eventuous.dart';
-import 'package:meta/meta.dart';
+part of 'aggregate.dart';
 
 /// [AggregateStore] store loads [AggregateState] from [AggregateStateStore].
 ///
@@ -12,112 +9,114 @@ import 'package:meta/meta.dart';
 /// snapshot of last stored [AggregateState].
 ///
 /// This class implements [AggregateCreator] as default method.
+
+/// Type parameter [TData] - [StreamEvent.data] content type
+/// Type parameter [TEvent] - [Aggregate.changes] event type
+/// Type parameter [TValue] - [AggregateState.value] type
+/// Type parameter [TId] - [Aggregate.id] type
+/// Type parameter [TState] - [AggregateState] type
+/// Type parameter [TAggregate] - [Aggregate] type
 ///
-/// Type parameter [V] - [AggregateState.value] type
-/// Type parameter [S] - [AggregateState] type
-/// Type parameter [T] - [Aggregate] type
-///
-class AggregateStore<V, S extends AggregateState<V>, T extends Aggregate<V>> {
+class AggregateStore<
+    TData extends Object,
+    TEvent extends Object,
+    TValue extends Object,
+    TId extends AggregateId,
+    TState extends AggregateState<TValue>,
+    TAggregate extends Aggregate<TEvent, TValue, TId, TState>> {
   /// Default constructor.
   ///
   /// If [onNew] is not given, [AggregateCreator]
-  /// must be registered with [AggregateTypeMap.addType],
+  /// must be registered with [AggregateType.addType],
   /// or method [newInstance] must be overridden.
   ///
   /// If [stateStore] is not given, [AggregateStateCreator]
-  /// must be registered with [AggregateStateTypeMap.addType],
+  /// must be registered with [AggregateStateType.addType],
   /// or method [newStateInstance] must be overridden.
   ///
   @mustCallSuper
   AggregateStore(
     EventStore eventStore, {
-    EventSerializer<V>? serializer,
-    AggregateCreator<V, T>? onNew,
-    AggregateStateStore<V, S>? stateStore,
+    EventSerializer<TEvent>? serializer,
+    AggregateCreator<TEvent, TValue, TId, TState, TAggregate>? onNew,
+    AggregateStateStore<TValue, TState>? stateStore,
   })  : _onNew = onNew,
         _eventStore = eventStore,
         _stateStore = stateStore,
-        _serializer = serializer ?? DefaultEventSerializer<V>() {
+        _serializer = serializer ?? DefaultEventSerializer<TData, TEvent>() {
     //
     // Sanity checks
     //
-    if (_onNew == null && !AggregateTypeMap.contains<V, T>()) {
+    if (_onNew == null && !AggregateType.containsType(TAggregate)) {
       throw UnimplementedError('newInstance is not implemented');
     }
-    if (_stateStore == null && !AggregateStateTypeMap.contains<V, S>()) {
+    if (_stateStore == null && !AggregateStateType.containsType(TState)) {
       throw UnimplementedError('newStateInstance is not implemented');
     }
   }
 
   /// [AggregateCreator] instance. If not
   /// given, method [newInstance] must be overridden.
-  final AggregateCreator<V, T>? _onNew;
+  final AggregateCreator<TEvent, TValue, TId, TState, TAggregate>? _onNew;
 
   /// [EventStore] loading and storing [StreamEvent]s
   final EventStore _eventStore;
 
   /// [AggregateStateStore] loading [AggregateState]s
-  final AggregateStateStore<V, S>? _stateStore;
+  final AggregateStateStore<TValue, TState>? _stateStore;
 
   /// [EventSerializer] for serializing and deserializing [Event]s
-  late final EventSerializer<V> _serializer;
+  late final EventSerializer<TEvent> _serializer;
 
   /// [AggregateCreator] implementation. If [state] is not given,
-  /// a new [AggregateState] instance will be created.
-  T call(String id, [S? state]) => newInstance(id, state);
+  /// a new [AggregateState] instance will be created from [EventStore].
+  TAggregate call(TId id, [TState? state]) => newInstance(id, state);
 
-  /// Create new [Aggregate] instance of type [T]
-  T newInstance(String id, [S? state]) {
+  /// Create new [Aggregate] instance of type [TAggregate]
+  TAggregate newInstance(TId id, [TState? state]) {
     return _onNew == null
-        ? AggregateTypeMap.create<V, T>(id, state)
+        ? AggregateType.create<TEvent, TValue, TId, TState, TAggregate>(
+            id, state)
         : _onNew!(id, state);
   }
 
-  /// Create new [AggregateState] instance of type [S]
-  S newStateInstance([V? value]) {
+  /// Create new [AggregateState] instance of type [TState]
+  TState newStateInstance([TValue? value]) {
     return _stateStore == null
-        ? AggregateStateTypeMap.create<V, S>(value)
+        ? AggregateStateType.create<TValue, TState>(value)
         : _stateStore!.newInstance(value);
   }
 
   /// Load [AggregateState] into given [aggregate] from this store
   /// If aggregate does not exist a AggregateNotFound is thrown.
   @mustCallSuper
-  Future<AggregateStateResult<V>> load(String id) async {
+  Future<TAggregate> load(TId id) async {
     final aggregate = newInstance(
       id,
       await loadState(id),
     );
-    final stream = StreamName.fromId<T>(id);
+    final stream = StreamName.fromId(TAggregate, id);
     final start = StreamReadPosition(aggregate.originalVersion);
     try {
-      return await _eventStore
-          .readStream(stream.value, start)
+      await _eventStore
+          .readStream(stream, start)
           .map(_toDomainEvent)
           .map((event) => aggregate.fold(event))
-          .last;
-    } on StreamNotFound {
-      return AggregateStateResult.failure(
-        AggregateNotFound<T>(id),
-        aggregate,
-      );
-    } on Exception catch (error) {
-      return AggregateStateResult.failure(
-        error,
-        aggregate,
-      );
+          .length;
+      return aggregate;
+    } on StreamNotFoundException catch (e) {
+      throw AggregateNotFoundException(TAggregate, id, e);
     }
   }
 
   /// Load state for [Aggregate] with given [id].
-  /// If aggregate for given
-  FutureOr<S> loadState(String id, [V? value]) async {
+  FutureOr<TState> loadState(TId id, [TValue? value]) async {
     return _stateStore == null
         ? newStateInstance(value)
-        : await _stateStore!.load(StreamName.fromId(id));
+        : await _stateStore!.load(StreamName.fromId(TAggregate, id));
   }
 
-  Event<V> _toDomainEvent(StreamEvent event) {
+  TEvent _toDomainEvent(StreamEvent event) {
     return _serializer.decode(
       event.data,
       event.name,
@@ -126,31 +125,51 @@ class AggregateStore<V, S extends AggregateState<V>, T extends Aggregate<V>> {
 
   /// Save [AggregateState] of given [aggregate] to this store
   ///
-  Future<AggregateStateResult<V>> save(Aggregate<V> aggregate) async {
+  Future<AggregateStateResult<TEvent, TValue, TId, TState>> save(
+      TAggregate aggregate) async {
     if (!aggregate.isChanged) {
       return AggregateStateNoOp(aggregate.current);
     }
 
     try {
       await _eventStore.appendEvents(
-        StreamName.from(aggregate).value,
+        StreamName.from(aggregate),
         aggregate.changes.map(toStreamEvent),
-        ExpectedStreamVersion(aggregate.originalVersion),
+        aggregate.expectedVersion,
       );
-      // ignore: invalid_use_of_protected_member
-      return aggregate.commit();
+      final result = aggregate.commit();
+      await _saveState(aggregate);
+      return result;
+    } on StreamNotFoundException {
+      return AggregateStateResult.fromCause(
+        AggregateNotFoundException(
+          TAggregate,
+          aggregate.id,
+        ),
+        aggregate,
+      );
     } on Exception catch (error) {
-      return AggregateStateResult.failure(
+      return AggregateStateResult.fromCause(
         error,
-        // ignore: invalid_use_of_protected_member
         aggregate..rollback(),
       );
     }
   }
 
-  StreamEvent toStreamEvent(Event<V> event) {
+  // Save state of given [aggregate]
+  FutureOr<TAggregate> _saveState(TAggregate aggregate) async {
+    if (_stateStore != null) {
+      await _stateStore!.save(
+        StreamName.fromId(TAggregate, aggregate.id),
+        aggregate.current,
+      );
+    }
+    return aggregate;
+  }
+
+  StreamEvent toStreamEvent(TEvent event) {
     return StreamEvent(
-      DomainEventTypeMap.getTypeNameFromEvent(event),
+      EventType.getTypeNameFromEvent(event),
       _serializer.encode(event),
       _serializer.contentType,
     );

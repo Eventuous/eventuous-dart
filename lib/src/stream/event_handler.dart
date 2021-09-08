@@ -1,12 +1,11 @@
 import 'package:eventuous/eventuous.dart';
 
-typedef EventHandlerCallback<S extends Event<T>, T> = AggregateState<T>
-    Function(S, T);
+typedef EventHandlerCallback<TEvent extends Object, TValue extends Object,
+        TState extends AggregateState<TValue>>
+    = TState Function(TEvent event, TValue current);
 
-typedef EventHandlerMap<S extends Event<T>, T>
-    = Map<Type, EventHandlerCallback<S, T>>;
-
-abstract class EventHandler<S extends Event<T>, T> {
-  AggregateState<T> call(S event, T current);
-  AggregateState<T> handle(S event, T current);
+abstract class EventHandler<TEvent extends Object, TValue extends Object,
+    TState extends AggregateState<TValue>> {
+  TState call(TEvent event, TValue current);
+  TState handle(TEvent event, TValue current);
 }

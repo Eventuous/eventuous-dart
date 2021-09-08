@@ -1,8 +1,8 @@
 .PHONY: \
-	configure certs test doc release
+	configure certs models test doc release
 
 .SILENT: \
-	configure certs test doc release
+	configure certs models test doc release
 
 configure:
 	dart pub global activate pub_release
@@ -17,6 +17,11 @@ certs:
 test:
 	if [ ! -d test/certs ]; then . tool/gencert.sh test; fi
 	dart test -j 1
+
+models:
+	echo "Generating models..."; \
+	pub run build_runner build --delete-conflicting-outputs; \
+	echo "[✓] Generating models complete."
 
 doc:
 	rm -rf doc

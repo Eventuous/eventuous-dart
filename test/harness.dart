@@ -2,33 +2,43 @@ import 'package:eventuous/eventuous.dart';
 import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 
-import 'model/foo.dart';
-import 'fakes/memory_event_store.dart';
+import 'domain/booking/booking.dart';
+import 'fakes/in_memory_event_store.dart';
+
+export 'domain/booking/booking.dart';
+export 'fakes/in_memory_event_store.dart';
 
 class TestHarness {
   TestHarness() {
     Logger.root.level = Level.SEVERE;
   }
 
-  late final MemoryEventStore eventStore;
-  late final AggregateStateStore<JsonMap, FooState> stateStore;
-  late final AggregateStore<JsonMap, FooState, Foo> aggregateStore;
+  late final EventStore eventStore;
+  late final BookingStore bookingStore;
+  late final BookingService bookingService;
+  late final BookingStateStore bookingStateStore;
 
-  bool _useTypeMaps = false;
-  TestHarness withTypeMaps() {
-    _useTypeMaps = true;
+  bool _useBookingTypeMaps = false;
+  TestHarness withBookingTypeMaps() {
+    _useBookingTypeMaps = true;
     return this;
   }
 
-  bool _useStateStore = false;
-  TestHarness withStateStore() {
-    _useStateStore = true;
+  bool _useBookingStateStore = false;
+  TestHarness withBookingStateStore() {
+    _useBookingStateStore = true;
     return this;
   }
 
-  bool _useAggregateStore = false;
-  TestHarness withAggregateStore() {
-    _useAggregateStore = true;
+  bool _useBookingStore = false;
+  TestHarness withBookingStore() {
+    _useBookingStore = true;
+    return this;
+  }
+
+  bool _useBookingService = false;
+  TestHarness withBookingService() {
+    _useBookingService = true;
     return this;
   }
 
@@ -44,34 +54,36 @@ class TestHarness {
     return this;
   }
 
-  void install() {
+  void install([EventStore? store]) {
     setUpAll(() {
       _logger?.info('---setUpAll---');
       // _initHiveDir(hiveDir);
       // Hive.init(hiveDir.path);
 
-      if (_useTypeMaps) {
-        addFooTypes();
+      if (_useBookingTypeMaps) {
+        addBookingTypes();
       } else {
-        addFooEventTypes();
+        addBookingEventTypes();
       }
 
-      eventStore = MemoryEventStore();
+      eventStore = store ?? InMemoryEventStore();
 
-      if (_useStateStore) {
-        stateStore = AggregateStateStore<JsonMap, FooState>(
-          onNew: ([value]) => FooState(value),
+      if (_useBookingStateStore) {
+        bookingStateStore = BookingStateStore(
+          onNew: ([value]) => BookingState(value),
         );
       }
-      if (_useAggregateStore) {
-        aggregateStore = AggregateStore<JsonMap, FooState, Foo>(
+      if (_useBookingStore) {
+        bookingStore = BookingStore(
           eventStore,
-          onNew: (String id, [state]) => Foo(
-            id,
-            state as FooState,
-          ),
-          stateStore: _useStateStore ? stateStore : null,
+          onNew: (id, [state]) => Booking(id, state),
+          stateStore: _useBookingStateStore ? bookingStateStore : null,
+          serializer: DefaultEventSerializer<JsonMap, JsonObject>(),
         );
+      }
+      if (_useBookingService) {
+        assert(_useBookingStore);
+        bookingService = BookingService(bookingStore);
       }
 
       _logger?.info('---setUpAll--->ok');

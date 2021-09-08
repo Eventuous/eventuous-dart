@@ -1,7 +1,7 @@
 import 'exceptions.dart';
 
 class Ensure {
-  static T notNull<T>(T? value, String name) {
+  static TAggregate notNull<TAggregate>(TAggregate? value, String name) {
     if (value != null) {
       return value;
     }

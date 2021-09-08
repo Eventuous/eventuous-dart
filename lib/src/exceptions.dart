@@ -7,15 +7,12 @@ class StreamException implements Exception {
   String toString() => "$runtimeType: '$message'";
 }
 
-class StreamNotFound extends StreamException {
-  StreamNotFound(StreamName stream) : super('Stream $stream not found');
+class StreamNotFoundException extends StreamException {
+  StreamNotFoundException(StreamName stream)
+      : super("Stream '$stream' not found");
 
-  factory StreamNotFound.from(String name) => StreamNotFound(StreamName(name));
-}
-
-class WrongExpectedVersion extends StreamException {
-  WrongExpectedVersion(ExpectedStreamVersion expected, int actual)
-      : super('Wrong stream version: expected $expected, actual was $actual');
+  factory StreamNotFoundException.from(StreamName name) =>
+      StreamNotFoundException(name);
 }
 
 class DomainException implements Exception {
@@ -25,20 +22,44 @@ class DomainException implements Exception {
   String toString() => "$runtimeType: '$message'";
 }
 
-class AggregateNotFound<T extends Aggregate> extends DomainException {
-  AggregateNotFound(String id)
-      : super(
-          'Aggregate ${typeOf<T>()} $id not found '
-          'in stream ${StreamName.fromId<T>(id)}',
-        );
+class UnknownEventException extends DomainException {
+  UnknownEventException(
+    Type type, [
+    this.cause,
+  ]) : super("Event '$type' is unknown. $cause");
+
+  final Object? cause;
 }
 
-class AggregateExists<T extends Aggregate> extends DomainException {
-  AggregateExists(String id)
-      : super(
-          'Aggregate ${typeOf<T>()} $id exists already '
-          'in stream ${StreamName.fromId<T>(id)}',
+class AggregateNotFoundException extends DomainException {
+  AggregateNotFoundException(
+    Type type,
+    AggregateId id, [
+    this.cause,
+  ]) : super(
+          "Aggregate $type '$id' not found "
+          'in stream ${StreamName.fromId(type, id)}',
         );
+
+  final Object? cause;
+}
+
+class AggregateExistsException extends DomainException {
+  AggregateExistsException(
+    Type type,
+    AggregateId id, [
+    this.cause,
+  ]) : super(
+          "Aggregate $type '$id' exists already "
+          'in stream ${StreamName.fromId(type, id)}',
+        );
+  final Object? cause;
+}
+
+class CommandHandlerNotFoundException extends DomainException {
+  CommandHandlerNotFoundException(
+    Type type,
+  ) : super("Handler not found for command '$type'");
 }
 
 /// The [ArgumentException] is thrown when an argument
@@ -48,7 +69,7 @@ class ArgumentNullOrEmptyException implements Exception {
   final String name;
   final bool isNull;
   bool get isEmpty => !isNull;
-  String get message => 'Argument $name is ${isNull ? 'null' : 'empty'}';
+  String get message => "Argument '$name' is ${isNull ? 'null' : 'empty'}";
 
   @override
   String toString() {

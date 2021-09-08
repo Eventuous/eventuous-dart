@@ -1,29 +1,33 @@
 part of 'aggregate_state.dart';
 
-abstract class AggregateStateResult<T> {
+abstract class AggregateStateResult<
+    TEvent extends Object,
+    TValue extends Object,
+    TId extends AggregateId,
+    TState extends AggregateState<TValue>> {
   AggregateStateResult(
-    AggregateState<T> previous,
-    AggregateState<T> current,
-  )   : previous = previous.value,
-        version = current.version,
-        current = current.value;
+    TState previous,
+    TState current,
+  )   : previous = previous,
+        current = current,
+        version = current.version;
 
-  factory AggregateStateResult.from({
-    required AggregateState<T> current,
-    required AggregateState<T> previous,
+  factory AggregateStateResult.fromDiff({
+    required TState current,
+    required TState previous,
   }) =>
       previous == current
-          ? AggregateStateNoOp(current)
-          : AggregateStateOk(
+          ? AggregateStateNoOp<TEvent, TValue, TId, TState>(current)
+          : AggregateStateOk<TEvent, TValue, TId, TState>(
               current: current,
               previous: previous,
             );
 
-  factory AggregateStateResult.failure(
+  factory AggregateStateResult.fromCause(
     Object failure,
-    Aggregate<T> aggregate,
+    Aggregate<TEvent, TValue, TId, TState> aggregate,
   ) =>
-      AggregateStateFailure(
+      AggregateStateError(
         failure,
         current: aggregate.current,
         previous: aggregate.original,
@@ -33,34 +37,46 @@ abstract class AggregateStateResult<T> {
   final int version;
 
   /// Previous [AggregateState] value
-  final T previous;
+  final TState previous;
 
   /// Current [AggregateState] value
-  final T? current;
+  final TState? current;
 
   /// Check if no operation occurred
-  bool get isNoOp => previous != current;
+  bool get isNoOp => previous.value != current?.value;
+
+  /// Check if state is OK
+  bool get isOK => this is AggregateStateOk<TEvent, TValue, TId, TState>;
+
+  /// Check if error state
+  bool get isError => this is AggregateStateError<TEvent, TValue, TId, TState>;
 }
 
-class AggregateStateOk<T> extends AggregateStateResult<T> {
+class AggregateStateOk<TEvent extends Object, TValue extends Object,
+        TId extends AggregateId, TState extends AggregateState<TValue>>
+    extends AggregateStateResult<TEvent, TValue, TId, TState> {
   AggregateStateOk({
-    required AggregateState<T> previous,
-    required AggregateState<T> current,
+    required TState previous,
+    required TState current,
   }) : super(previous, current);
 }
 
-class AggregateStateNoOp<T> extends AggregateStateResult<T> {
+class AggregateStateNoOp<TEvent extends Object, TValue extends Object,
+        TId extends AggregateId, TState extends AggregateState<TValue>>
+    extends AggregateStateResult<TEvent, TValue, TId, TState> {
   AggregateStateNoOp(
-    AggregateState<T> state,
+    TState state,
   ) : super(state, state);
 }
 
-class AggregateStateFailure<T> extends AggregateStateResult<T> {
-  AggregateStateFailure(
-    this.failure, {
-    required AggregateState<T> previous,
-    required AggregateState<T> current,
+class AggregateStateError<TEvent extends Object, TValue extends Object,
+        TId extends AggregateId, TState extends AggregateState<TValue>>
+    extends AggregateStateResult<TEvent, TValue, TId, TState> {
+  AggregateStateError(
+    this.cause, {
+    required TState previous,
+    required TState current,
   }) : super(previous, current);
 
-  final Object failure;
+  final Object cause;
 }

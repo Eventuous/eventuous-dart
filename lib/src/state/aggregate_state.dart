@@ -5,50 +5,59 @@ part 'aggregate_state_result.dart';
 /// New [AggregateState] instance creator method.
 /// If [value] is not given, a default value must
 /// be given.
-typedef AggregateStateCreator<S, T extends AggregateState<S>> = T Function([
-  S? value,
+typedef AggregateStateCreator<TState extends Object,
+        TAggregate extends AggregateState<TState>>
+    = TAggregate Function([
+  TState? value,
 ]);
 
 /// [AggregateState] base class.
-abstract class AggregateState<T> {
+abstract class AggregateState<TValue extends Object> {
   AggregateState(
     this.value, {
     int version = -1,
   }) : _version = version;
 
-  // ignore: prefer_collection_literals
-  final _handlers = EventHandlerMap<Event<T>, T>();
+  final _handlers = <Type, Object>{};
 
-  /// Get state value of type [T]
-  final T value;
+  /// Get state value of type [TValue]
+  final TValue value;
 
   /// The current version of [AggregateState].
   /// Is incremented [when] an event is handled.
   int get version => _version;
   int _version;
 
-  /// Handle [Event].
+  /// Handle [event].
   /// Returns [value] after event is handled.
   /// If given [event] is not handled by this
   /// state, original [value] is returned.
   ///
-  AggregateState<T> when(Event<T> event) {
+  TState when<TEvent extends Object, TState extends AggregateState<TValue>>(
+    TEvent event,
+  ) {
     final eventType = event.runtimeType;
     if (!_handlers.containsKey(eventType)) {
-      return this;
+      throw UnknownEventException(eventType, 'Handler not found');
     }
-    return _handlers[eventType]!(event, value).._version = _version + 1;
+    return (_handlers[eventType]!
+        as EventHandlerCallback<TEvent, TValue, TState>)(event, value)
+      .._version = _version + 1;
   }
 
   /// Register handler for given event
-  void on<S extends Event<T>>(
-    EventHandlerCallback<Event<T>, T> handler,
+  void on<TEvent extends Object>(
+    EventHandlerCallback<TEvent, TValue, AggregateState<TValue>> handler,
   ) {
-    if (_handlers.containsKey(typeOf<S>())) {
-      throw ArgumentError('Duplicate handler for event type ${typeOf<S>()}');
+    if (_handlers.containsKey(typeOf<TEvent>())) {
+      throw ArgumentError(
+          'Duplicate handler for event type ${typeOf<TEvent>()}');
     }
-    _handlers[typeOf<S>()] = handler;
+    _handlers[typeOf<TEvent>()] = handler;
   }
+
+  /// Get [ExpectedStreamVersion] on next [AggregateStore.save]
+  ExpectedStreamVersion get expectedVersion => ExpectedStreamVersion(version);
 
   @override
   bool operator ==(Object other) =>

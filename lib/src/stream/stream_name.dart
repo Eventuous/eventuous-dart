@@ -10,8 +10,8 @@ class StreamName {
       );
 
   /// Get [StreamName] for given [type] and [id]
-  static StreamName fromId<T extends Aggregate>(String id) => StreamName(
-        '${typeOf<T>().toColonCase()}-$id',
+  static StreamName fromId(Type type, AggregateId id) => StreamName(
+        '${type.toColonCase()}-$id',
       );
 
   final String value;
