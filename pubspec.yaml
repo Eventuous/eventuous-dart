@@ -5,7 +5,7 @@ description: A lightweight and open-souce Event Sourcing library for Dart.
 repository: https://github.com/Eventuous/eventuous-dart
 environment: 
   sdk: '>=2.13.0 <3.0.0'
-dependencies:
+dependencies: 
   uuid: ^3.0.4
   meta: ^1.7.0
   logging: ^1.0.1
@@ -14,7 +14,7 @@ dependencies:
   collection: ^1.15.0
   json_annotation: ^4.1.0
   eventstore_client: ^0.2.1
-dev_dependencies:
+dev_dependencies: 
   pedantic: ^1.10.0
   test: ^1.17.12
   build_runner: ^2.1.2
