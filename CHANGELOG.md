@@ -1,3 +1,6 @@
-## 0.0.1-prerelease
+# 0.0.2-prerelease
+- Added application service support
+- Added serializer for Metadata
 
+## 0.0.1-prerelease
 - Initial version.
