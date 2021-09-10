@@ -168,7 +168,7 @@ abstract class Aggregate<TEvent extends Object, TValue extends Object,
 
   /// Subclasses of [Aggregate] should use this method
   /// to ensure that is is operating on an existing [Aggregate].
-  @visibleForOverriding
+  @protected
   void ensureExists() {
     if (currentVersion == -1) {
       throw AggregateNotFoundException(runtimeType, id);
@@ -177,7 +177,7 @@ abstract class Aggregate<TEvent extends Object, TValue extends Object,
 
   /// Subclasses of [Aggregate] should use this method
   /// to ensure that is is operating on a new [Aggregate].
-  @visibleForOverriding
+  @protected
   void ensureDoesntExists() {
     if (currentVersion > -1) {
       throw AggregateExistsException(runtimeType, id);
