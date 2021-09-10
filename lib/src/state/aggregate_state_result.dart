@@ -1,4 +1,4 @@
-part of 'aggregate_state.dart';
+part of 'aggregate.dart';
 
 abstract class AggregateStateResult<
     TEvent extends Object,
@@ -12,7 +12,7 @@ abstract class AggregateStateResult<
         current = current,
         version = current.version;
 
-  factory AggregateStateResult.fromDiff({
+  factory AggregateStateResult.ok({
     required TState current,
     required TState previous,
   }) =>
@@ -23,7 +23,7 @@ abstract class AggregateStateResult<
               previous: previous,
             );
 
-  factory AggregateStateResult.fromCause(
+  factory AggregateStateResult.error(
     Object failure,
     Aggregate<TEvent, TValue, TId, TState> aggregate,
   ) =>
@@ -42,14 +42,19 @@ abstract class AggregateStateResult<
   /// Current [AggregateState] value
   final TState? current;
 
-  /// Check if no operation occurred
-  bool get isNoOp => previous.value != current?.value;
-
   /// Check if state is OK
-  bool get isOK => this is AggregateStateOk<TEvent, TValue, TId, TState>;
+  bool get isOk => this is AggregateStateOk<TEvent, TValue, TId, TState>;
+
+  /// Check if no state change occurred
+  bool get isNoOp => this is AggregateStateNoOp<TEvent, TValue, TId, TState>;
 
   /// Check if error state
   bool get isError => this is AggregateStateError<TEvent, TValue, TId, TState>;
+
+  @override
+  String toString() {
+    return '$runtimeType{version: $version, previous: $previous, current: $current}';
+  }
 }
 
 class AggregateStateOk<TEvent extends Object, TValue extends Object,
@@ -79,4 +84,9 @@ class AggregateStateError<TEvent extends Object, TValue extends Object,
   }) : super(previous, current);
 
   final Object cause;
+
+  @override
+  String toString() {
+    return '$runtimeType{version: $version, previous: $previous, current: $current, cause: $cause}';
+  }
 }

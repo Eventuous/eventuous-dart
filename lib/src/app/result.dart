@@ -6,13 +6,28 @@ abstract class Result<
     TId extends AggregateId,
     TState extends AggregateState<TValue>,
     TAggregate extends Aggregate<TEvent, TValue, TId, TState>> {
-  Result([this.state, this.changes]);
-  final TState? state;
-  final Iterable<TEvent>? changes;
+  Result([this.aggregate]);
 
-  bool get isError => !isOK;
-  bool get isOK => this is OkResult;
+  /// [TAggregate] modified
+  final TAggregate? aggregate;
+
+  /// Get [TEvent]s appended to [aggregate]
+  Iterable<TEvent>? get changes => aggregate?.changes;
+
+  /// Get state after [changes] was applied
+  TState? get current => aggregate?.current;
+
+  /// Get state before [changes] was applied
+  TState? get original => aggregate?.original;
+
+  bool get isError => !isOk;
+  bool get isOk => this is OkResult;
   bool get isNoOp => changes?.isNotEmpty != true;
+
+  @override
+  String toString() {
+    return '$runtimeType{state: $current, changes: $changes}';
+  }
 }
 
 class OkResult<
@@ -23,15 +38,19 @@ class OkResult<
         TAggregate extends Aggregate<TEvent, TValue, TId, TState>>
     extends Result<TEvent, TValue, TId, TState, TAggregate> {
   OkResult(
-    TState state,
-    Iterable<TEvent> changes,
+    TAggregate aggregate,
     this.position,
-  ) : super(state, changes);
+  ) : super(aggregate);
 
   final StreamReadPosition position;
 
   @override
-  TState get state => super.state as TState;
+  TState get current => super.current as TState;
+
+  @override
+  String toString() {
+    return '$runtimeType{state: $current, changes: $changes, position: $position}';
+  }
 }
 
 class ErrorResult<
@@ -43,9 +62,13 @@ class ErrorResult<
     extends Result<TEvent, TValue, TId, TState, TAggregate> {
   ErrorResult(
     this.cause, [
-    TState? state,
-    Iterable<TEvent>? changes,
-  ]) : super(state, changes);
+    TAggregate? aggregate,
+  ]) : super(aggregate);
 
   final Object cause;
+
+  @override
+  String toString() {
+    return '$runtimeType{cause: $cause, state: $current, changes: $changes}';
+  }
 }

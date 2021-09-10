@@ -37,7 +37,7 @@ class JsonUtils {
   /// updates to an existing object that is
   /// semantically consistent with the HTTP
   /// PATCH method by only including keys
-  /// in [next] should be updated, keeping
+  /// in [expectedVersion] should be updated, keeping
   /// the rest unchanged.
   ///
   static JsonMapList diff(JsonObject o1, JsonObject o2) {

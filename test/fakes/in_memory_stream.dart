@@ -14,22 +14,27 @@ class InMemoryStream {
   List<StoredEvent> get events => _events.toList();
   final List<StoredEvent> _events = [];
 
-  void appendEvents(
+  Iterable<StoredEvent> appendEvents(
     Iterable<StreamEvent> events,
     ExpectedStreamVersion expected,
   ) {
-    _checkVersion(expected);
+    checkVersion(expected);
 
+    final stored = <StoredEvent>[];
     for (var event in events) {
-      _events.add(StoredEvent(event, ++_version));
+      stored.add(
+        StoredEvent(event, ++_version),
+      );
+      _events.add(stored.last);
     }
+    return stored;
   }
 
   void truncate(
     ExpectedStreamVersion version,
     StreamTruncatePosition position,
   ) {
-    _checkVersion(version);
+    checkVersion(version);
     _events.removeWhere((e) => e.position <= position.value);
   }
 
@@ -44,7 +49,7 @@ class InMemoryStream {
     return _events.reversed.take(count).map((e) => e.event);
   }
 
-  void _checkVersion(ExpectedStreamVersion expected) {
+  void checkVersion(ExpectedStreamVersion expected) {
     if (expected.value != _version) {
       throw WrongExpectedVersionException(expected, version);
     }

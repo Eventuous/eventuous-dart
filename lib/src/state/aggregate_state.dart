@@ -1,22 +1,19 @@
-import 'package:eventuous/eventuous.dart';
-
-part 'aggregate_state_result.dart';
+part of 'aggregate.dart';
 
 /// New [AggregateState] instance creator method.
 /// If [value] is not given, a default value must
 /// be given.
-typedef AggregateStateCreator<TState extends Object,
-        TAggregate extends AggregateState<TState>>
-    = TAggregate Function([
-  TState? value,
+typedef AggregateStateCreator<TValue extends Object,
+        TState extends AggregateState<TValue>>
+    = TState Function([
+  TValue? value,
 ]);
 
 /// [AggregateState] base class.
 abstract class AggregateState<TValue extends Object> {
   AggregateState(
-    this.value, {
-    int version = -1,
-  }) : _version = version;
+    this.value,
+  );
 
   final _handlers = <Type, Object>{};
 
@@ -26,13 +23,14 @@ abstract class AggregateState<TValue extends Object> {
   /// The current version of [AggregateState].
   /// Is incremented [when] an event is handled.
   int get version => _version;
-  int _version;
+  int _version = ExpectedStreamVersion.noStream.value;
 
   /// Handle [event].
   /// Returns [value] after event is handled.
   /// If given [event] is not handled by this
   /// state, original [value] is returned.
   ///
+  @mustCallSuper
   TState when<TEvent extends Object, TState extends AggregateState<TValue>>(
     TEvent event,
   ) {
@@ -62,11 +60,16 @@ abstract class AggregateState<TValue extends Object> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is AggregateState &&
+      other is AggregateState<TValue> &&
           runtimeType == other.runtimeType &&
           value == other.value &&
           version == other.version;
 
   @override
   int get hashCode => value.hashCode ^ version.hashCode;
+
+  @override
+  String toString() {
+    return '$runtimeType{value: $value, version: $version}';
+  }
 }

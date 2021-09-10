@@ -1,20 +1,16 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'room_booked.dart';
+part of 'booking_fully_paid.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-RoomBooked _$RoomBookedFromJson(Map json) => RoomBooked(
-      price: json['price'] as int,
-      roomId: json['roomId'] as String,
+BookingFullyPaid _$BookingFullyPaidFromJson(Map json) => BookingFullyPaid(
       bookingId: json['bookingId'] as String,
     );
 
-Map<String, dynamic> _$RoomBookedToJson(RoomBooked instance) =>
+Map<String, dynamic> _$BookingFullyPaidToJson(BookingFullyPaid instance) =>
     <String, dynamic>{
-      'price': instance.price,
-      'roomId': instance.roomId,
       'bookingId': instance.bookingId,
     };

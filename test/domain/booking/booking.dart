@@ -1,17 +1,19 @@
 import 'package:eventuous/eventuous.dart';
-import 'package:eventuous/src/json/json_utils.dart';
+import 'package:uuid/uuid.dart';
 
 import 'events/room_booked.dart';
-import 'events/room_paid.dart';
+import 'events/booking_payment_registered.dart';
 import 'events/booking_imported.dart';
+import 'states/booking_state.dart';
 import 'states/booking_state_model.dart';
 
 export 'app/booking_commands.dart';
 export 'app/booking_service.dart';
 export 'booking_typedefs.dart';
 export 'events/room_booked.dart';
-export 'events/room_paid.dart';
+export 'events/booking_payment_registered.dart';
 export 'events/booking_imported.dart';
+export 'states/booking_state.dart';
 export 'states/booking_state_model.dart';
 export 'states/booking_state_model.dart';
 export 'states/booking_state_store.dart';
@@ -21,7 +23,7 @@ class BookingId extends AggregateId {
 }
 
 class Booking
-    extends Aggregate<JsonObject, JsonObject, BookingId, BookingState> {
+    extends Aggregate<JsonObject, BookingStateModel, BookingId, BookingState> {
   Booking(
     BookingId id, [
     BookingState? state,
@@ -29,23 +31,41 @@ class Booking
 
   static Booking from(String id) => Booking(BookingId(id));
 
-  bool get isPaid => changes.whereType<RoomPaid>().isNotEmpty;
-
-  void bookRoom(String roomId) {
+  void bookRoom(String roomId, int price) {
     ensureDoesntExists();
-    apply(RoomBooked(roomId: roomId));
+    apply(RoomBooked(
+      price: price,
+      roomId: roomId,
+      bookingId: id.value,
+    ));
   }
 
-  void payRoom(String roomId) {
+  void recordPayment(String roomId, int amountPaid) {
     ensureExists();
-    apply(RoomPaid(roomId: roomId));
+    apply(BookingPaymentRegistered(
+      paymentId: roomId,
+      bookingId: id.value,
+      amountPaid: amountPaid,
+    ));
   }
 
-  void import(String roomId) {
-    if (!isPaid) {
-      apply(BookingImported(roomId: roomId));
-    }
+  void importBooking(String roomId, int price, [String? importId]) {
+    apply(
+      BookingImported(
+        price: price,
+        roomId: roomId,
+        bookingId: id.value,
+        importId: importId ?? Uuid().v4(),
+      ),
+    );
   }
+
+  String? get roomId => current.roomId;
+  String? get importId => current.importId;
+
+  int? get price => current.price;
+  int? get amountPaid => current.amountPaid;
+  bool get isFullyPaid => current.isFullyPaid;
 }
 
 void addBookingTypes() {
@@ -53,34 +73,16 @@ void addBookingTypes() {
       Booking>(
     (id, [state]) => Booking(id, state as BookingState),
   );
-  AggregateStateType.addType<JsonObject, BookingState>(
+  AggregateStateType.addType<BookingStateModel, BookingState>(
     ([value]) => BookingState(value),
   );
   addBookingEventTypes();
 }
 
-class BookingState extends AggregateState<JsonObject> {
-  BookingState([
-    JsonObject? value,
-  ]) : super(value ?? JsonObject.empty()) {
-    on<RoomBooked>(BookingState.patch);
-    on<RoomPaid>(BookingState.patch);
-    on<BookingImported>(BookingState.patch);
-  }
-
-  String? get roomId => value['roomId'] as String?;
-
-  static BookingState patch(JsonObject next, JsonObject old) {
-    return BookingState(BookingStateModel.fromJson(JsonUtils.patch(
-      old,
-      next,
-    )));
-  }
-}
-
 void addBookingEventTypes() {
   EventType.addType<JsonMap, RoomBooked>((data) => RoomBooked.fromJson(data));
-  EventType.addType<JsonMap, RoomPaid>((data) => RoomPaid.fromJson(data));
+  EventType.addType<JsonMap, BookingPaymentRegistered>(
+      (data) => BookingPaymentRegistered.fromJson(data));
   EventType.addType<JsonMap, BookingImported>(
     (data) => BookingImported.fromJson(data),
   );

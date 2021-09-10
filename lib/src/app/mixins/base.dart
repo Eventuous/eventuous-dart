@@ -57,17 +57,16 @@ mixin ApplicationServiceMixin<
             'Unknown expected state',
           ));
       }
-      final base = aggregate.changes.toList();
       await _handlers[typeOf<TCommand>()]!(
         command,
         aggregate,
       );
-      final result = await store.save(aggregate);
-      return _fromResult(
-        aggregate,
-        aggregate.changes.where((e) => !base.contains(e)),
-        result,
-      );
+      return aggregate.isChanged
+          ? _fromResult(
+              aggregate,
+              await store.save(aggregate),
+            )
+          : _toOk(aggregate);
     } on Exception catch (error) {
       return _toError(
         error,
@@ -78,7 +77,6 @@ mixin ApplicationServiceMixin<
 
   Result<TEvent, TValue, TId, TState, TAggregate> _fromResult(
     TAggregate aggregate,
-    Iterable<TEvent> changes,
     AggregateStateResult<TEvent, TValue, TId, TState> result,
   ) {
     return result.isError
@@ -86,16 +84,13 @@ mixin ApplicationServiceMixin<
             (result as AggregateStateError<TEvent, TValue, TId, TState>).cause,
             aggregate,
           )
-        : _toOk(aggregate, changes);
+        : _toOk(aggregate);
   }
 
   OkResult<TEvent, TValue, TId, TState, TAggregate> _toOk(
-    TAggregate aggregate,
-    Iterable<TEvent> changes,
-  ) {
+      TAggregate aggregate) {
     return OkResult<TEvent, TValue, TId, TState, TAggregate>(
-      aggregate.current,
-      EventList(changes),
+      aggregate,
       StreamReadPosition(aggregate.currentVersion),
     );
   }
@@ -106,8 +101,7 @@ mixin ApplicationServiceMixin<
   ]) {
     return ErrorResult<TEvent, TValue, TId, TState, TAggregate>(
       cause,
-      aggregate?.current,
-      aggregate?.changes,
+      aggregate,
     );
   }
 

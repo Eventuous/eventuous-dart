@@ -4,7 +4,7 @@ part of 'aggregate.dart';
 ///
 /// This decouples loading [AggregateState] from [Aggregate] allowing
 /// different strategies to be implemented like building state
-/// directly from the [EventStore] by folding every event on some
+/// directly from the [StreamEventStore] by folding every event on some
 /// initial condition, or loading state from a locally persisted
 /// snapshot of last stored [AggregateState].
 ///
@@ -30,19 +30,19 @@ class AggregateStore<
   /// must be registered with [AggregateType.addType],
   /// or method [newInstance] must be overridden.
   ///
-  /// If [stateStore] is not given, [AggregateStateCreator]
+  /// If [states] is not given, [AggregateStateCreator]
   /// must be registered with [AggregateStateType.addType],
   /// or method [newStateInstance] must be overridden.
   ///
   @mustCallSuper
   AggregateStore(
-    EventStore eventStore, {
+    StreamEventStore events, {
     EventSerializer<TEvent>? serializer,
     AggregateCreator<TEvent, TValue, TId, TState, TAggregate>? onNew,
-    AggregateStateStore<TValue, TState>? stateStore,
+    AggregateStateStore<TValue, TState>? states,
   })  : _onNew = onNew,
-        _eventStore = eventStore,
-        _stateStore = stateStore,
+        _events = events,
+        _states = states,
         _serializer = serializer ?? DefaultEventSerializer<TData, TEvent>() {
     //
     // Sanity checks
@@ -50,7 +50,7 @@ class AggregateStore<
     if (_onNew == null && !AggregateType.containsType(TAggregate)) {
       throw UnimplementedError('newInstance is not implemented');
     }
-    if (_stateStore == null && !AggregateStateType.containsType(TState)) {
+    if (_states == null && !AggregateStateType.containsType(TState)) {
       throw UnimplementedError('newStateInstance is not implemented');
     }
   }
@@ -59,18 +59,16 @@ class AggregateStore<
   /// given, method [newInstance] must be overridden.
   final AggregateCreator<TEvent, TValue, TId, TState, TAggregate>? _onNew;
 
-  /// [EventStore] loading and storing [StreamEvent]s
-  final EventStore _eventStore;
+  /// [StreamEventStore] loading and storing [StreamEvent]s
+  StreamEventStore get events => _events;
+  final StreamEventStore _events;
 
   /// [AggregateStateStore] loading [AggregateState]s
-  final AggregateStateStore<TValue, TState>? _stateStore;
+  AggregateStateStore<TValue, TState>? get states => _states;
+  final AggregateStateStore<TValue, TState>? _states;
 
   /// [EventSerializer] for serializing and deserializing [Event]s
   late final EventSerializer<TEvent> _serializer;
-
-  /// [AggregateCreator] implementation. If [state] is not given,
-  /// a new [AggregateState] instance will be created from [EventStore].
-  TAggregate call(TId id, [TState? state]) => newInstance(id, state);
 
   /// Create new [Aggregate] instance of type [TAggregate]
   TAggregate newInstance(TId id, [TState? state]) {
@@ -82,9 +80,9 @@ class AggregateStore<
 
   /// Create new [AggregateState] instance of type [TState]
   TState newStateInstance([TValue? value]) {
-    return _stateStore == null
+    return _states == null
         ? AggregateStateType.create<TValue, TState>(value)
-        : _stateStore!.newInstance(value);
+        : _states!.newInstance(value);
   }
 
   /// Load [AggregateState] into given [aggregate] from this store
@@ -96,13 +94,11 @@ class AggregateStore<
       await loadState(id),
     );
     final stream = StreamName.fromId(TAggregate, id);
-    final start = StreamReadPosition(aggregate.originalVersion);
+    final next = StreamReadPosition(aggregate.originalVersion + 1);
     try {
-      await _eventStore
-          .readStream(stream, start)
-          .map(_toDomainEvent)
-          .map((event) => aggregate.fold(event))
-          .length;
+      for (var event in await _events.readEvents(stream, next)) {
+        aggregate.fold(_toDomainEvent(event));
+      }
       return aggregate;
     } on StreamNotFoundException catch (e) {
       throw AggregateNotFoundException(TAggregate, id, e);
@@ -111,37 +107,33 @@ class AggregateStore<
 
   /// Load state for [Aggregate] with given [id].
   FutureOr<TState> loadState(TId id, [TValue? value]) async {
-    return _stateStore == null
+    return _states == null
         ? newStateInstance(value)
-        : await _stateStore!.load(StreamName.fromId(TAggregate, id));
+        : await _states!.load(StreamName.fromId(TAggregate, id));
   }
 
   TEvent _toDomainEvent(StreamEvent event) {
     return _serializer.decode(
       event.data,
-      event.name,
+      event.eventType,
     );
   }
 
-  /// Save [AggregateState] of given [aggregate] to this store
-  ///
-  Future<AggregateStateResult<TEvent, TValue, TId, TState>> save(
+  /// Save [AggregateState] of given [aggregate]
+  Future<AggregateStateResult<TEvent, TValue, TId, TState>> delete(
       TAggregate aggregate) async {
-    if (!aggregate.isChanged) {
-      return AggregateStateNoOp(aggregate.current);
-    }
-
     try {
-      await _eventStore.appendEvents(
+      aggregate.ensureExists();
+      await _events.deleteStream(
         StreamName.from(aggregate),
-        aggregate.changes.map(toStreamEvent),
         aggregate.expectedVersion,
       );
-      final result = aggregate.commit();
-      await _saveState(aggregate);
-      return result;
+      return AggregateStateResult.ok(
+        current: aggregate.current,
+        previous: aggregate.original,
+      );
     } on StreamNotFoundException {
-      return AggregateStateResult.fromCause(
+      return AggregateStateResult.error(
         AggregateNotFoundException(
           TAggregate,
           aggregate.id,
@@ -149,7 +141,80 @@ class AggregateStore<
         aggregate,
       );
     } on Exception catch (error) {
-      return AggregateStateResult.fromCause(
+      return AggregateStateResult.error(
+        error,
+        aggregate..rollback(),
+      );
+    }
+  }
+
+  /// Truncate [AggregateState] of given [aggregate]
+  Future<AggregateStateResult<TEvent, TValue, TId, TState>> truncate(
+      TAggregate aggregate) async {
+    try {
+      aggregate.ensureExists();
+      await _events.truncateStream(
+        StreamName.from(aggregate),
+        aggregate.expectedVersion,
+        aggregate.expectedVersion.toTruncatePosition(
+          StreamTruncatePosition.Exclude,
+        ),
+      );
+      return AggregateStateResult.ok(
+        current: aggregate.current,
+        previous: aggregate.original,
+      );
+    } on StreamNotFoundException {
+      return AggregateStateResult.error(
+        AggregateNotFoundException(
+          TAggregate,
+          aggregate.id,
+        ),
+        aggregate,
+      );
+    } on Exception catch (error) {
+      return AggregateStateResult.error(
+        error,
+        aggregate..rollback(),
+      );
+    }
+  }
+
+  /// Save [AggregateState] of given [aggregate] to this store
+  Future<AggregateStateResult<TEvent, TValue, TId, TState>> save(
+      TAggregate aggregate) async {
+    if (!aggregate.isChanged) {
+      return AggregateStateNoOp(aggregate.current);
+    }
+
+    try {
+      var position = aggregate.expectedVersion.value;
+      final append = await _events.appendEvents(
+        StreamName.from(aggregate),
+        aggregate.changes.map(
+          (e) => toStreamEvent(e, ++position),
+        ),
+        aggregate.expectedVersion,
+      );
+      if (append.isOk) {
+        final result = aggregate.commit();
+        await _saveState(aggregate);
+        return result;
+      }
+      return AggregateStateResult.error(
+        (append as AppendEventsError).cause,
+        aggregate,
+      );
+    } on StreamNotFoundException {
+      return AggregateStateResult.error(
+        AggregateNotFoundException(
+          TAggregate,
+          aggregate.id,
+        ),
+        aggregate,
+      );
+    } on Exception catch (error) {
+      return AggregateStateResult.error(
         error,
         aggregate..rollback(),
       );
@@ -158,8 +223,8 @@ class AggregateStore<
 
   // Save state of given [aggregate]
   FutureOr<TAggregate> _saveState(TAggregate aggregate) async {
-    if (_stateStore != null) {
-      await _stateStore!.save(
+    if (_states != null) {
+      await _states!.save(
         StreamName.fromId(TAggregate, aggregate.id),
         aggregate.current,
       );
@@ -167,11 +232,12 @@ class AggregateStore<
     return aggregate;
   }
 
-  StreamEvent toStreamEvent(TEvent event) {
+  StreamEvent toStreamEvent(TEvent event, int position) {
     return StreamEvent(
       EventType.getTypeNameFromEvent(event),
       _serializer.encode(event),
       _serializer.contentType,
+      position,
     );
   }
 }

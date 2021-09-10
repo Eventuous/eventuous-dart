@@ -1,10 +1,11 @@
 import 'package:eventuous/eventuous.dart';
 import 'package:test/test.dart';
 
+import 'fixtures/esdb/server_single_node.dart';
 import 'fixtures/harness.dart';
 
 void main() {
-  group('When using a service', () {
+  group('When using a service with eventstore db', () {
     const Price = 1000;
     const RoomId = 'room-1';
     const ImportId = 'import-1';
@@ -17,7 +18,15 @@ void main() {
       ..withBookingStore()
       ..withBookingStateStore()
       ..withBookingService()
-      ..install();
+      ..install<EventStoreServerSingleNode>(
+        setup: () async {
+          final server = EventStoreServerSingleNode();
+          await server.start();
+          return server;
+        },
+        teardown: (server) => server.stop(),
+        use: EventStoreDB.parse('esdb://localhost:2113?tls=false'),
+      );
 
     test('operation on new succeeds when not exist', () async {
       // Arrange
@@ -29,12 +38,15 @@ void main() {
         RoomId,
         Price,
       );
+      final loaded = await harness.bookingService.store.load(
+        BookingId(bookingId),
+      );
 
       // Assert
-      expect(roomBooked.isOk, isTrue);
-      expect(roomBooked.current?.price, Price);
+      expect(roomBooked.isOk, isTrue, reason: '$roomBooked');
       expect(roomBooked.current?.roomId, RoomId);
-      expect(roomBooked.current?.isFullyPaid, isFalse);
+      expect(loaded.original, roomBooked.current);
+      expect(loaded.changes, roomBooked.changes);
     });
 
     test('operation on new fails when exists', () async {
@@ -54,7 +66,7 @@ void main() {
       );
 
       // Assert
-      expect(duplicate.isError, isTrue);
+      expect(duplicate.isError, isTrue, reason: '$duplicate');
       expect(
         duplicate,
         isA<BookingError>().having(
@@ -73,36 +85,25 @@ void main() {
         RoomId,
         Price,
       );
-      expect(roomBooked.isOk, isTrue);
+      expect(roomBooked.isOk, isTrue, reason: '$roomBooked');
 
       // Act
-      final roomPaid1 = await harness.bookingService.recordPayment(
+      final roomPaid = await harness.bookingService.recordPayment(
         bookingId,
         nextPaymentId(),
-        Price ~/ 2,
+        Price,
       );
-      final roomPaid2 = await harness.bookingService.recordPayment(
-        bookingId,
-        nextPaymentId(),
-        Price ~/ 2,
-      );
-
-      final events = await harness.eventStore.readEvents(
-        StreamName.from(roomBooked.aggregate!),
-        StreamReadPosition.start,
+      final loaded = await harness.bookingService.store.load(
+        BookingId(bookingId),
       );
 
       // Assert
-      expect(events.length, 3);
-      expect(roomPaid1.isOk, isTrue, reason: '$roomPaid1');
-      expect(roomPaid1.current?.price, Price);
-      expect(roomPaid1.current?.roomId, RoomId);
-      expect(roomPaid1.current?.isFullyPaid, isFalse);
-
-      expect(roomPaid2.isOk, isTrue, reason: '$roomPaid2');
-      expect(roomPaid2.current?.price, Price);
-      expect(roomPaid2.current?.roomId, RoomId);
-      expect(roomPaid2.current?.isFullyPaid, isTrue);
+      expect(loaded.isFullyPaid, isTrue);
+      expect(loaded.original, roomPaid.current);
+      expect(loaded.changes, roomPaid.changes);
+      expect(roomPaid.isOk, isTrue, reason: '$roomBooked');
+      expect(roomPaid.current?.roomId, RoomId);
+      expect(roomPaid.aggregate!.isFullyPaid, isTrue);
     });
 
     test('operation on existing fails when not exist', () async {
@@ -117,7 +118,7 @@ void main() {
       );
 
       // Assert
-      expect(duplicate.isError, isTrue);
+      expect(duplicate.isError, isTrue, reason: '$duplicate');
       expect(
         duplicate,
         isA<BookingError>().having(
@@ -133,15 +134,22 @@ void main() {
       final bookingId = nextBookingId();
 
       // Act
-      final roomImported = await harness.bookingService.importBooking(
+      final imported = await harness.bookingService.importBooking(
         bookingId,
         RoomId,
         Price,
+        ImportId,
+      );
+      final loaded = await harness.bookingService.store.load(
+        BookingId(bookingId),
       );
 
       // Assert
-      expect(roomImported.isOk, isTrue);
-      expect(roomImported.current?.roomId, RoomId);
+      expect(imported.isOk, isTrue, reason: '$imported');
+      expect(imported.current?.roomId, RoomId);
+      expect(imported.current?.importId, ImportId);
+      expect(loaded.original, imported.current);
+      expect(loaded.changes, imported.changes);
     });
 
     test('operation on any state succeeds when exists', () async {
@@ -153,19 +161,26 @@ void main() {
         Price,
       );
       expect(roomBooked.isOk, isTrue);
+      expect(roomBooked.current?.roomId, RoomId);
 
       // Act
-      final roomImported = await harness.bookingService.importBooking(
+      final imported = await harness.bookingService.importBooking(
         bookingId,
         RoomId,
         Price,
+        ImportId,
+      );
+      expect(imported.current?.importId, ImportId);
+      final loaded = await harness.bookingService.store.load(
+        BookingId(bookingId),
       );
 
       // Assert
-      expect(roomImported.isOk, isTrue);
-      expect(roomImported.current?.price, Price);
-      expect(roomImported.current?.roomId, RoomId);
-      expect(roomImported.current?.isFullyPaid, isFalse);
+      expect(imported.isOk, isTrue, reason: '$imported');
+      expect(imported.current?.roomId, RoomId);
+      expect(imported.current?.importId, ImportId);
+      expect(loaded.original, imported.current);
+      expect(loaded.changes, imported.changes);
     });
 
     test('duplicate operation on any state does not mutate', () async {
@@ -177,18 +192,22 @@ void main() {
         Price,
       );
       expect(roomBooked.isOk, isTrue);
-      final roomImported = await harness.bookingService.importBooking(
+      expect(roomBooked.current?.roomId, RoomId);
+      final imported = await harness.bookingService.importBooking(
         bookingId,
         RoomId,
         Price,
+        ImportId,
       );
-      expect(roomImported.isOk, isTrue);
+      expect(imported.isOk, isTrue);
+      expect(imported.current?.importId, ImportId);
 
       // Act
       final duplicate = await harness.bookingService.importBooking(
         bookingId,
         RoomId,
         Price,
+        ImportId,
       );
 
       // Assert

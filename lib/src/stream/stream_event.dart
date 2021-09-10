@@ -1,12 +1,14 @@
 class StreamEvent {
   StreamEvent(
-    this.name,
+    this.eventType,
     this.data,
-    this.contentType, {
-    this.meta = const <int>[],
+    this.contentType,
+    this.position, {
+    this.metadata = const <int>[],
   });
-  final String name;
+  final int position;
   final List<int> data;
-  final List<int> meta;
+  final String eventType;
+  final List<int> metadata;
   final String contentType;
 }

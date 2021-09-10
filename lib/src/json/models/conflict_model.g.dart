@@ -6,32 +6,41 @@ part of 'conflict_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-ConflictModel _$ConflictModelFromJson(Map<String, dynamic> json) =>
-    ConflictModel(
+ConflictModel _$ConflictModelFromJson(Map json) => ConflictModel(
       type: _$enumDecode(_$ConflictTypeEnumMap, json['type']),
       code: json['code'] as String?,
-      base: json['base'] as Map<String, dynamic>?,
+      base: (json['base'] as Map?)?.map(
+        (k, e) => MapEntry(k as String, e),
+      ),
       mine: (json['mine'] as List<dynamic>?)
-          ?.map((e) => e as Map<String, dynamic>)
+          ?.map((e) => Map<String, dynamic>.from(e as Map))
           .toList(),
       yours: (json['yours'] as List<dynamic>?)
-          ?.map((e) => e as Map<String, dynamic>)
+          ?.map((e) => Map<String, dynamic>.from(e as Map))
           .toList(),
       error: json['error'] as String?,
       paths:
           (json['paths'] as List<dynamic>?)?.map((e) => e as String).toList(),
     );
 
-Map<String, dynamic> _$ConflictModelToJson(ConflictModel instance) =>
-    <String, dynamic>{
-      'code': instance.code,
-      'error': instance.error,
-      'type': _$ConflictTypeEnumMap[instance.type],
-      'paths': instance.paths,
-      'base': instance.base,
-      'mine': instance.mine,
-      'yours': instance.yours,
-    };
+Map<String, dynamic> _$ConflictModelToJson(ConflictModel instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('code', instance.code);
+  writeNotNull('error', instance.error);
+  val['type'] = _$ConflictTypeEnumMap[instance.type];
+  writeNotNull('paths', instance.paths);
+  writeNotNull('base', instance.base);
+  writeNotNull('mine', instance.mine);
+  writeNotNull('yours', instance.yours);
+  return val;
+}
 
 K _$enumDecode<K, V>(
   Map<K, V> enumValues,

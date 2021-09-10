@@ -1,18 +1,46 @@
 import 'package:eventuous/eventuous.dart';
 
 class StreamException implements Exception {
-  StreamException(this.message);
+  StreamException(this.message, [this.cause]);
   final String message;
+  final Object? cause;
+
   @override
-  String toString() => "$runtimeType: '$message'";
+  String toString() {
+    return '$runtimeType{message: $message, cause: $cause}';
+  }
+}
+
+class ConcurrentModificationException extends StreamException {
+  ConcurrentModificationException(
+    this.name,
+    this.expectedVersion,
+    this.actualVersion, [
+    Object? cause,
+  ]) : super('');
+
+  final StreamName name;
+  final ExpectedStreamVersion expectedVersion;
+  final ExpectedStreamVersion actualVersion;
+
+  /// [Exception] message
+  @override
+  String get message {
+    final buffer = StringBuffer()
+      ..writeAll(<String>[
+        'Append failed due to ${cause?.runtimeType ?? 'WrongExpectedVersion'}. ',
+        'Stream: $name, ',
+        'Expected version: $expectedVersion, ',
+        'Actual version: $actualVersion',
+        if (cause != null) ', Cause: $cause',
+      ]);
+    return buffer.toString();
+  }
 }
 
 class StreamNotFoundException extends StreamException {
   StreamNotFoundException(StreamName stream)
       : super("Stream '$stream' not found");
-
-  factory StreamNotFoundException.from(StreamName name) =>
-      StreamNotFoundException(name);
 }
 
 class DomainException implements Exception {

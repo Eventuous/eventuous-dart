@@ -5,6 +5,8 @@ import 'package:eventuous/eventuous.dart';
 import 'package:meta/meta.dart';
 
 part 'aggregate_store.dart';
+part 'aggregate_state.dart';
+part 'aggregate_state_result.dart';
 
 /// [Aggregate] instance creator method. If [state] is
 /// not given, a new [AggregateState] instance must be
@@ -73,9 +75,7 @@ abstract class Aggregate<TEvent extends Object, TValue extends Object,
         originalVersion,
       );
 
-  /// Get list of pending changes made by
-  /// [Event]s applied locally.
-  ///
+  /// Get list of pending changes [Event]s folded into [current] state
   EventList<TEvent> get changes => UnmodifiableListView(_changes);
   final _changes = <TEvent>[];
 
@@ -87,7 +87,7 @@ abstract class Aggregate<TEvent extends Object, TValue extends Object,
   /// changed, an DomainException is thrown.
   ///
   AggregateStateResult<TEvent, TValue, TId, TState> load(
-      Iterable<TValue> events) {
+      Iterable<TEvent> events) {
     if (currentVersion > -1) {
       throw DomainException(
         '$runtimeType is already ${isChanged ? 'created' : 'loaded'}',
@@ -95,9 +95,10 @@ abstract class Aggregate<TEvent extends Object, TValue extends Object,
     }
     _current = events.fold(
       _original,
-      (previous, event) => previous.when(event),
+      (previous, event) => previous.when<TEvent, TState>(event),
     );
-    return AggregateStateResult.fromDiff(
+    // _current._version = events.length - 1;
+    return AggregateStateResult.ok(
       current: _current,
       previous: _original,
     );
@@ -107,8 +108,8 @@ abstract class Aggregate<TEvent extends Object, TValue extends Object,
   ///
   AggregateStateResult<TEvent, TValue, TId, TState> fold(TEvent event) {
     final previous = _current;
-    _current = previous.when(event);
-    return AggregateStateResult.fromDiff(
+    _current = previous.when<TEvent, TState>(event);
+    return AggregateStateResult.ok(
       current: _current,
       previous: previous,
     );
@@ -120,28 +121,33 @@ abstract class Aggregate<TEvent extends Object, TValue extends Object,
   /// incremented by 1.
   AggregateStateResult<TEvent, TValue, TId, TState> apply(TEvent event) {
     final previous = _current;
-    _current = previous.when(event);
+    _current = previous.when<TEvent, TState>(event);
+    if (_current == previous) {
+      return AggregateStateNoOp(
+        _current,
+      );
+    }
     _changes.add(event);
-    return AggregateStateResult.fromDiff(
+    return AggregateStateResult.ok(
       current: _current,
       previous: previous,
     );
   }
 
   /// Commit local [changes] to [original] state.
-  @protected
+  @visibleForOverriding
   AggregateStateResult<TEvent, TValue, TId, TState> commit() {
     _changes.clear();
     final previous = _original;
     _original = _current;
-    return AggregateStateResult.fromDiff(
+    return AggregateStateResult.ok(
       current: _current,
       previous: previous,
     );
   }
 
   /// Rollback local [changes] to [original] state.
-  @protected
+  @visibleForOverriding
   AggregateStateResult<TEvent, TValue, TId, TState> rollback() {
     if (_original.expectedVersion == ExpectedStreamVersion.noStream) {
       _changes.clear();
@@ -154,7 +160,7 @@ abstract class Aggregate<TEvent extends Object, TValue extends Object,
     }
     final previous = _current;
     _current = _original;
-    return AggregateStateResult.fromDiff(
+    return AggregateStateResult.ok(
       current: _current,
       previous: previous,
     );
@@ -162,7 +168,7 @@ abstract class Aggregate<TEvent extends Object, TValue extends Object,
 
   /// Subclasses of [Aggregate] should use this method
   /// to ensure that is is operating on an existing [Aggregate].
-  @protected
+  @visibleForOverriding
   void ensureExists() {
     if (currentVersion == -1) {
       throw AggregateNotFoundException(runtimeType, id);
@@ -171,7 +177,7 @@ abstract class Aggregate<TEvent extends Object, TValue extends Object,
 
   /// Subclasses of [Aggregate] should use this method
   /// to ensure that is is operating on a new [Aggregate].
-  @protected
+  @visibleForOverriding
   void ensureDoesntExists() {
     if (currentVersion > -1) {
       throw AggregateExistsException(runtimeType, id);

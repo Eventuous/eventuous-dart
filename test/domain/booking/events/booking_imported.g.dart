@@ -6,12 +6,17 @@ part of 'booking_imported.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-BookingImported _$RoomImportedFromJson(Map<String, dynamic> json) =>
-    BookingImported(
+BookingImported _$BookingImportedFromJson(Map json) => BookingImported(
+      price: json['price'] as int,
       roomId: json['roomId'] as String,
+      importId: json['importId'] as String,
+      bookingId: json['bookingId'] as String,
     );
 
-Map<String, dynamic> _$RoomImportedToJson(BookingImported instance) =>
+Map<String, dynamic> _$BookingImportedToJson(BookingImported instance) =>
     <String, dynamic>{
+      'price': instance.price,
       'roomId': instance.roomId,
+      'importId': instance.importId,
+      'bookingId': instance.bookingId,
     };

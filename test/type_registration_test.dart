@@ -1,7 +1,7 @@
 import 'package:eventuous/eventuous.dart';
 import 'package:test/test.dart';
 
-import 'harness.dart';
+import 'fixtures/harness.dart';
 
 void main() {
   group('When registering types', () {
@@ -13,20 +13,26 @@ void main() {
       // Assert
       expect(EventType.containsType(RoomBooked), isTrue);
       expect(EventType.containsTypeName('$RoomBooked'), isTrue);
-      expect(EventType.containsType(RoomPaid), isTrue);
-      expect(EventType.containsTypeName('$RoomPaid'), isTrue);
+      expect(EventType.containsType(BookingPaymentRegistered), isTrue);
+      expect(EventType.containsTypeName('$BookingPaymentRegistered'), isTrue);
     });
 
     test('event types are creatable', () async {
       // Arrange
-      final data = {'roomId': 'value'};
+      final data = {
+        'price': 1000,
+        'roomId': 'value',
+        'amountPaid': 1000,
+        'paymentId': 'value',
+        'bookingId': 'value',
+      };
       // Act
       final roomBooked = EventType.create<JsonMap, RoomBooked>(
         '$RoomBooked',
         data,
       );
-      final roomPaid = EventType.create<JsonMap, RoomPaid>(
-        '$RoomPaid',
+      final roomPaid = EventType.create<JsonMap, BookingPaymentRegistered>(
+        '$BookingPaymentRegistered',
         data,
       );
 
@@ -34,7 +40,7 @@ void main() {
       expect(roomBooked, isNotNull);
       expect(roomBooked.roomId, 'value');
       expect(roomPaid, isNotNull);
-      expect(roomPaid.roomId, 'value');
+      expect(roomPaid.paymentId, 'value');
     });
 
     test('aggregate types are checkable', () async {
@@ -65,10 +71,17 @@ void main() {
 
     test('aggregate state types are creatable', () async {
       // Arrange
-      final data = BookingStateModel.fromJson({'roomId': 'value'});
+      final data = {
+        'price': 1000,
+        'roomId': 'value',
+        'amountPaid': 1000,
+        'paymentId': 'value',
+        'bookingId': 'value',
+      };
+
       // Act
-      final state = AggregateStateType.create<JsonObject, BookingState>(
-        data,
+      final state = AggregateStateType.create<BookingStateModel, BookingState>(
+        BookingStateModel.fromJson(data),
       );
 
       // Assert

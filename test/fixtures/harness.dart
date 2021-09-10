@@ -1,19 +1,21 @@
+import 'package:equatable/equatable.dart';
 import 'package:eventuous/eventuous.dart';
 import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 
-import 'domain/booking/booking.dart';
-import 'fakes/in_memory_event_store.dart';
+import '../domain/booking/booking.dart';
+import '../fakes/in_memory_event_store.dart';
 
-export 'domain/booking/booking.dart';
-export 'fakes/in_memory_event_store.dart';
+export '../domain/booking/booking.dart';
+export '../fakes/in_memory_event_store.dart';
 
 class TestHarness {
   TestHarness() {
     Logger.root.level = Level.SEVERE;
+    EquatableConfig.stringify = true;
   }
 
-  late final EventStore eventStore;
+  late final StreamEventStore eventStore;
   late final BookingStore bookingStore;
   late final BookingService bookingService;
   late final BookingStateStore bookingStateStore;
@@ -54,11 +56,18 @@ class TestHarness {
     return this;
   }
 
-  void install([EventStore? store]) {
-    setUpAll(() {
+  void install<T>({
+    StreamEventStore? use,
+    Future<T> Function()? setup,
+    Future<void> Function(T)? teardown,
+  }) {
+    late T ref;
+    setUpAll(() async {
       _logger?.info('---setUpAll---');
-      // _initHiveDir(hiveDir);
-      // Hive.init(hiveDir.path);
+
+      if (setup != null) {
+        ref = await setup.call();
+      }
 
       if (_useBookingTypeMaps) {
         addBookingTypes();
@@ -66,7 +75,8 @@ class TestHarness {
         addBookingEventTypes();
       }
 
-      eventStore = store ?? InMemoryEventStore();
+      // Setup EventStore instance
+      eventStore = use ?? InMemoryEventStore();
 
       if (_useBookingStateStore) {
         bookingStateStore = BookingStateStore(
@@ -77,7 +87,7 @@ class TestHarness {
         bookingStore = BookingStore(
           eventStore,
           onNew: (id, [state]) => Booking(id, state),
-          stateStore: _useBookingStateStore ? bookingStateStore : null,
+          states: _useBookingStateStore ? bookingStateStore : null,
           serializer: DefaultEventSerializer<JsonMap, JsonObject>(),
         );
       }
@@ -89,24 +99,10 @@ class TestHarness {
       _logger?.info('---setUpAll--->ok');
     });
 
-    setUp(() {
-      _logger?.info('---setUp---');
-      // _initHiveDir(hiveDir);
-      _logger?.info('---setUp--->ok');
-    });
-
-    tearDown(() {
-      _logger?.info('---tearDown---');
-      // await Hive.deleteFromDisk();
-      // await hiveDir.delete(recursive: true);
-      _logger?.info('---tearDown--->ok');
-    });
-
-    tearDownAll(() {
-      _logger?.info('---tearDownAll---');
-
-      // return await Hive.deleteFromDisk();
-      _logger?.info('---tearDownAll--->ok');
-    });
+    if (teardown != null) {
+      tearDownAll(() async {
+        return teardown(ref);
+      });
+    }
   }
 }

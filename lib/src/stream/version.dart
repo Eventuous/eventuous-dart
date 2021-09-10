@@ -1,10 +1,20 @@
 class ExpectedStreamVersion {
   const ExpectedStreamVersion(this.value);
 
+  /// Any stream state is expected
   static const any = ExpectedStreamVersion(-2);
+
+  /// Not stream is expected
   static const noStream = ExpectedStreamVersion(-1);
 
+  /// Get version value
   final int value;
+
+  /// Get stream truncate position from
+  StreamTruncatePosition toTruncatePosition([
+    int offset = StreamTruncatePosition.Include,
+  ]) =>
+      StreamTruncatePosition(value);
 
   @override
   String toString() {
@@ -48,6 +58,13 @@ class StreamReadPosition {
 class StreamTruncatePosition {
   const StreamTruncatePosition(this.value);
 
+  /// Truncate all events in stream including last event
+  static const int Include = 0;
+
+  /// Truncate all events in stream excluding last event
+  static const int Exclude = -1;
+
+  /// Get version value
   final int value;
 
   @override

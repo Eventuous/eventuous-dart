@@ -1,9 +1,11 @@
 import 'package:eventuous/eventuous.dart';
 
+import 'exceptions.dart';
 import 'in_memory_stream.dart';
+import 'stored_event.dart';
 
-class InMemoryEventStore extends EventStore {
-  final _global = <StreamEvent>[];
+class InMemoryEventStore extends StreamEventStore {
+  final _global = <StoredEvent>[];
   final _storage = <StreamName, InMemoryStream>{};
 
   @override
@@ -11,19 +13,34 @@ class InMemoryEventStore extends EventStore {
     StreamName name,
     Iterable<StreamEvent> events,
     ExpectedStreamVersion expected,
-  ) {
-    final next = _storage.putIfAbsent(
-      name,
-      () => InMemoryStream(name),
-    );
-    next.appendEvents(events, expected);
-    _global.addAll(events);
-    return Future.value(
-      AppendEventsResult.from(
+  ) async {
+    try {
+      final next = _storage.putIfAbsent(
+        name,
+        () => InMemoryStream(name),
+      );
+      _global.addAll(
+        next.appendEvents(events, expected),
+      );
+      return AppendEventsResult.ok(
+        name,
         _global.length,
         next.version,
-      ),
-    );
+      );
+    } on WrongExpectedVersionException catch (cause) {
+      return WrongExpectedVersionResult(
+        name,
+        cause.expectedVersion,
+        ExpectedStreamVersion(cause.actualVersion),
+        cause,
+      );
+    } on Exception catch (cause) {
+      return AppendEventsResult.error(
+        name,
+        expected.value,
+        cause,
+      );
+    }
   }
 
   @override
@@ -55,19 +72,28 @@ class InMemoryEventStore extends EventStore {
   }
 
   @override
-  Stream<StreamEvent> readStreamBackwards(
-    StreamName name, [
-    int count = Max,
-  ]) async* {
-    for (var event in _findStream(name).getEventsBackwards(count)) {
-      yield event;
-    }
+  Future<void> deleteStream(
+    StreamName name,
+    ExpectedStreamVersion expected,
+  ) async {
+    final stream = _findStream(name)..checkVersion(expected);
+    stream.events.forEach(_global.remove);
+    _storage.remove(name);
+  }
+
+  @override
+  Future<void> truncateStream(
+    StreamName name,
+    ExpectedStreamVersion expected,
+    StreamTruncatePosition truncate,
+  ) async {
+    _findStream(name).truncate(expected, truncate);
   }
 
   InMemoryStream _findStream(StreamName name) {
     final stream = _storage[name];
     if (stream == null) {
-      throw StreamNotFoundException.from(name);
+      throw StreamNotFoundException(name);
     }
     return stream;
   }

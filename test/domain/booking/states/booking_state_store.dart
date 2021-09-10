@@ -2,9 +2,10 @@ import 'package:eventuous/eventuous.dart';
 
 import '../booking.dart';
 
-class BookingStateStore extends AggregateStateStore<JsonObject, BookingState> {
+class BookingStateStore
+    extends AggregateStateStore<BookingStateModel, BookingState> {
   BookingStateStore({
-    AggregateStateCreator<JsonObject, BookingState>? onNew,
+    AggregateStateCreator<BookingStateModel, BookingState>? onNew,
   }) : super(onNew: onNew);
 
   final Map<StreamName, BookingState> _states = {};

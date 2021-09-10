@@ -1,7 +1,7 @@
 import 'package:eventuous/eventuous.dart';
 import 'package:test/test.dart';
 
-import 'harness.dart';
+import 'fixtures/harness.dart';
 
 void main() {
   group('When only aggregate types given', () {
@@ -28,6 +28,9 @@ void main() {
 }
 
 void _doAll(TestHarness harness) {
+  const Price = 1000;
+  const RoomId = 'room-1';
+  const _BookingId = 'booking-1';
   test('Initial state is empty', () async {
     // Arrange
     final original = Booking.from('is_empty');
@@ -40,7 +43,11 @@ void _doAll(TestHarness harness) {
   test('Apply completes with state ok', () async {
     // Arrange
     final original = Booking.from('apply_it');
-    final event = RoomBooked(roomId: 'value');
+    final event = RoomBooked(
+      price: Price,
+      roomId: RoomId,
+      bookingId: _BookingId,
+    );
 
     // Act
     final local = original.apply(event);
@@ -59,7 +66,7 @@ void _doAll(TestHarness harness) {
       isA<BookingState>().having(
         (e) => e.roomId,
         'room id',
-        'value',
+        RoomId,
       ),
     );
     expect(
@@ -67,7 +74,7 @@ void _doAll(TestHarness harness) {
       isA<BookingState>().having(
         (e) => e.roomId,
         'room id',
-        'value',
+        RoomId,
       ),
     );
   });
@@ -75,7 +82,11 @@ void _doAll(TestHarness harness) {
   test('Save completes with state ok', () async {
     // Arrange
     final original = Booking.from('save_it');
-    final event = RoomBooked(roomId: 'value');
+    final event = RoomBooked(
+      price: Price,
+      roomId: RoomId,
+      bookingId: _BookingId,
+    );
     final local = original.apply(event);
 
     // Act
@@ -87,7 +98,7 @@ void _doAll(TestHarness harness) {
       isA<BookingState>().having(
         (e) => e.roomId,
         'room id',
-        'value',
+        RoomId,
       ),
     );
     expect(
@@ -95,7 +106,7 @@ void _doAll(TestHarness harness) {
       isA<BookingState>().having(
         (e) => e.roomId,
         'room id',
-        'value',
+        RoomId,
       ),
     );
     expect(
@@ -139,7 +150,11 @@ void _doAll(TestHarness harness) {
   test('Load completes with state ok', () async {
     // Arrange
     final original = Booking.from('load_it');
-    final event = RoomBooked(roomId: 'value');
+    final event = RoomBooked(
+      price: Price,
+      roomId: RoomId,
+      bookingId: _BookingId,
+    );
     final local = original.apply(event);
     await harness.bookingStore.save(original);
 
@@ -152,7 +167,7 @@ void _doAll(TestHarness harness) {
       isA<Booking>().having(
         (e) => e.current.value['roomId'],
         'room id',
-        'value',
+        RoomId,
       ),
     );
     expect(
@@ -160,7 +175,7 @@ void _doAll(TestHarness harness) {
       isA<BookingState>().having(
         (e) => e.roomId,
         'room id',
-        'value',
+        RoomId,
       ),
     );
     expect(
@@ -168,7 +183,7 @@ void _doAll(TestHarness harness) {
       isA<BookingState>().having(
         (e) => e.roomId,
         'room id',
-        'value',
+        RoomId,
       ),
     );
   });
