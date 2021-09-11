@@ -115,7 +115,7 @@ mixin ApplicationServiceMixin<
 
   Future<TAggregate> _load<TCommand extends Object>(TCommand command) async {
     final id = await _resolvers[typeOf<TCommand>()]!(command);
-    return await store.load(id);
+    return store.load(id);
   }
 
   Future<TAggregate> _create<TCommand extends Object>(TCommand command) async {

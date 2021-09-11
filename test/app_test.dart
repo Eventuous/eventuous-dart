@@ -162,7 +162,7 @@ void main() {
       );
 
       // Assert
-      expect(roomImported.isOk, isTrue);
+      expect(roomImported.isOk, isTrue, reason: '$roomImported');
       expect(roomImported.current?.price, Price);
       expect(roomImported.current?.roomId, RoomId);
       expect(roomImported.current?.isFullyPaid, isFalse);
@@ -182,7 +182,7 @@ void main() {
         RoomId,
         Price,
       );
-      expect(roomImported.isOk, isTrue);
+      expect(roomImported.isOk, isTrue, reason: '$roomImported');
 
       // Act
       final duplicate = await harness.bookingService.importBooking(

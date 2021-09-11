@@ -99,7 +99,7 @@ class AggregateStore<
       for (var event in await _events.readEvents(stream, next)) {
         aggregate.fold(_toDomainEvent(event));
       }
-      return aggregate;
+      return aggregate..commit();
     } on StreamNotFoundException catch (e) {
       throw AggregateNotFoundException(TAggregate, id, e);
     }
