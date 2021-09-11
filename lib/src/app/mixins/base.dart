@@ -2,12 +2,12 @@ part of '../service.dart';
 
 /// Application service base mixin.
 
-/// Type parameter [TData] - [StreamEvent.data] content type
-/// Type parameter [TEvent] - [Aggregate.changes] event type
-/// Type parameter [TValue] - [AggregateState.value] type
-/// Type parameter [TId] - [Aggregate.id] type
-/// Type parameter [TState] - [AggregateState] type
-/// Type parameter [TAggregate] - [Aggregate] type
+/// * Type parameter [TData] - [StreamEvent.data] content type
+/// * Type parameter [TEvent] - [Aggregate.changes] event type
+/// * Type parameter [TValue] - [AggregateState.value] type
+/// * Type parameter [TId] - [Aggregate.id] type
+/// * Type parameter [TState] - [AggregateState] type
+/// * Type parameter [TAggregate] - [Aggregate] type
 ///
 mixin ApplicationServiceMixin<
     TData extends Object,
@@ -28,8 +28,8 @@ mixin ApplicationServiceMixin<
 
   /// The generic command handler. Call this function from your edge (API).
   /// Use parameter [command] to execute
-  /// Type parameter [TCommand] - command type
   /// Returns the [Result] of the execution
+  /// * Type parameter [TCommand] - command type
   FutureOr<Result<TEvent, TValue, TId, TState, TAggregate>>
       handle<TCommand extends Object>(
     TCommand command,

@@ -15,7 +15,7 @@ export 'src/json/json_object.dart';
 export 'src/json/json_typedefs.dart';
 export 'src/state/aggregate.dart';
 export 'src/state/aggregate_id.dart';
-export 'src/state/aggregate_state_store.dart';
+export 'src/state/aggregate_state_storage.dart';
 export 'src/state/aggregate_state_type.dart';
 export 'src/state/aggregate_type.dart';
 export 'src/store/event_store.dart';

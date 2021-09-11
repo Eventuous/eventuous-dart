@@ -16,7 +16,7 @@ export 'events/booking_imported.dart';
 export 'states/booking_state.dart';
 export 'states/booking_state_model.dart';
 export 'states/booking_state_model.dart';
-export 'states/booking_state_store.dart';
+export 'states/booking_state_storage.dart';
 
 class BookingId extends AggregateId {
   BookingId([String? id]) : super(id);

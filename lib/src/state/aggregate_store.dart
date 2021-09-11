@@ -1,21 +1,21 @@
 part of 'aggregate.dart';
 
-/// [AggregateStore] store loads [AggregateState] from [AggregateStateStore].
+/// [AggregateStore] store maintains [Aggregate] instances.
 ///
 /// This decouples loading [AggregateState] from [Aggregate] allowing
 /// different strategies to be implemented like building state
-/// directly from the [StreamEventStore] by folding every event on some
-/// initial condition, or loading state from a locally persisted
-/// snapshot of last stored [AggregateState].
+/// directly from the [StreamEventStore] by folding every event on
+/// some initial condition, or loading state from a snapshot of last
+/// stored [AggregateState].
 ///
 /// This class implements [AggregateCreator] as default method.
-
-/// Type parameter [TData] - [StreamEvent.data] content type
-/// Type parameter [TEvent] - [Aggregate.changes] event type
-/// Type parameter [TValue] - [AggregateState.value] type
-/// Type parameter [TId] - [Aggregate.id] type
-/// Type parameter [TState] - [AggregateState] type
-/// Type parameter [TAggregate] - [Aggregate] type
+///
+/// * Type parameter [TData] - [StreamEvent.data] content type
+/// * Type parameter [TEvent] - [Aggregate.changes] event type
+/// * Type parameter [TValue] - [AggregateState.value] type
+/// * Type parameter [TId] - [Aggregate.id] type
+/// * Type parameter [TState] - [AggregateState] type
+/// * Type parameter [TAggregate] - [Aggregate] type
 ///
 class AggregateStore<
     TData extends Object,
@@ -39,7 +39,7 @@ class AggregateStore<
     StreamEventStore events, {
     EventSerializer<TEvent>? serializer,
     AggregateCreator<TEvent, TValue, TId, TState, TAggregate>? onNew,
-    AggregateStateStore<TValue, TState>? states,
+    AggregateStateStorage<TValue, TState>? states,
   })  : _onNew = onNew,
         _events = events,
         _states = states,
@@ -64,8 +64,8 @@ class AggregateStore<
   final StreamEventStore _events;
 
   /// [AggregateStateStore] loading [AggregateState]s
-  AggregateStateStore<TValue, TState>? get states => _states;
-  final AggregateStateStore<TValue, TState>? _states;
+  AggregateStateStorage<TValue, TState>? get states => _states;
+  final AggregateStateStorage<TValue, TState>? _states;
 
   /// [EventSerializer] for serializing and deserializing [Event]s
   late final EventSerializer<TEvent> _serializer;

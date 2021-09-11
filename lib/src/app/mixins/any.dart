@@ -13,7 +13,7 @@ mixin OnAnyAggregateMixin<
   /// Use parameter [toId] to get the [AggregateId] from give command.
   /// Use parameter [action] to performed actions on the aggregate,
   /// given the aggregate instance and the command
-  /// Type parameter [TCommand] - Command type
+  /// * Type parameter [TCommand] - Command type
   void OnAny<TCommand extends Object>(AggregateIdResolver<TCommand, TId> toId,
       Handler<TCommand, TEvent, TValue, TId, TState, TAggregate> action) {
     _handlers.putIfAbsent(

@@ -11,12 +11,12 @@ part 'mixins/update.dart';
 /// A derived class should be scoped to handle commands
 /// for one aggregate type only.
 
-/// Type parameter [TData] - [StreamEvent.data] content type
-/// Type parameter [TEvent] - [Aggregate.changes] event type
-/// Type parameter [TValue] - [AggregateState.value] type
-/// Type parameter [TId] - [Aggregate.id] type
-/// Type parameter [TState] - [AggregateState] type
-/// Type parameter [TAggregate] - [Aggregate] type
+/// * Type parameter [TData] - [StreamEvent.data] content type
+/// * Type parameter [TEvent] - [Aggregate.changes] event type
+/// * Type parameter [TValue] - [AggregateState.value] type
+/// * Type parameter [TId] - [Aggregate.id] type
+/// * Type parameter [TState] - [AggregateState] type
+/// * Type parameter [TAggregate] - [Aggregate] type
 ///
 abstract class ApplicationServiceBase<
         TData extends Object,

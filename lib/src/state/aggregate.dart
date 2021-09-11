@@ -21,7 +21,7 @@ typedef AggregateCreator<
 
 /// Base class for implementing a model within a specific domain
 ///
-/// Type parameter [TState] - [AggregateState.value] type
+/// * Type parameter [TState] - [AggregateState.value] type
 ///
 abstract class Aggregate<TEvent extends Object, TValue extends Object,
     TId extends AggregateId, TState extends AggregateState<TValue>> {
