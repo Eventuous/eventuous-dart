@@ -6,9 +6,10 @@ github:
     - name: Collect and publish coverage
       runs-on: ubuntu-latest
       steps:
-        - name: Collect coverage
+        - name: Collect test coverage
+          working-directory: packages/eventuous_generator
           run: format_coverage --lcov --in=coverage --out=coverage.lcov --packages=.packages --report-on=lib
-        - name: Publish coverage
+        - name: Publish test coverage
           uses: codecov/codecov-action@v1.0.2
           with:
             token: ${{ secrets.CODECOV_TOKEN }}
@@ -20,5 +21,5 @@ github:
 self_validate: analyze
 
 # Use this key to merge stages across packages to create fewer jobs
-merge_stages:
-  - analyze_and_format
+#merge_stages:
+#  - analyze_and_format
