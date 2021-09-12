@@ -1,8 +1,8 @@
 .PHONY: \
-	configure certs models test doc release
+	configure certs models action test doc release
 
 .SILENT: \
-	configure certs models test doc release
+	configure certs models action test doc release
 
 configure:
 	dart pub global activate pub_release
@@ -10,6 +10,7 @@ configure:
 	pub global activate dcli
 	pub global activate dartdoc
 	pub global activate dhttpd
+	brew install act
 
 certs:
 	sh tool/gencert.sh . --secure
@@ -28,6 +29,10 @@ doc:
 	dartdoc
 	echo "Starting server at http://localhost:8080"
 	dhttpd --path doc/api
+
+action:
+	echo "Running github actions..."
+	act
 
 release:
 	echo 'Release to pub.dev...'
