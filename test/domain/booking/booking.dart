@@ -70,11 +70,9 @@ class Booking
 
 void addBookingTypes() {
   AggregateType.addType<JsonObject, JsonObject, BookingId, BookingState,
-      Booking>(
-    (id, [state]) => Booking(id, state as BookingState),
-  );
+      Booking>((id, [state]) => Booking(id, state));
   AggregateStateType.addType<BookingStateModel, BookingState>(
-    ([value]) => BookingState(value),
+    ([value, version]) => BookingState(value, version),
   );
   addBookingEventTypes();
 }

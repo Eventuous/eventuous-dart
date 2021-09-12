@@ -6,7 +6,8 @@ import '../booking.dart';
 class BookingState extends AggregateState<BookingStateModel> {
   BookingState([
     BookingStateModel? value,
-  ]) : super(value ?? BookingStateModel()) {
+    int? version,
+  ]) : super(value ?? BookingStateModel(), version) {
     on<RoomBooked>(BookingState.patch);
     on<BookingImported>(BookingState.patch);
     on<BookingPaymentRegistered>(BookingState.patch);

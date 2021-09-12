@@ -13,7 +13,7 @@ void main() {
 
   group('When only aggregate state store given', () {
     _doAll(TestHarness()
-      ..withBookingStateStore()
+      ..withBookingStateStorage()
       ..withBookingStore()
       ..install());
   });
@@ -21,7 +21,7 @@ void main() {
   group('With both aggregate types and state store is given', () {
     _doAll(TestHarness()
       ..withBookingTypeMaps()
-      ..withBookingStateStore()
+      ..withBookingStateStorage()
       ..withBookingStore()
       ..install());
   });

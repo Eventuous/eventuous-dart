@@ -18,7 +18,7 @@ class TestHarness {
   late final StreamEventStore eventStore;
   late final BookingStore bookingStore;
   late final BookingService bookingService;
-  late final BookingStateStore bookingStateStore;
+  late final BookingStateStorage bookingStateStorage;
 
   bool _useBookingTypeMaps = false;
   TestHarness withBookingTypeMaps() {
@@ -26,9 +26,9 @@ class TestHarness {
     return this;
   }
 
-  bool _useBookingStateStore = false;
-  TestHarness withBookingStateStore() {
-    _useBookingStateStore = true;
+  bool _useBookingStateStorage = false;
+  TestHarness withBookingStateStorage() {
+    _useBookingStateStorage = true;
     return this;
   }
 
@@ -78,16 +78,16 @@ class TestHarness {
       // Setup EventStore instance
       eventStore = use ?? InMemoryEventStore();
 
-      if (_useBookingStateStore) {
-        bookingStateStore = BookingStateStore(
-          onNew: ([value]) => BookingState(value),
+      if (_useBookingStateStorage) {
+        bookingStateStorage = BookingStateStorage(
+          onNew: ([value, version]) => BookingState(value, version),
         );
       }
       if (_useBookingStore) {
         bookingStore = BookingStore(
           eventStore,
           onNew: (id, [state]) => Booking(id, state),
-          states: _useBookingStateStore ? bookingStateStore : null,
+          states: _useBookingStateStorage ? bookingStateStorage : null,
           serializer: DefaultEventSerializer<JsonMap, JsonObject>(),
         );
       }

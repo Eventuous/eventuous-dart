@@ -47,8 +47,8 @@ abstract class AggregateStateStorage<TValue extends Object,
     //
     // Sanity checks
     //
-    if (_onNew == null && !AggregateStateType.containsType(typeOf<TState>())) {
-      throw UnimplementedError('newInstance is not implemented');
+    if (_onNew == null && !AggregateStateType.containsType(TState)) {
+      throw UnimplementedError('newInstance is not implemented for $TState');
     }
   }
 
@@ -58,10 +58,10 @@ abstract class AggregateStateStorage<TValue extends Object,
   /// Create new [AggregateState] instance with
   /// [AggregateState.value] of [TValue]. If [value]
   /// is not given, a default value is used.
-  TState newInstance([TValue? value]) {
+  TState newInstance([TValue? value, int? version]) {
     return _onNew == null
-        ? AggregateStateType.create<TValue, TState>(value)
-        : _onNew!(value);
+        ? AggregateStateType.create<TValue, TState>(value, version)
+        : _onNew!(value, version);
   }
 
   /// Snapshot settings
@@ -71,24 +71,39 @@ abstract class AggregateStateStorage<TValue extends Object,
   final Map<StreamName, _Snapshot<TValue, TState>> _states = {};
 
   /// Read [TState] for given [name] from storage.
-  /// Default implementation returns a new state instance.
-  Future<TState?> read(StreamName name) async => newInstance();
+  Future<AggregateStateSnapshotModel<TValue>?> read(StreamName name);
 
-  /// Write [state] for given [name] to storage
-  Future<void> write(StreamName name, TState state);
+  /// Write [snapshot] of [TState] for given [name] to storage
+  Future<void> write(
+    StreamName name,
+    AggregateStateSnapshotModel<TValue> snapshot,
+  );
 
   /// Load [AggregateState] of type [TState] for given [StreamName].
   @mustCallSuper
   Future<TState> load(StreamName name) async {
     invalidate();
-    return _states[name]?.state ?? await read(name) ?? newInstance();
+    return _states[name]?.state ?? await _read(name) ?? newInstance();
+  }
+
+  Future<TState?> _read(StreamName name) async {
+    final snapshot = await read(name);
+    if (snapshot != null) {
+      return newInstance(
+        snapshot.value,
+        snapshot.version,
+      );
+    }
   }
 
   /// Save [AggregateState] of type [TState] for given [StreamName].
   @mustCallSuper
   Future<void> save(StreamName name, TState state) async {
     if (await shouldSnapshot(name, state)) {
-      await write(name, state);
+      await write(
+        name,
+        AggregateStateSnapshotModel(state.value, state.version),
+      );
       if (settings.useCache) {
         _states[name] = _Snapshot<TValue, TState>(state);
       }
@@ -111,7 +126,7 @@ abstract class AggregateStateStorage<TValue extends Object,
 
   /// Test if given [state] of stream [name] should be taken snapshot of
   Future<bool> shouldSnapshot(StreamName name, TState state) async {
-    final snapshot = _states[name]?.state ?? await read(name);
+    final snapshot = _states[name]?.state ?? await _read(name);
     return state.version > ExpectedStreamVersion.noStream.value &&
         (snapshot == null &&
                 // Eager snapshot?

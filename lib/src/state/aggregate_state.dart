@@ -5,15 +5,11 @@ part of 'aggregate.dart';
 /// be given.
 typedef AggregateStateCreator<TValue extends Object,
         TState extends AggregateState<TValue>>
-    = TState Function([
-  TValue? value,
-]);
+    = TState Function([TValue? value, int? version]);
 
 /// [AggregateState] base class.
 abstract class AggregateState<TValue extends Object> {
-  AggregateState(
-    this.value,
-  );
+  AggregateState(this.value, [int? version]) : _version = version ?? -1;
 
   final _handlers = <Type, Object>{};
 

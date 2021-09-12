@@ -20,9 +20,9 @@ class AggregateStateType {
   /// Create [AggregateState] of [TState] from given [value]
   static TState
       create<TValue extends Object, TState extends AggregateState<TValue>>(
-              [TValue? value]) =>
+              [TValue? value, int? version]) =>
           (_creators[typeOf<TState>()]!
-              as AggregateStateCreator<TValue, TState>)(value);
+              as AggregateStateCreator<TValue, TState>)(value, version);
 
   static bool containsType(Type type) => _map.containsKey(type);
   static bool containsTypeName(String name) => _reverseMap.containsKey(name);

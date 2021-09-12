@@ -22,7 +22,9 @@ class DefaultEventSerializer<TData extends Object, TEvent extends Object>
 
   @override
   List<int> encode(TEvent event) {
-    return utf8.encode(json.encode(event));
+    return utf8.encode(json.encode(
+      event is JsonObject ? event.toJson() : event,
+    ));
   }
 
   @override

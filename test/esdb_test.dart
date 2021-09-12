@@ -16,7 +16,7 @@ void main() {
     final harness = TestHarness()
       ..withBookingTypeMaps()
       ..withBookingStore()
-      ..withBookingStateStore()
+      ..withBookingStateStorage()
       ..withBookingService()
       ..install<EventStoreServerSingleNode>(
         setup: () async {

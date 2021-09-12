@@ -8,9 +8,7 @@ import 'esdb/extensions.dart';
 export 'esdb/extensions.dart';
 
 class EventStoreDB extends StreamEventStore {
-  EventStoreDB(
-    EventStoreStreamsClient client,
-  ) : _client = client;
+  EventStoreDB(this.client);
 
   factory EventStoreDB.from(
     EventStoreClientSettings settings,
@@ -26,7 +24,7 @@ class EventStoreDB extends StreamEventStore {
         EventStoreClientSettings.parse(connectionString),
       ));
 
-  final EventStoreStreamsClient _client;
+  final EventStoreStreamsClient client;
 
   @override
   Future<AppendEventsResult> appendEvents(
@@ -36,17 +34,17 @@ class EventStoreDB extends StreamEventStore {
   ) async {
     try {
       final request = expected == ExpectedStreamVersion.noStream
-          ? _client.append(
+          ? client.append(
               StreamState.noStream(name.value),
               Stream.fromIterable(events.map(_toEventData)),
             )
           : _anyOrNot(
               expected,
-              whenAny: () => _client.append(
+              whenAny: () => client.append(
                 StreamState.any(name.value),
                 Stream.fromIterable(events.map(_toEventData)),
               ),
-              otherwise: () => _client.append(
+              otherwise: () => client.append(
                 StreamState.exists(
                   name.value,
                   revision: expected.asStreamRevision(),
@@ -83,7 +81,7 @@ class EventStoreDB extends StreamEventStore {
     int count = Max,
   ]) async {
     try {
-      final read = await _client.read(
+      final read = await client.read(
         name.value,
         position: start.asStreamPosition(),
         maxCount: count,
@@ -102,7 +100,7 @@ class EventStoreDB extends StreamEventStore {
     int count = Max,
   ]) async {
     try {
-      final read = await _client.read(
+      final read = await client.read(
         name.value,
         forward: false,
         maxCount: count,
@@ -120,7 +118,7 @@ class EventStoreDB extends StreamEventStore {
     int count = Max,
   ]) async* {
     try {
-      final read = await _client.subscribe(
+      final read = await client.subscribe(
         name.value,
         position: start.asStreamPosition(),
       );
@@ -138,10 +136,10 @@ class EventStoreDB extends StreamEventStore {
     try {
       await _anyOrNot(
         expected,
-        whenAny: () => _client.delete(StreamState.any(
+        whenAny: () => client.delete(StreamState.any(
           name.value,
         )),
-        otherwise: () => _client.delete(StreamState.exists(
+        otherwise: () => client.delete(StreamState.exists(
           name.value,
           revision: expected.asStreamRevision(),
         )),
@@ -163,11 +161,11 @@ class EventStoreDB extends StreamEventStore {
       );
       await _anyOrNot(
         expected,
-        whenAny: () => _client.setStreamMetadata(
+        whenAny: () => client.setStreamMetadata(
           StreamState.any(name.value),
           metadata,
         ),
-        otherwise: () => _client.setStreamMetadata(
+        otherwise: () => client.setStreamMetadata(
           StreamState.exists(
             name.value,
             revision: expected.asStreamRevision(),
