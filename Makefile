@@ -1,39 +1,26 @@
 .PHONY: \
-	configure certs models action test doc release
+	configure generate verify update action
 
 .SILENT: \
-	configure certs models action test doc release
+	configure generate verify update action
 
 configure:
-	dart pub global activate pub_release
-	dart pub global activate critical_test
-	pub global activate dcli
-	pub global activate dartdoc
-	pub global activate dhttpd
+	dart pub global activate mono_repo
 	brew install act
 
-certs:
-	sh tool/gencert.sh . --secure
+generate:
+	echo "Generating github actions for all packages..."
+	mono_repo generate
 
-test:
-	if [ ! -d test/certs ]; then . tool/gencert.sh test; fi
-	dart test -j 1
+verify:
+	echo "Verifying packages..."
+	mono_repo check
+	mono_repo presubmit
 
-models:
-	echo "Generating models..."; \
-	pub run build_runner build --delete-conflicting-outputs; \
-	echo "[✓] Generating models complete."
-
-doc:
-	rm -rf doc
-	dartdoc
-	echo "Starting server at http://localhost:8080"
-	dhttpd --path doc/api
+upgrade:
+	echo "Updating packages..."
+	mono_repo pub upgrade --major-versions
 
 action:
 	echo "Running github actions..."
 	act
-
-release:
-	echo 'Release to pub.dev...'
-	pub_release --no-test

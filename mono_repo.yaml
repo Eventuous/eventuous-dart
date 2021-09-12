@@ -1,0 +1,24 @@
+# Enabled GitHub actions - https://docs.github.com/actions
+# If you have no configuration, you can set the value to `true` or just leave it
+# empty.
+github:
+  on_completion:
+    - name: Collect and publish coverage
+      runs-on: ubuntu-latest
+      steps:
+        - name: Collect coverage
+          run: format_coverage --lcov --in=coverage --out=coverage.lcov --packages=.packages --report-on=lib
+        - name: Publish coverage
+          uses: codecov/codecov-action@v1.0.2
+          with:
+            token: ${{ secrets.CODECOV_TOKEN }}
+
+
+# Adds a job that runs `mono_repo generate --validate` to check that everything
+# is upto date. You can specify the value as just `true` or give a `stage`
+# you'd like this job to run in.
+self_validate: analyze
+
+# Use this key to merge stages across packages to create fewer jobs
+merge_stages:
+  - analyze_and_format
