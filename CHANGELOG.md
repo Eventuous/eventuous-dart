@@ -1,3 +1,6 @@
+# 0.0.4
+- Added support for snapshotting
+
 # 0.0.3-prerelease
 - Added EventStoreDB support
 
