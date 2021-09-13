@@ -1,5 +1,5 @@
 [![Pub](https://img.shields.io/pub/v/eventuous.svg)](https://pub.dev/packages/eventuous)
-[![Dart](https://github.com/Eventuous/eventuous-dart/actions/workflows/test.yml/badge.svg)](https://github.com/Eventuous/eventuous-dart/actions/workflows/test.yml)
+[![Dart](https://github.com/Eventuous/eventuous-dart/actions/workflows/dart.yml/badge.svg)](https://github.com/Eventuous/eventuous-dart/actions/workflows/dart.yml)
 [![codecov](https://codecov.io/gh/Eventuous/eventuous-dart/branch/master/graph/badge.svg?token=HAHS8DUBHM)](https://codecov.io/gh/Eventuous/eventuous-dart)
 
 

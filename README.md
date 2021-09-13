@@ -1,3 +1,5 @@
+[![Dart](https://github.com/Eventuous/eventuous-dart/actions/workflows/dart.yml/badge.svg)](https://github.com/Eventuous/eventuous-dart/actions/workflows/dart.yml)
+
 A mono-repo for [eventuous](https://pub.dev/packages/eventuous) and associated packages for building event sourced applications.
 
 ## About
