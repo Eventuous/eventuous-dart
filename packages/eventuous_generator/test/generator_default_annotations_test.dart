@@ -65,7 +65,7 @@ void main() {
 
 const ExampleSourceCodeDefaults = r'''
 import 'package:eventuous/eventuous.dart';
-import 'package:eventuous_annotation/eventuous_annotation.dart';
+import 'package:eventuous/eventuous.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'example.eventuous.dart';
@@ -87,7 +87,7 @@ class ExampleCreated extends _$ExampleCreated {}
 
 const ExampleSourceCodeTyped = r'''
 import 'package:eventuous/eventuous.dart';
-import 'package:eventuous_annotation/eventuous_annotation.dart';
+import 'package:eventuous/eventuous.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'example.eventuous.dart';

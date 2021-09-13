@@ -69,40 +69,6 @@ jobs:
     needs:
       - job_001
   job_003:
-    name: "analyze_and_format; PKG: packages/eventuous_annotations; `dart analyze --fatal-infos .`, `dart format --output=none --set-exit-if-changed .`"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cache Pub hosted dependencies
-        uses: actions/cache@v2.1.6
-        with:
-          path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:packages/eventuous_annotations;commands:analyze-format"
-          restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:packages/eventuous_annotations
-            os:ubuntu-latest;pub-cache-hosted;dart:stable
-            os:ubuntu-latest;pub-cache-hosted
-            os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v1.2
-        with:
-          sdk: stable
-      - id: checkout
-        uses: actions/checkout@v2.3.4
-      - id: packages_eventuous_annotations_pub_upgrade
-        name: packages/eventuous_annotations; dart pub upgrade
-        if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: packages/eventuous_annotations
-        run: dart pub upgrade
-      - name: "packages/eventuous_annotations; dart analyze --fatal-infos ."
-        if: "always() && steps.packages_eventuous_annotations_pub_upgrade.conclusion == 'success'"
-        working-directory: packages/eventuous_annotations
-        run: dart analyze --fatal-infos .
-      - name: "packages/eventuous_annotations; dart format --output=none --set-exit-if-changed ."
-        if: "always() && steps.packages_eventuous_annotations_pub_upgrade.conclusion == 'success'"
-        working-directory: packages/eventuous_annotations
-        run: "dart format --output=none --set-exit-if-changed ."
-    needs:
-      - job_001
-  job_004:
     name: "analyze_and_format; PKG: packages/eventuous_generator; `dart analyze --fatal-infos .`, `dart format --output=none --set-exit-if-changed .`"
     runs-on: ubuntu-latest
     steps:
@@ -136,7 +102,7 @@ jobs:
         run: "dart format --output=none --set-exit-if-changed ."
     needs:
       - job_001
-  job_005:
+  job_004:
     name: "unit_test; PKG: packages/eventuous; `dart test -j 1 --reporter=expanded --coverage=\"coverage\"`"
     runs-on: ubuntu-latest
     steps:
@@ -168,41 +134,7 @@ jobs:
       - job_001
       - job_002
       - job_003
-      - job_004
-  job_006:
-    name: "unit_test; PKG: packages/eventuous_annotations; `dart test -j 1 --reporter=expanded --coverage=\"coverage\"`"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cache Pub hosted dependencies
-        uses: actions/cache@v2.1.6
-        with:
-          path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:packages/eventuous_annotations;commands:test"
-          restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:packages/eventuous_annotations
-            os:ubuntu-latest;pub-cache-hosted;dart:stable
-            os:ubuntu-latest;pub-cache-hosted
-            os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v1.2
-        with:
-          sdk: stable
-      - id: checkout
-        uses: actions/checkout@v2.3.4
-      - id: packages_eventuous_annotations_pub_upgrade
-        name: packages/eventuous_annotations; dart pub upgrade
-        if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: packages/eventuous_annotations
-        run: dart pub upgrade
-      - name: "packages/eventuous_annotations; dart test -j 1 --reporter=expanded --coverage=\"coverage\""
-        if: "always() && steps.packages_eventuous_annotations_pub_upgrade.conclusion == 'success'"
-        working-directory: packages/eventuous_annotations
-        run: "dart test -j 1 --reporter=expanded --coverage=\"coverage\""
-    needs:
-      - job_001
-      - job_002
-      - job_003
-      - job_004
-  job_007:
+  job_005:
     name: "unit_test; PKG: packages/eventuous_generator; `dart test -j 1 --reporter=expanded --coverage=\"coverage\"`"
     runs-on: ubuntu-latest
     steps:
@@ -234,14 +166,14 @@ jobs:
       - job_001
       - job_002
       - job_003
-      - job_004
-  job_008:
+  job_006:
     name: Collect and publish coverage
     runs-on: ubuntu-latest
     steps:
-      - name: Collect coverage
+      - name: Collect test coverage
+        working-directory: packages/eventuous_generator
         run: "format_coverage --lcov --in=coverage --out=coverage.lcov --packages=.packages --report-on=lib"
-      - name: Publish coverage
+      - name: Publish test coverage
         uses: codecov/codecov-action@v1.0.2
         with:
           token: "${{ secrets.CODECOV_TOKEN }}"
@@ -251,5 +183,3 @@ jobs:
       - job_003
       - job_004
       - job_005
-      - job_006
-      - job_007

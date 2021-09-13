@@ -1,6 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:eventuous/eventuous.dart';
-import 'package:eventuous_annotation/eventuous_annotation.dart';
 
 import '../extensions.dart';
 import '../inference.dart';

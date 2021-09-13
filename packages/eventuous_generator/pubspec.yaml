@@ -12,13 +12,10 @@ dependencies:
   build: ^2.1.0
   source_gen: ^1.1.0
   eventuous: ^0.0.4
-  eventuous_annotation: ^0.0.1-prerelase
 
 dependency_overrides:
   eventuous:
     path: ../eventuous
-  eventuous_annotation:
-    path: ../eventuous_annotation
 
 dev_dependencies:
   build_runner: ^2.0.0

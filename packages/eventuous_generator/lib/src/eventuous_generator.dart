@@ -3,7 +3,7 @@ import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:build/src/builder/build_step.dart';
-import 'package:eventuous_annotation/eventuous_annotation.dart';
+import 'package:eventuous/eventuous.dart';
 import 'package:eventuous_generator/src/templates/aggregate_template.dart';
 import 'package:source_gen/source_gen.dart';
 

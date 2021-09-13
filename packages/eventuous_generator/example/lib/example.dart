@@ -1,5 +1,4 @@
 import 'package:eventuous/eventuous.dart';
-import 'package:eventuous_annotation/eventuous_annotation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'example.g.dart';

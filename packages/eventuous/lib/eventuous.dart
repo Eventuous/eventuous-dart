@@ -2,6 +2,12 @@
 ///
 library eventuous;
 
+export 'src/annotations/aggregate_command_type.dart';
+export 'src/annotations/aggregate_event_type.dart';
+export 'src/annotations/aggregate_state_type.dart';
+export 'src/annotations/aggregate_type.dart';
+export 'src/annotations/aggregate_value_type.dart';
+export 'src/annotations/eventuous.dart';
 export 'src/app/enums.dart';
 export 'src/app/handlers.dart';
 export 'src/app/result.dart';
@@ -25,10 +31,10 @@ export 'src/store/event_store.dart';
 export 'src/store/event_store_db.dart';
 export 'src/store/event_store_result.dart';
 export 'src/stream/event_handler.dart';
-export 'src/stream/event_types.dart';
-export 'src/stream/event_typedefs.dart';
-export 'src/stream/metadata.dart';
 export 'src/stream/event_serializer.dart';
+export 'src/stream/event_typedefs.dart';
+export 'src/stream/event_types.dart';
+export 'src/stream/metadata.dart';
 export 'src/stream/stream_event.dart';
 export 'src/stream/stream_name.dart';
 export 'src/stream/version.dart';
