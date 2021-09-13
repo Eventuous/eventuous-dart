@@ -1,6 +1,6 @@
-import 'package:json_patch/json_patch.dart';
 import 'package:collection/collection.dart';
 import 'package:eventuous/eventuous.dart';
+import 'package:json_patch/json_patch.dart';
 
 import 'json_object.dart';
 import 'models/conflict_model.dart';

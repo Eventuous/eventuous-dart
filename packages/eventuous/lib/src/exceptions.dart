@@ -2,6 +2,7 @@ import 'package:eventuous/eventuous.dart';
 
 class StreamException implements Exception {
   StreamException(this.message, [this.cause]);
+
   final String message;
   final Object? cause;
 
@@ -45,7 +46,9 @@ class StreamNotFoundException extends StreamException {
 
 class DomainException implements Exception {
   DomainException(this.message);
+
   final String message;
+
   @override
   String toString() => "$runtimeType: '$message'";
 }
@@ -94,9 +97,12 @@ class CommandHandlerNotFoundException extends DomainException {
 ///  is null when it shouldn't be.
 class ArgumentNullOrEmptyException implements Exception {
   ArgumentNullOrEmptyException(this.name, this.isNull);
+
   final String name;
   final bool isNull;
+
   bool get isEmpty => !isNull;
+
   String get message => "Argument '$name' is ${isNull ? 'null' : 'empty'}";
 
   @override

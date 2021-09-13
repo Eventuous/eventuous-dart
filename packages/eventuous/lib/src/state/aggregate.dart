@@ -4,9 +4,9 @@ import 'dart:collection';
 import 'package:eventuous/eventuous.dart';
 import 'package:meta/meta.dart';
 
-part 'aggregate_store.dart';
 part 'aggregate_state.dart';
 part 'aggregate_state_result.dart';
+part 'aggregate_store.dart';
 
 /// [Aggregate] instance creator method. If [state] is
 /// not given, a new [AggregateState] instance must be
@@ -76,7 +76,7 @@ abstract class Aggregate<TEvent extends Object, TValue extends Object,
       );
 
   /// Get list of pending changes [Event]s folded into [current] state
-  EventList<TEvent> get changes => UnmodifiableListView(_changes);
+  AggregateEventList<TEvent> get changes => UnmodifiableListView(_changes);
   final _changes = <TEvent>[];
 
   /// Check if local [changes] exists

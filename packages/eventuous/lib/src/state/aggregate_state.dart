@@ -35,13 +35,14 @@ abstract class AggregateState<TValue extends Object> {
       throw UnknownEventException(eventType, 'Handler not found');
     }
     return (_handlers[eventType]!
-        as EventHandlerCallback<TEvent, TValue, TState>)(event, value)
+        as AggregateEventHandlerCallback<TEvent, TValue, TState>)(event, value)
       .._version = _version + 1;
   }
 
   /// Register handler for given event
   void on<TEvent extends Object>(
-    EventHandlerCallback<TEvent, TValue, AggregateState<TValue>> handler,
+    AggregateEventHandlerCallback<TEvent, TValue, AggregateState<TValue>>
+        handler,
   ) {
     if (_handlers.containsKey(typeOf<TEvent>())) {
       throw ArgumentError(

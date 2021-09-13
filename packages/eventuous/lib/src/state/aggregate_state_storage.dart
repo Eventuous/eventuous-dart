@@ -6,12 +6,12 @@ import 'package:meta/meta.dart';
 /// Snapshots are the representation of the current state
 /// at a certain "point in time", and it is an optimization
 /// that is considered and anti-pattern in general. Streams
-/// with may events indicates usually that the model is wrong.
-/// In general each stream should contain events from a aggregate
+/// with many events indicates usually that the model is wrong.
+/// In general each stream should contain events from an aggregate
 /// instance (instance streams) only, which normally implies a
 /// small number of events in each stream. In such cases, it is
 /// better to just read all events and fold them onto the state.
-/// Snapshotting could be a good fit if the number of events is
+/// Snapshotting could be a good fit if the number of events are
 /// large though. For more on how to implement snapshotting,
 /// see [Snapshotting strategies](https://www.eventstore.com/blog/snapshotting-strategies)
 /// and [Snapshots in Event sourcing](https://www.eventstore.com/blog/snapshots-in-event-sourcing).
@@ -25,7 +25,7 @@ import 'package:meta/meta.dart';
 /// [AggregateStateStorageSettings.useCache] must be [true].
 ///
 /// If [onNew] is not given, [AggregateStateCreator]
-/// must be registered with [AggregateStateType.addType],
+/// must be registered with [AggregateStateTypes.define],
 /// or method [newInstance] must be overridden (implements
 /// [AggregateStateCreator] as default method).
 ///
@@ -37,7 +37,7 @@ abstract class AggregateStateStorage<TValue extends Object,
   /// Default constructor.
   ///
   /// If [onNew] is not given, [AggregateStateCreator]
-  /// must be registered with [AggregateStateType.addType],
+  /// must be registered with [AggregateStateTypes.define],
   /// or method [newInstance] must be overridden.
   ///
   AggregateStateStorage({
@@ -47,7 +47,7 @@ abstract class AggregateStateStorage<TValue extends Object,
     //
     // Sanity checks
     //
-    if (_onNew == null && !AggregateStateType.containsType(TState)) {
+    if (_onNew == null && !AggregateStateTypes.containsType(TState)) {
       throw UnimplementedError('newInstance is not implemented for $TState');
     }
   }
@@ -60,7 +60,7 @@ abstract class AggregateStateStorage<TValue extends Object,
   /// is not given, a default value is used.
   TState newInstance([TValue? value, int? version]) {
     return _onNew == null
-        ? AggregateStateType.create<TValue, TState>(value, version)
+        ? AggregateStateTypes.create<TValue, TState>(value, version)
         : _onNew!(value, version);
   }
 

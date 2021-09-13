@@ -6,6 +6,7 @@ class StreamEvent {
     this.position, {
     this.metadata = const <int>[],
   });
+
   final int position;
   final List<int> data;
   final String eventType;

@@ -27,11 +27,11 @@ class AggregateStore<
   /// Default constructor.
   ///
   /// If [onNew] is not given, [AggregateCreator]
-  /// must be registered with [AggregateType.addType],
+  /// must be registered with [AggregateTypes.define],
   /// or method [newInstance] must be overridden.
   ///
   /// If [states] is not given, [AggregateStateCreator]
-  /// must be registered with [AggregateStateType.addType],
+  /// must be registered with [AggregateStateTypes.define],
   /// or method [newStateInstance] must be overridden.
   ///
   @mustCallSuper
@@ -47,10 +47,10 @@ class AggregateStore<
     //
     // Sanity checks
     //
-    if (_onNew == null && !AggregateType.containsType(TAggregate)) {
+    if (_onNew == null && !AggregateTypes.containsType(TAggregate)) {
       throw UnimplementedError('newInstance is not implemented');
     }
-    if (_states == null && !AggregateStateType.containsType(TState)) {
+    if (_states == null && !AggregateStateTypes.containsType(TState)) {
       throw UnimplementedError('newStateInstance is not implemented');
     }
   }
@@ -73,7 +73,7 @@ class AggregateStore<
   /// Create new [Aggregate] instance of type [TAggregate]
   TAggregate newInstance(TId id, [TState? state]) {
     return _onNew == null
-        ? AggregateType.create<TEvent, TValue, TId, TState, TAggregate>(
+        ? AggregateTypes.create<TEvent, TValue, TId, TState, TAggregate>(
             id, state)
         : _onNew!(id, state);
   }
@@ -81,7 +81,7 @@ class AggregateStore<
   /// Create new [AggregateState] instance of type [TState]
   TState newStateInstance([TValue? value]) {
     return _states == null
-        ? AggregateStateType.create<TValue, TState>(value)
+        ? AggregateStateTypes.create<TValue, TState>(value)
         : _states!.newInstance(value);
   }
 
@@ -234,7 +234,7 @@ class AggregateStore<
 
   StreamEvent toStreamEvent(TEvent event, int position) {
     return StreamEvent(
-      EventType.getTypeNameFromEvent(event),
+      AggregateEventTypes.getTypeNameFromEvent(event),
       _serializer.encode(event),
       _serializer.contentType,
       position,

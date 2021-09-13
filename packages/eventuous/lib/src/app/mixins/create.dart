@@ -14,12 +14,14 @@ mixin OnCreateAggregateMixin<
   /// Use parameter [action] to performed actions on the aggregate,
   /// given the aggregate instance and the command
   /// * Type parameter [TCommand] - Command type
-  void OnNew<TCommand extends Object>(AggregateIdResolver<TCommand, TId> toId,
-      Handler<TCommand, TEvent, TValue, TId, TState, TAggregate> action) {
+  void OnNew<TCommand extends Object>(
+      AggregateIdResolver<TCommand, TId> toId,
+      AggregateCommandHandler<TCommand, TEvent, TValue, TId, TState, TAggregate>
+          action) {
     _handlers.putIfAbsent(
       typeOf<TCommand>(),
-      () =>
-          RegisteredHandler<TCommand, TEvent, TValue, TId, TState, TAggregate>(
+      () => RegisteredAggregateCommandHandler<TCommand, TEvent, TValue, TId,
+          TState, TAggregate>(
         ExpectedState.notExists,
         action,
       ),

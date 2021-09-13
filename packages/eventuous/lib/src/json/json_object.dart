@@ -35,6 +35,7 @@ abstract class JsonObject extends Equatable {
   static JsonObject empty() => _EmptyJsonObject();
 
   bool get isNotEmpty => !isEmpty;
+
   bool get isEmpty => toJson().isEmpty;
 
   @override

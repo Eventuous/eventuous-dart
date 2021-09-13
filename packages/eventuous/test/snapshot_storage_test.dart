@@ -6,7 +6,7 @@ import 'fixtures/harness.dart';
 void main() {
   group('When saving aggregate state', () {
     setUpAll(() {
-      addBookingTypes();
+      defineBookingTypes();
     });
 
     test('snapshots are not saved eagerly', () async {
@@ -30,7 +30,7 @@ void main() {
         'roomId': 'value',
         'bookingId': 'value',
       };
-      final roomBooked = EventType.create<JsonMap, RoomBooked>(
+      final roomBooked = AggregateEventTypes.create<JsonMap, RoomBooked>(
         '$RoomBooked',
         data,
       );
@@ -58,7 +58,7 @@ void main() {
         'roomId': 'value',
         'bookingId': 'value',
       };
-      final roomBooked = EventType.create<JsonMap, RoomBooked>(
+      final roomBooked = AggregateEventTypes.create<JsonMap, RoomBooked>(
         '$RoomBooked',
         data,
       );
@@ -108,7 +108,7 @@ void main() {
         'roomId': 'value',
         'bookingId': 'value',
       };
-      final roomBooked = EventType.create<JsonMap, RoomBooked>(
+      final roomBooked = AggregateEventTypes.create<JsonMap, RoomBooked>(
         '$RoomBooked',
         data,
       );

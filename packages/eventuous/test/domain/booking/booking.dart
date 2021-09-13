@@ -1,18 +1,18 @@
 import 'package:eventuous/eventuous.dart';
 import 'package:uuid/uuid.dart';
 
-import 'events/room_booked.dart';
-import 'events/booking_payment_registered.dart';
 import 'events/booking_imported.dart';
+import 'events/booking_payment_registered.dart';
+import 'events/room_booked.dart';
 import 'states/booking_state.dart';
 import 'states/booking_state_model.dart';
 
 export 'app/booking_commands.dart';
 export 'app/booking_service.dart';
 export 'booking_typedefs.dart';
-export 'events/room_booked.dart';
-export 'events/booking_payment_registered.dart';
 export 'events/booking_imported.dart';
+export 'events/booking_payment_registered.dart';
+export 'events/room_booked.dart';
 export 'states/booking_state.dart';
 export 'states/booking_state_model.dart';
 export 'states/booking_state_model.dart';
@@ -61,27 +61,31 @@ class Booking
   }
 
   String? get roomId => current.roomId;
+
   String? get importId => current.importId;
 
   int? get price => current.price;
+
   int? get amountPaid => current.amountPaid;
+
   bool get isFullyPaid => current.isFullyPaid;
 }
 
-void addBookingTypes() {
-  AggregateType.addType<JsonObject, JsonObject, BookingId, BookingState,
+void defineBookingTypes() {
+  AggregateTypes.define<JsonObject, JsonObject, BookingId, BookingState,
       Booking>((id, [state]) => Booking(id, state));
-  AggregateStateType.addType<BookingStateModel, BookingState>(
+  AggregateStateTypes.define<BookingStateModel, BookingState>(
     ([value, version]) => BookingState(value, version),
   );
-  addBookingEventTypes();
+  defineBookingEventTypes();
 }
 
-void addBookingEventTypes() {
-  EventType.addType<JsonMap, RoomBooked>((data) => RoomBooked.fromJson(data));
-  EventType.addType<JsonMap, BookingPaymentRegistered>(
+void defineBookingEventTypes() {
+  AggregateEventTypes.define<JsonMap, RoomBooked>(
+      (data) => RoomBooked.fromJson(data));
+  AggregateEventTypes.define<JsonMap, BookingPaymentRegistered>(
       (data) => BookingPaymentRegistered.fromJson(data));
-  EventType.addType<JsonMap, BookingImported>(
+  AggregateEventTypes.define<JsonMap, BookingImported>(
     (data) => BookingImported.fromJson(data),
   );
 }

@@ -1,12 +1,12 @@
 import 'package:eventuous/eventuous.dart';
 
-abstract class Result<
+abstract class AggregateCommandResult<
     TEvent extends Object,
     TValue extends Object,
     TId extends AggregateId,
     TState extends AggregateState<TValue>,
     TAggregate extends Aggregate<TEvent, TValue, TId, TState>> {
-  Result([this.aggregate]);
+  AggregateCommandResult([this.aggregate]);
 
   /// [TAggregate] modified
   final TAggregate? aggregate;
@@ -21,7 +21,9 @@ abstract class Result<
   TState? get original => aggregate?.original;
 
   bool get isError => !isOk;
-  bool get isOk => this is OkResult;
+
+  bool get isOk => this is AggregateCommandOkResult;
+
   bool get isNoOp => changes?.isNotEmpty != true;
 
   @override
@@ -30,14 +32,14 @@ abstract class Result<
   }
 }
 
-class OkResult<
+class AggregateCommandOkResult<
         TEvent extends Object,
         TValue extends Object,
         TId extends AggregateId,
         TState extends AggregateState<TValue>,
         TAggregate extends Aggregate<TEvent, TValue, TId, TState>>
-    extends Result<TEvent, TValue, TId, TState, TAggregate> {
-  OkResult(
+    extends AggregateCommandResult<TEvent, TValue, TId, TState, TAggregate> {
+  AggregateCommandOkResult(
     TAggregate aggregate,
     this.position,
   ) : super(aggregate);
@@ -53,14 +55,14 @@ class OkResult<
   }
 }
 
-class ErrorResult<
+class AggregateCommandErrorResult<
         TEvent extends Object,
         TValue extends Object,
         TId extends AggregateId,
         TState extends AggregateState<TValue>,
         TAggregate extends Aggregate<TEvent, TValue, TId, TState>>
-    extends Result<TEvent, TValue, TId, TState, TAggregate> {
-  ErrorResult(
+    extends AggregateCommandResult<TEvent, TValue, TId, TState, TAggregate> {
+  AggregateCommandErrorResult(
     this.cause, [
     TAggregate? aggregate,
   ]) : super(aggregate);

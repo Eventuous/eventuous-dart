@@ -7,8 +7,12 @@ repository: https://github.com/Eventuous/eventuous-dart
 environment:
   sdk: '>=2.12.0 <3.0.0'
 
-# dependencies:
-#   path: ^1.8.0
+dependencies:
+  eventuous: ^0.0.4
+
+dependency_overrides:
+  eventuous:
+    path: ../eventuous
 
 dev_dependencies:
   pedantic: ^1.10.0

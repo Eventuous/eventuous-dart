@@ -8,6 +8,7 @@ class AggregateId {
       );
     }
   }
+
   final String value;
 
   @override

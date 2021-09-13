@@ -19,7 +19,9 @@ abstract class EventStoreServer {
   final String hostCertificatePath;
 
   Future<void> start({bool Function(String)? isReady});
+
   Future<void> stop();
+
   void verifyCertificatesExist() {
     if (secure) {
       final certificateFiles = [

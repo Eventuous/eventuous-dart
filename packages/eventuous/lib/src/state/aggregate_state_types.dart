@@ -1,12 +1,12 @@
 import 'package:eventuous/eventuous.dart';
 
-class AggregateStateType {
+class AggregateStateTypes {
   static final Map<Type, Object> _creators = {};
   static final Map<Type, String> _map = <Type, String>{};
   static final Map<String, Type> _reverseMap = <String, Type>{};
 
   static void
-      addType<TValue extends Object, TState extends AggregateState<TValue>>(
+      define<TValue extends Object, TState extends AggregateState<TValue>>(
     AggregateStateCreator<TValue, TState> creator, {
     String? name,
   }) {
@@ -25,5 +25,6 @@ class AggregateStateType {
               as AggregateStateCreator<TValue, TState>)(value, version);
 
   static bool containsType(Type type) => _map.containsKey(type);
+
   static bool containsTypeName(String name) => _reverseMap.containsKey(name);
 }

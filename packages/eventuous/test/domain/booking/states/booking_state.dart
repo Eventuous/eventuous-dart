@@ -14,10 +14,13 @@ class BookingState extends AggregateState<BookingStateModel> {
   }
 
   String? get roomId => value.roomId;
+
   String? get importId => value.importId;
 
   int? get price => value.price;
+
   int? get amountPaid => value.amountPaid;
+
   bool get isFullyPaid => value.isFullyPaid;
 
   static BookingState patch(JsonObject event, BookingStateModel state) {

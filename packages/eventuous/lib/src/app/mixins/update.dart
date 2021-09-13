@@ -16,11 +16,12 @@ mixin OnUpdateAggregateMixin<
   /// * Type parameter [TCommand] - Command type
   void OnExisting<TCommand extends Object>(
       AggregateIdResolver<TCommand, TId> toId,
-      Handler<TCommand, TEvent, TValue, TId, TState, TAggregate> action) {
+      AggregateCommandHandler<TCommand, TEvent, TValue, TId, TState, TAggregate>
+          action) {
     _handlers.putIfAbsent(
       typeOf<TCommand>(),
-      () =>
-          RegisteredHandler<TCommand, TEvent, TValue, TId, TState, TAggregate>(
+      () => RegisteredAggregateCommandHandler<TCommand, TEvent, TValue, TId,
+          TState, TAggregate>(
         ExpectedState.exists,
         action,
       ),

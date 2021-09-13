@@ -6,15 +6,17 @@ import 'fixtures/harness.dart';
 void main() {
   group('When registering types', () {
     setUpAll(() {
-      addBookingTypes();
+      defineBookingTypes();
     });
 
     test('event types are checkable', () async {
       // Assert
-      expect(EventType.containsType(RoomBooked), isTrue);
-      expect(EventType.containsTypeName('$RoomBooked'), isTrue);
-      expect(EventType.containsType(BookingPaymentRegistered), isTrue);
-      expect(EventType.containsTypeName('$BookingPaymentRegistered'), isTrue);
+      expect(AggregateEventTypes.containsType(RoomBooked), isTrue);
+      expect(AggregateEventTypes.containsTypeName('$RoomBooked'), isTrue);
+      expect(
+          AggregateEventTypes.containsType(BookingPaymentRegistered), isTrue);
+      expect(AggregateEventTypes.containsTypeName('$BookingPaymentRegistered'),
+          isTrue);
     });
 
     test('event types are creatable', () async {
@@ -27,11 +29,12 @@ void main() {
         'bookingId': 'value',
       };
       // Act
-      final roomBooked = EventType.create<JsonMap, RoomBooked>(
+      final roomBooked = AggregateEventTypes.create<JsonMap, RoomBooked>(
         '$RoomBooked',
         data,
       );
-      final roomPaid = EventType.create<JsonMap, BookingPaymentRegistered>(
+      final roomPaid =
+          AggregateEventTypes.create<JsonMap, BookingPaymentRegistered>(
         '$BookingPaymentRegistered',
         data,
       );
@@ -45,14 +48,14 @@ void main() {
 
     test('aggregate types are checkable', () async {
       // Assert
-      expect(AggregateType.containsType(Booking), isTrue);
+      expect(AggregateTypes.containsType(Booking), isTrue);
     });
 
     test('aggregate types are creatable', () async {
       // Arrange
       final data = BookingStateModel.fromJson({'roomId': 'value'});
       // Act
-      final booking = AggregateType.create<JsonObject, JsonObject, BookingId,
+      final booking = AggregateTypes.create<JsonObject, JsonObject, BookingId,
           BookingState, Booking>(
         BookingId('$RoomBooked'),
         BookingState(data),
@@ -66,7 +69,7 @@ void main() {
 
     test('aggregate state types are checkable', () async {
       // Assert
-      expect(AggregateStateType.containsType(BookingState), isTrue);
+      expect(AggregateStateTypes.containsType(BookingState), isTrue);
     });
 
     test('aggregate state types are creatable', () async {
@@ -80,7 +83,7 @@ void main() {
       };
 
       // Act
-      final state = AggregateStateType.create<BookingStateModel, BookingState>(
+      final state = AggregateStateTypes.create<BookingStateModel, BookingState>(
         BookingStateModel.fromJson(data),
       );
 

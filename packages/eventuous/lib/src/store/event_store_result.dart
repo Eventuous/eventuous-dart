@@ -4,6 +4,7 @@ class EventStoreResult {}
 
 class AppendEventsResult extends EventStoreResult {
   AppendEventsResult._(this.name);
+
   final StreamName name;
 
   factory AppendEventsResult.ok(StreamName name, int global, int expected) =>
@@ -25,6 +26,7 @@ class AppendEventsResult extends EventStoreResult {
       );
 
   bool get isOk => this is AppendEventsOk;
+
   bool get isError => this is AppendEventsError;
 }
 

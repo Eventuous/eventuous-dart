@@ -1,11 +1,11 @@
 import 'package:eventuous/eventuous.dart';
 
-class AggregateType {
+class AggregateTypes {
   static final Map<Type, Object> _creators = {};
   static final Map<Type, String> _map = <Type, String>{};
   static final Map<String, Type> _reverseMap = <String, Type>{};
 
-  static void addType<
+  static void define<
       TEvent extends Object,
       TValue extends Object,
       TId extends AggregateId,
@@ -21,7 +21,7 @@ class AggregateType {
     _creators[type] = creator;
   }
 
-  /// Create [Aggregate] of [type] from given [data]
+  /// Create [Aggregate] of [type] from given [event]
   static TAggregate create<
               TEvent extends Object,
               TValue extends Object,
@@ -34,5 +34,6 @@ class AggregateType {
           id, state);
 
   static bool containsType(Type type) => _map.containsKey(type);
+
   static bool containsTypeName(String name) => _reverseMap.containsKey(name);
 }

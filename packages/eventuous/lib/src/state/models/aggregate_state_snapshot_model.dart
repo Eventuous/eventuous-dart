@@ -15,7 +15,7 @@ class AggregateStateSnapshotModel<TValue extends Object> extends JsonObject {
   factory AggregateStateSnapshotModel.fromJson(Map<String, dynamic> json) =>
       _$AggregateStateSnapshotModelFromJson(
         json,
-        (json) => EventType.create<JsonMap, TValue>(
+        (json) => AggregateEventTypes.create<JsonMap, TValue>(
           '$TValue',
           json as JsonMap,
         ),

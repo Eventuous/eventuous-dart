@@ -20,17 +20,17 @@ mixin ApplicationServiceMixin<
   AggregateStore<TData, TEvent, TValue, TId, TState, TAggregate> get store;
 
   // Internal map of command handlers
-  final HandlersMap<Object, TEvent, TValue, TId, TState, TAggregate> _handlers =
-      {};
+  final AggregateCommandHandlersMap<Object, TEvent, TValue, TId, TState,
+      TAggregate> _handlers = {};
 
   // Internal map of aggregate id resolvers
   final AggregateIdMap<Object, TId> _resolvers = {};
 
   /// The generic command handler. Call this function from your edge (API).
   /// Use parameter [command] to execute
-  /// Returns the [Result] of the execution
+  /// Returns the [AggregateCommandResult] of the execution
   /// * Type parameter [TCommand] - command type
-  FutureOr<Result<TEvent, TValue, TId, TState, TAggregate>>
+  FutureOr<AggregateCommandResult<TEvent, TValue, TId, TState, TAggregate>>
       handle<TCommand extends Object>(
     TCommand command,
   ) async {
@@ -75,7 +75,7 @@ mixin ApplicationServiceMixin<
     }
   }
 
-  Result<TEvent, TValue, TId, TState, TAggregate> _fromResult(
+  AggregateCommandResult<TEvent, TValue, TId, TState, TAggregate> _fromResult(
     TAggregate aggregate,
     AggregateStateResult<TEvent, TValue, TId, TState> result,
   ) {
@@ -87,19 +87,19 @@ mixin ApplicationServiceMixin<
         : _toOk(aggregate);
   }
 
-  OkResult<TEvent, TValue, TId, TState, TAggregate> _toOk(
+  AggregateCommandOkResult<TEvent, TValue, TId, TState, TAggregate> _toOk(
       TAggregate aggregate) {
-    return OkResult<TEvent, TValue, TId, TState, TAggregate>(
+    return AggregateCommandOkResult<TEvent, TValue, TId, TState, TAggregate>(
       aggregate,
       StreamReadPosition(aggregate.currentVersion),
     );
   }
 
-  ErrorResult<TEvent, TValue, TId, TState, TAggregate> _toError(
+  AggregateCommandErrorResult<TEvent, TValue, TId, TState, TAggregate> _toError(
     Object cause, [
     TAggregate? aggregate,
   ]) {
-    return ErrorResult<TEvent, TValue, TId, TState, TAggregate>(
+    return AggregateCommandErrorResult<TEvent, TValue, TId, TState, TAggregate>(
       cause,
       aggregate,
     );

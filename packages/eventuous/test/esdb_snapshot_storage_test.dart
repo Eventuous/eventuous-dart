@@ -14,9 +14,9 @@ void main() {
     late EventStoreDB esdb;
     late EventStoreServerSingleNode server;
     setUpAll(() async {
-      addBookingTypes();
+      defineBookingTypes();
       // Register BookingState snapshot event type
-      EventType.addType<JsonMap, BookingStateModel>(
+      AggregateEventTypes.define<JsonMap, BookingStateModel>(
         (data) => BookingStateModel.fromJson(data),
       );
       server = EventStoreServerSingleNode();
@@ -48,7 +48,7 @@ void main() {
         'roomId': 'value',
         'bookingId': 'value',
       };
-      final roomBooked = EventType.create<JsonMap, RoomBooked>(
+      final roomBooked = AggregateEventTypes.create<JsonMap, RoomBooked>(
         '$RoomBooked',
         data,
       );
@@ -76,7 +76,7 @@ void main() {
         'roomId': 'value',
         'bookingId': 'value',
       };
-      final roomBooked = EventType.create<JsonMap, RoomBooked>(
+      final roomBooked = AggregateEventTypes.create<JsonMap, RoomBooked>(
         '$RoomBooked',
         data,
       );
@@ -126,7 +126,7 @@ void main() {
         'roomId': 'value',
         'bookingId': 'value',
       };
-      final roomBooked = EventType.create<JsonMap, RoomBooked>(
+      final roomBooked = AggregateEventTypes.create<JsonMap, RoomBooked>(
         '$RoomBooked',
         data,
       );

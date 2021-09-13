@@ -1,6 +1,6 @@
 import 'package:eventuous_annotation/eventuous_annotation.dart';
 
-void main() {
-  var awesome = Awesome();
-  print('awesome: ${awesome.isAwesome}');
-}
+part 'example.eventuous.dart';
+
+@AggregateType()
+class Example extends _$Example {}

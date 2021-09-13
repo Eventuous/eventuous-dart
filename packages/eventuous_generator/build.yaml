@@ -1,0 +1,18 @@
+targets:
+  $default:
+    builders:
+      eventuous:
+        enabled: true
+#        generate_for:
+#          exclude:
+#            - test
+#            - example
+
+builders:
+  eventuous:
+    import: "package:eventuous_generator/builder.dart"
+    builder_factories: ["eventuous"]
+    build_extensions: { ".dart": [".eventuous.dart"] }
+    auto_apply: dependents
+    build_to: source
+    runs_before: ["json_serializable|json_serializable"]

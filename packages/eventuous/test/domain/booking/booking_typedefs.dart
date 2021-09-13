@@ -5,14 +5,14 @@ import 'booking.dart';
 typedef BookingStore = AggregateStore<JsonMap, JsonObject, BookingStateModel,
     BookingId, BookingState, Booking>;
 
-typedef BookingResult
-    = Result<JsonObject, BookingStateModel, BookingId, BookingState, Booking>;
+typedef BookingResult = AggregateCommandResult<JsonObject, BookingStateModel,
+    BookingId, BookingState, Booking>;
 
-typedef BookingOk
-    = OkResult<JsonObject, BookingStateModel, BookingId, BookingState, Booking>;
+typedef BookingOk = AggregateCommandOkResult<JsonObject, BookingStateModel,
+    BookingId, BookingState, Booking>;
 
-typedef BookingError = ErrorResult<JsonObject, BookingStateModel, BookingId,
-    BookingState, Booking>;
+typedef BookingError = AggregateCommandErrorResult<JsonObject,
+    BookingStateModel, BookingId, BookingState, Booking>;
 
 typedef BookingStateResult = AggregateStateResult<JsonObject, BookingStateModel,
     BookingId, BookingState>;

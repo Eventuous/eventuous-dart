@@ -21,24 +21,28 @@ class TestHarness {
   late final BookingStateStorage bookingStateStorage;
 
   bool _useBookingTypeMaps = false;
+
   TestHarness withBookingTypeMaps() {
     _useBookingTypeMaps = true;
     return this;
   }
 
   bool _useBookingStateStorage = false;
+
   TestHarness withBookingStateStorage() {
     _useBookingStateStorage = true;
     return this;
   }
 
   bool _useBookingStore = false;
+
   TestHarness withBookingStore() {
     _useBookingStore = true;
     return this;
   }
 
   bool _useBookingService = false;
+
   TestHarness withBookingService() {
     _useBookingService = true;
     return this;
@@ -70,9 +74,9 @@ class TestHarness {
       }
 
       if (_useBookingTypeMaps) {
-        addBookingTypes();
+        defineBookingTypes();
       } else {
-        addBookingEventTypes();
+        defineBookingEventTypes();
       }
 
       // Setup EventStore instance

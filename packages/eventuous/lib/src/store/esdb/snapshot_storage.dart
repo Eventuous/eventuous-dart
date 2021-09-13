@@ -18,7 +18,7 @@ class EsdbSnapshotStorage<TData extends Object, TValue extends Object,
                 AggregateStateSnapshotModel<TValue>>(),
         super(onNew: onNew, settings: settings) {
     // Register as event type for serialization support
-    EventType.addType<JsonMap, AggregateStateSnapshotModel<TValue>>(
+    AggregateEventTypes.define<JsonMap, AggregateStateSnapshotModel<TValue>>(
       (data) => AggregateStateSnapshotModel.fromJson(data),
     );
   }
