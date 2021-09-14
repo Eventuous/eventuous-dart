@@ -3,7 +3,7 @@
 # empty.
 github:
   on_completion:
-    - name: Collect and publish coverage
+    - name: Test Eventuous & Publish coverage
       runs-on: ubuntu-latest
       steps:
         - name: Cache Pub hosted dependencies

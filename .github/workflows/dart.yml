@@ -135,7 +135,7 @@ jobs:
       - job_002
       - job_003
   job_005:
-    name: Collect and publish coverage
+    name: "Test Eventuous & Publish coverage"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
