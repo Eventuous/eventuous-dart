@@ -180,6 +180,9 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
+      - name: List files in packages/eventuous
+        working-directory: packages/eventuous
+        run: ls -al .
       - name: Collect test coverage
         working-directory: packages/eventuous
         run: "format_coverage --lcov --in=coverage --out=coverage.lcov --packages=.packages --report-on=lib"
