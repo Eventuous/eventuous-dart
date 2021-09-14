@@ -16,12 +16,25 @@ github:
               os:ubuntu-latest;pub-cache-hosted;dart:stable
               os:ubuntu-latest;pub-cache-hosted
               os:ubuntu-latest
-        - name: List files in packages/eventuous
+        - uses: dart-lang/setup-dart@v1.2
+          with:
+            sdk: stable
+
+        - id: checkout
+          uses: actions/checkout@v2.3.4
+
+        - name: packages/eventuous; dart pub upgrade && pub global activate coverage
           working-directory: packages/eventuous
-          run: ls -al .
+          run: dart pub upgrade && pub global activate coverage
+
+        - name: Run tests with coverage
+          working-directory: packages/eventuous
+          run: dart test -j 1 --reporter=expanded --coverage="coverage"
+
         - name: Collect test coverage
           working-directory: packages/eventuous
           run: format_coverage --lcov --in=coverage --out=coverage.lcov --packages=.packages --report-on=lib
+
         - name: Publish test coverage
           uses: codecov/codecov-action@v1.0.2
           with:
