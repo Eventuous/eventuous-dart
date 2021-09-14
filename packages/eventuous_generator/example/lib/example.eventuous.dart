@@ -17,11 +17,25 @@ abstract class _$Example extends Aggregate<JsonObject, ExampleStateModel1,
 
 abstract class _$ExampleStateModel1 extends JsonObject {
   _$ExampleStateModel1(List<Object?> props) : super(props);
+
+  static ExampleStateModel1 fromJson(JsonMap json) =>
+      _$ExampleStateModel1FromJson(json);
+
+  @override
+  JsonMap toJson() => _$ExampleStateModel1ToJson(this as ExampleStateModel1);
 }
 
 abstract class _$ExampleState1 extends AggregateState<ExampleStateModel1> {
   _$ExampleState1(ExampleStateModel1? value, int? version)
-      : super(value ?? ExampleStateModel1(), version);
+      : super(value ?? ExampleStateModel1(), version) {
+    on<ExampleCreated>(patch);
+  }
+  ExampleState1 patch(JsonObject event, ExampleStateModel1 value) {
+    return ExampleState1(_$ExampleStateModel1.fromJson(JsonUtils.patch(
+      value,
+      event,
+    )));
+  }
 }
 
 abstract class _$ExampleCreated extends JsonObject {

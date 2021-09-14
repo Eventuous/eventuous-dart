@@ -18,12 +18,21 @@ class AggregateValueTemplate {
     ElementAnnotation annotation,
   ) {
     final name = element.displayName;
-    final aggregate = annotation.computeConstantValue()!.getField('aggregate')!;
+    final library = element.library!;
+    final aggregate = annotation
+        .computeConstantValue()!
+        .getField('aggregate')!
+        .toTypeValue()!
+        .toTypeName();
+    final events = library
+        .whereAggregateEventClasses(aggregate)
+        .map((c) => c.toAggregateEventTemplate(eventuous, aggregate)!)
+        .toList();
 
     return AggregateValueTemplate(
       name: name,
-      aggregate: aggregate.toTypeValue()!.toTypeName(),
-      data: inferTData(eventuous, element, annotation),
+      aggregate: aggregate,
+      data: inferTData(eventuous, element, annotation, events),
       usesJsonSerializable: element.metadata.usesJsonSerializable(),
     );
   }

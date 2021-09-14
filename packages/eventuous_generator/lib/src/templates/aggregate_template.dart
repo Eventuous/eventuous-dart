@@ -45,6 +45,7 @@ class AggregateTemplate {
       event: annotation.read('event').toTypeName('Object'),
       value: inferTValue(
         eventuous,
+        element,
         annotation.read('value').isNull
             ? null
             : annotation.read('value').typeValue,

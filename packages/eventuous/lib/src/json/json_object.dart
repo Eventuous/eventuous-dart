@@ -31,12 +31,11 @@ abstract class JsonObject extends Equatable {
   @override
   List<Object?> get props => _props;
 
-  /// Get JsonObject that returns empty [JsonMap] from [toJson]
-  static JsonObject empty() => _EmptyJsonObject();
-
-  bool get isNotEmpty => !isEmpty;
-
+  /// Check if [toJson] is empty (no key/value pairs)
   bool get isEmpty => toJson().isEmpty;
+
+  /// Check if [toJson] is not empty (at least key/value pair)
+  bool get isNotEmpty => !isEmpty;
 
   @override
   String toString() {
@@ -48,11 +47,4 @@ abstract class JsonObject extends Equatable {
         return '$runtimeType';
     }
   }
-}
-
-class _EmptyJsonObject extends JsonObject {
-  _EmptyJsonObject() : super([]);
-
-  @override
-  JsonMap toJson() => {};
 }

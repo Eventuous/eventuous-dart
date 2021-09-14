@@ -1,6 +1,6 @@
 import 'package:build/build.dart';
 import 'package:build_test/build_test.dart';
-import 'package:eventuous_generator/builder.dart';
+import 'package:eventuous_generator/eventuous_generator.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -74,7 +74,13 @@ part 'example.eventuous.dart';
 class Example extends _$Example {}
 
 @JsonSerializable()
-@AggregateStateType(Example)
+@AggregateValueType(Example)
+class ExampleValue extends _$ExampleValue {
+  ExampleValue() : super([]);
+}
+
+@JsonSerializable()
+@AggregateStateType(Example, value)
 class ExampleState extends _$ExampleState {}
 
 @AggregateCommandType(Example)
@@ -140,15 +146,32 @@ part of 'example.dart';
 // **************************************************************************
 
 abstract class _\$Example
-    extends Aggregate<Object, Object, ExampleId, ExampleState> {
+    extends Aggregate<Object, ExampleValue, ExampleId, ExampleState> {
   _\$Example(ExampleId id, ExampleState? state)
       : super(id, state ?? ExampleState());
   static Example from(String id) => Example(ExampleId(id));
 }
 
-abstract class _\$ExampleState extends AggregateState<Object> {
-  _\$ExampleState(Object? value, int? version)
-      : super(value ?? Object(), version);
+abstract class _\$ExampleValue extends JsonObject {
+  _\$ExampleValue(List<Object?> props) : super(props);
+
+  static ExampleValue fromJson(JsonMap json) => _\$ExampleValueFromJson(json);
+
+  @override
+  JsonMap toJson() => _\$ExampleValueToJson(this as ExampleValue);
+}
+
+abstract class _\$ExampleState extends AggregateState<ExampleValue> {
+  _\$ExampleState(ExampleValue? value, int? version)
+      : super(value ?? ExampleValue(), version) {
+    on<ExampleCreated>(patch);
+  }
+  ExampleState patch(JsonObject event, ExampleValue value) {
+    return ExampleState(_\$ExampleValue.fromJson(JsonUtils.patch(
+      value,
+      event,
+    )));
+  }
 }
 
 abstract class _\$ExampleCreated extends JsonObject {
@@ -162,9 +185,9 @@ abstract class _\$ExampleCreated extends JsonObject {
 }
 
 void defineExampleTypes() {
-  AggregateTypes.define<Object, Object, ExampleId, ExampleState, Example>(
+  AggregateTypes.define<Object, ExampleValue, ExampleId, ExampleState, Example>(
       (id, [state]) => Example(id, state));
-  AggregateStateTypes.define<Object, ExampleState>(
+  AggregateStateTypes.define<ExampleValue, ExampleState>(
     ([value, version]) => ExampleState(value, version),
   );
   AggregateEventTypes.define<JsonMap, ExampleCreated>(
@@ -188,9 +211,26 @@ abstract class _\$Example
   static Example from(String id) => Example(ExampleId(id));
 }
 
+abstract class _\$ExampleValue extends JsonObject {
+  _\$ExampleValue(List<Object?> props) : super(props);
+
+  static ExampleValue fromJson(JsonMap json) => _\$ExampleValueFromJson(json);
+
+  @override
+  JsonMap toJson() => _\$ExampleValueToJson(this as ExampleValue);
+}
+
 abstract class _\$ExampleState extends AggregateState<ExampleValue> {
   _\$ExampleState(ExampleValue? value, int? version)
-      : super(value ?? ExampleValue(), version);
+      : super(value ?? ExampleValue(), version) {
+    on<ExampleCreated>(patch);
+  }
+  ExampleState patch(JsonObject event, ExampleValue value) {
+    return ExampleState(_\$ExampleValue.fromJson(JsonUtils.patch(
+      value,
+      event,
+    )));
+  }
 }
 
 abstract class _\$ExampleCreated extends JsonObject {
@@ -242,7 +282,15 @@ abstract class _\$ExampleStateModel1 extends JsonObject {
 
 abstract class _\$ExampleState1 extends AggregateState<ExampleStateModel1> {
   _\$ExampleState1(ExampleStateModel1? value, int? version)
-      : super(value ?? ExampleStateModel1(), version);
+      : super(value ?? ExampleStateModel1(), version) {
+    on<ExampleCreated>(patch);
+  }
+  ExampleState1 patch(JsonObject event, ExampleStateModel1 value) {
+    return ExampleState1(_\$ExampleStateModel1.fromJson(JsonUtils.patch(
+      value,
+      event,
+    )));
+  }
 }
 
 abstract class _\$ExampleCreated extends JsonObject {

@@ -10,7 +10,7 @@ targets:
 
 builders:
   eventuous:
-    import: "package:eventuous_generator/builder.dart"
+    import: "package:eventuous_generator/eventuous_generator.dart"
     builder_factories: ["eventuous"]
     build_extensions: { ".dart": [".eventuous.dart"] }
     auto_apply: dependents

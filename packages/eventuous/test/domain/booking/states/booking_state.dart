@@ -8,9 +8,9 @@ class BookingState extends AggregateState<BookingStateModel> {
     BookingStateModel? value,
     int? version,
   ]) : super(value ?? BookingStateModel(), version) {
-    on<RoomBooked>(BookingState.patch);
-    on<BookingImported>(BookingState.patch);
-    on<BookingPaymentRegistered>(BookingState.patch);
+    on<RoomBooked>(patch);
+    on<BookingImported>(patch);
+    on<BookingPaymentRegistered>(patch);
   }
 
   String? get roomId => value.roomId;
@@ -23,7 +23,7 @@ class BookingState extends AggregateState<BookingStateModel> {
 
   bool get isFullyPaid => value.isFullyPaid;
 
-  static BookingState patch(JsonObject event, BookingStateModel state) {
+  BookingState patch(JsonObject event, BookingStateModel state) {
     if (event is BookingPaymentRegistered) {
       return BookingState(
         state.recordPayment(event.paymentId, event.amountPaid),

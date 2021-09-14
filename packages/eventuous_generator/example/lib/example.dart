@@ -18,15 +18,15 @@ class ExampleId1 extends AggregateId {
   ExampleId1(String id) : super(id);
 }
 
+@JsonSerializable()
 @AggregateValueType(Example, data: JsonMap)
 class ExampleStateModel1 extends _$ExampleStateModel1 {
-  ExampleStateModel1() : super([]);
-
-  @override
-  JsonMap toJson() {
-    // TODO: implement toJson
-    throw UnimplementedError();
-  }
+  ExampleStateModel1({
+    this.title,
+    this.author,
+  }) : super([title, author]);
+  final String? title;
+  final String? author;
 }
 
 @AggregateStateType(Example, value: ExampleStateModel1)
@@ -38,5 +38,7 @@ class ExampleState1 extends _$ExampleState1 {
 @JsonSerializable()
 @AggregateEventType(Example)
 class ExampleCreated extends _$ExampleCreated {
-  ExampleCreated() : super([]);
+  ExampleCreated(this.title, this.author) : super([title, author]);
+  final String title;
+  final String author;
 }

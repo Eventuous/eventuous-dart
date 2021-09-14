@@ -4,7 +4,7 @@ library eventuous_generator;
 import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
 
-import 'src/eventuous_generator.dart';
+import 'src/generator.dart';
 
 /// Builds generators for `build_runner` to run
 Builder eventuous(BuilderOptions options) {

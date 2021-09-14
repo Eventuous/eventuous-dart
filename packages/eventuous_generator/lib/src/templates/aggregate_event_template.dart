@@ -66,10 +66,16 @@ JsonMap toJson() => _\$${name}ToJson(this as $name);
 ''';
   }
 
+  String toAggregateEventPatchString() {
+    return '''
+on<$name>(patch);
+''';
+  }
+
   String toDefineAggregateEventTypeString() {
     return '''
 $AggregateEventTypes.define<$data, $name>(
     (data) => _\$$name.fromJson(data),
-  );''';
+);''';
   }
 }

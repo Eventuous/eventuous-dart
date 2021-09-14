@@ -19,6 +19,7 @@ export 'src/extensions.dart';
 export 'src/helpers.dart';
 export 'src/json/json_object.dart';
 export 'src/json/json_typedefs.dart';
+export 'src/json/json_utils.dart';
 export 'src/state/aggregate.dart';
 export 'src/state/aggregate_id.dart';
 export 'src/state/aggregate_state_storage.dart';
