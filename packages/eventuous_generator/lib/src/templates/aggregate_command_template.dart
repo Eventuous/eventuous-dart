@@ -4,7 +4,7 @@ import 'package:source_gen/source_gen.dart';
 
 import '../extensions.dart';
 import '../builders/models/inference_model.dart';
-import '../builders/models/parameterized_type_model.dart';
+import '../helpers.dart';
 
 class AggregateCommandTemplate {
   AggregateCommandTemplate({
@@ -22,12 +22,13 @@ class AggregateCommandTemplate {
     final name = element.displayName;
     final aggregate = annotation.toFieldTypeName('aggregate');
     final command =
-        inference.firstAnnotationOf<AggregateCommandType>(aggregate)!;
+        inference.firstAnnotationOf<AggregateCommandType>(aggregate);
     return AggregateCommandTemplate(
       name: name,
       aggregate: aggregate,
-      data: (command['data'] as ParameterizedTypeModel).value,
-      usesJsonSerializable: element.metadata.usesJsonSerializable(),
+      data: parameterValueAt('data', command, annotation),
+      usesJsonSerializable:
+          command?.usesJsonSerializable ?? element.usesJsonSerializable,
     );
   }
 

@@ -12,7 +12,7 @@ void main() {
         configBuilder(BuilderOptions({})),
         {
           'test_lib|eventuous.dart': ConfigSourceCodeDefaults,
-          'test_lib|lib/inference.json': '$InferenceGeneratedJsonDefaults',
+          'test_lib|lib/inference.json': '$InferenceGeneratedJsonInferred',
         },
         outputs: {
           'test_lib|eventuous.config.g.part': ConfigGeneratedCodeDefaults,
@@ -28,7 +28,7 @@ void main() {
         })),
         {
           'test_lib|eventuous.dart': ConfigSourceCodeInitializerGiven,
-          'test_lib|lib/inference.json': '$InferenceGeneratedJsonDefaults',
+          'test_lib|lib/inference.json': '$InferenceGeneratedJsonInferred',
         },
         outputs: {
           'test_lib|eventuous.config.g.part':

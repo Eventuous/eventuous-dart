@@ -3,8 +3,8 @@ import 'package:eventuous/eventuous.dart';
 import 'package:source_gen/source_gen.dart';
 
 import '../builders/models/inference_model.dart';
-import '../builders/models/parameterized_type_model.dart';
 import '../extensions.dart';
+import '../helpers.dart';
 import 'aggregate_event_template.dart';
 
 class AggregateStateTemplate {
@@ -23,7 +23,7 @@ class AggregateStateTemplate {
     ConstantReader annotation,
   ) {
     final aggregate = annotation.toFieldTypeName('aggregate');
-    final inferred = inference.firstAnnotationOf<AggregateType>(aggregate)!;
+    final state = inference.firstAnnotationOf<AggregateType>(aggregate);
     final events = inference
         .annotationsOf<AggregateEventType>(aggregate)
         .map((a) => a.toAggregateEventTemplate())
@@ -33,10 +33,11 @@ class AggregateStateTemplate {
       name: element.displayName,
       events: events,
       aggregate: aggregate,
-      event: (inferred['event'] as ParameterizedTypeModel).value,
-      value: (inferred['value'] as ParameterizedTypeModel).value,
-      usesJsonSerializable: inferred.usesJsonSerializable ||
-          events.any((e) => e.usesJsonSerializable),
+      event: parameterValueAt('event', state, annotation),
+      value: parameterValueAt('value', state, annotation, '${aggregate}Value'),
+      usesJsonSerializable:
+          (state?.usesJsonSerializable ?? element.usesJsonSerializable) ||
+              events.any((e) => e.usesJsonSerializable),
     );
   }
 

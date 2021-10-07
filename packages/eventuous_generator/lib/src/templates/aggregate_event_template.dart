@@ -4,7 +4,7 @@ import 'package:source_gen/source_gen.dart';
 
 import '../extensions.dart';
 import '../builders/models/inference_model.dart';
-import '../builders/models/parameterized_type_model.dart';
+import '../helpers.dart';
 
 class AggregateEventTemplate {
   AggregateEventTemplate({
@@ -21,12 +21,13 @@ class AggregateEventTemplate {
   ) {
     final name = element.displayName;
     final aggregate = annotation.toFieldTypeName('aggregate');
-    final event = inference.firstAnnotationOf<AggregateEventType>(aggregate)!;
+    final event = inference.firstAnnotationOf<AggregateEventType>(aggregate);
     return AggregateEventTemplate(
       name: name,
       aggregate: aggregate,
-      data: (event['data'] as ParameterizedTypeModel).value,
-      usesJsonSerializable: element.metadata.usesJsonSerializable(),
+      data: parameterValueAt('data', event, annotation),
+      usesJsonSerializable:
+          event?.usesJsonSerializable ?? element.usesJsonSerializable,
     );
   }
 

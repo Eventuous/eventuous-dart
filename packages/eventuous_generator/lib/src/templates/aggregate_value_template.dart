@@ -1,10 +1,10 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:eventuous/eventuous.dart';
 import 'package:eventuous_generator/src/builders/models/inference_model.dart';
-import 'package:eventuous_generator/src/builders/models/parameterized_type_model.dart';
 import 'package:source_gen/source_gen.dart';
 
 import '../extensions.dart';
+import '../helpers.dart';
 
 class AggregateValueTemplate {
   AggregateValueTemplate({
@@ -21,13 +21,14 @@ class AggregateValueTemplate {
   ) {
     final name = element.displayName;
     final aggregate = annotation.toFieldTypeName('aggregate');
-    final inferred = inference.firstAnnotationOf<AggregateValueType>(aggregate);
+    final value = inference.firstAnnotationOf<AggregateValueType>(aggregate);
 
     return AggregateValueTemplate(
       name: name,
       aggregate: aggregate,
-      data: (inferred!['data'] as ParameterizedTypeModel).value,
-      usesJsonSerializable: inferred.usesJsonSerializable,
+      data: parameterValueAt('data', value, annotation),
+      usesJsonSerializable:
+          value?.usesJsonSerializable ?? element.usesJsonSerializable,
     );
   }
 

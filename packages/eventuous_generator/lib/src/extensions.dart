@@ -3,6 +3,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:eventuous/eventuous.dart';
 import 'package:eventuous_generator/src/builders/models/inference_model.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:source_gen/source_gen.dart';
 
 import 'builders/models/annotation_model.dart';
@@ -82,8 +83,9 @@ extension DartObjectX on DartObject {
 }
 
 extension ConstantReaderX on ConstantReader {
-  DartType? toFieldType(String field, [String defaultName = 'Object']) {
-    return read(field).isNull ? null : read(field).typeValue;
+  DartType? toFieldType(String field) {
+    final reader = peek(field);
+    return reader == null || reader.isNull ? null : reader.typeValue;
   }
 
   ParameterizedTypeModel toTypeModel(String field,
@@ -93,6 +95,13 @@ extension ConstantReaderX on ConstantReader {
   String toFieldTypeName(String field, [String defaultName = 'Object']) {
     return toFieldType(field)?.toTypeName() ?? defaultName;
   }
+}
+
+const _jsonSerializableChecker = TypeChecker.fromRuntime(JsonSerializable);
+
+extension ElementX on Element {
+  bool get usesJsonSerializable =>
+      _jsonSerializableChecker.hasAnnotationOfExact(this);
 }
 
 extension ElementAnnotationX on ElementAnnotation {

@@ -1,10 +1,9 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:eventuous/eventuous.dart';
-import 'package:eventuous_generator/src/builders/models/parameterized_type_model.dart';
 import 'package:source_gen/source_gen.dart';
 
-import '../extensions.dart';
 import '../builders/models/inference_model.dart';
+import '../helpers.dart';
 
 class AggregateTemplate {
   AggregateTemplate({
@@ -21,14 +20,14 @@ class AggregateTemplate {
     ConstantReader annotation,
   ) {
     final name = element.displayName;
-    final aggregate = inference.firstAnnotationOf<AggregateType>(name)!;
+    final aggregate = inference.firstAnnotationOf<AggregateType>(name);
 
     return AggregateTemplate(
       name: name,
-      id: annotation.toFieldTypeName('id', '${name}Id'),
-      event: (aggregate['event'] as ParameterizedTypeModel).value,
-      value: (aggregate['value'] as ParameterizedTypeModel).value,
-      state: (aggregate['state'] as ParameterizedTypeModel).value,
+      id: parameterValueAt('id', aggregate, annotation, '${name}Id'),
+      event: parameterValueAt('event', aggregate, annotation),
+      value: parameterValueAt('value', aggregate, annotation, '${name}Value'),
+      state: parameterValueAt('state', aggregate, annotation, '${name}State'),
     );
   }
 

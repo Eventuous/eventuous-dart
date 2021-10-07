@@ -69,6 +69,9 @@ void main() {
   });
 }
 
+const InferenceGeneratedJsonDefaults = '''
+{"config":{"infer_types":true,"initialize_name":"_\$initEventuous"},"annotations":[]}''';
+
 const ExampleSourceCodeDefaults = r'''
 import 'package:eventuous/eventuous.dart';
 import 'package:eventuous/eventuous.dart';
@@ -160,6 +163,20 @@ abstract class _\$Example
 }
 
 // **************************************************************************
+// AggregateCommandGenerator
+// **************************************************************************
+
+abstract class _\$CreateExample extends JsonObject {
+  _\$CreateExample(List<Object?> props) : super(props);
+
+  // ignore: unused_element
+  static CreateExample fromJson(Object json) => _\$CreateExampleFromJson(json);
+
+  @override
+  JsonMap toJson() => _\$CreateExampleToJson(this as CreateExample);
+}
+
+// **************************************************************************
 // AggregateEventGenerator
 // **************************************************************************
 
@@ -204,7 +221,6 @@ abstract class _\$ExampleState extends AggregateState<ExampleValue> {
     AggregateStateTypes.define<ExampleValue, ExampleState>(
       ([value, version]) => ExampleState(value, version),
     );
-    on<ExampleCreated>(patch);
   }
 
   ExampleState patch(Object event, ExampleValue value) {
@@ -234,6 +250,20 @@ abstract class _\$Example
   }
   // ignore: unused_element
   static Example from(String id) => Example(ExampleId(id));
+}
+
+// **************************************************************************
+// AggregateCommandGenerator
+// **************************************************************************
+
+abstract class _\$CreateExample extends JsonObject {
+  _\$CreateExample(List<Object?> props) : super(props);
+
+  // ignore: unused_element
+  static CreateExample fromJson(JsonMap json) => _\$CreateExampleFromJson(json);
+
+  @override
+  JsonMap toJson() => _\$CreateExampleToJson(this as CreateExample);
 }
 
 // **************************************************************************
@@ -312,6 +342,20 @@ abstract class _\$Example extends Aggregate<JsonObject, ExampleStateModel1,
   }
   // ignore: unused_element
   static Example from(String id) => Example(ExampleId1(id));
+}
+
+// **************************************************************************
+// AggregateCommandGenerator
+// **************************************************************************
+
+abstract class _\$CreateExample extends JsonObject {
+  _\$CreateExample(List<Object?> props) : super(props);
+
+  // ignore: unused_element
+  static CreateExample fromJson(JsonMap json) => _\$CreateExampleFromJson(json);
+
+  @override
+  JsonMap toJson() => _\$CreateExampleToJson(this as CreateExample);
 }
 
 // **************************************************************************

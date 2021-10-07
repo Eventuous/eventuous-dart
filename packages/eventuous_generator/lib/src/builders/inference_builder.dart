@@ -29,8 +29,6 @@ const Map<Type, TypeChecker> checkers = {
   AggregateCommandType: TypeChecker.fromRuntime(AggregateCommandType),
 };
 
-const jsonSerializableChecker = TypeChecker.fromRuntime(JsonSerializable);
-
 class InferenceBuilder implements Builder {
   InferenceBuilder(this._config);
   final Map<String, Object?> _config;
@@ -74,7 +72,7 @@ class InferenceBuilder implements Builder {
       for (var check in checkers.entries) {
         if (check.value.hasAnnotationOfExact(clz)) {
           final annotation = _firstAnnotationOf(check, clz);
-          final usesJsonSerializable = _usesJsonSerializable(clz);
+          final usesJsonSerializable = clz.usesJsonSerializable;
           final reader = ConstantReader(annotation);
           switch (check.key) {
             case Eventuous:
@@ -90,8 +88,8 @@ class InferenceBuilder implements Builder {
                     parameters: [
                       reader.toTypeModel('id', '${clz.name}Id'),
                       reader.toTypeModel('event'),
-                      reader.toTypeModel('value'),
-                      reader.toTypeModel('state'),
+                      reader.toTypeModel('value', '${clz.name}Value'),
+                      reader.toTypeModel('state', '${clz.name}State'),
                     ]).toJson(),
               );
               break;
@@ -130,7 +128,7 @@ class InferenceBuilder implements Builder {
                     usesJsonSerializable: usesJsonSerializable,
                     parameters: [
                       reader.toTypeModel('aggregate'),
-                      reader.toTypeModel('value'),
+                      reader.toTypeModel('value', '${clz.name}Value'),
                     ]).toJson(),
               );
               break;
@@ -154,9 +152,6 @@ class InferenceBuilder implements Builder {
     }
     return inferences;
   }
-
-  bool _usesJsonSerializable(ClassElement clz) =>
-      jsonSerializableChecker.hasAnnotationOfExact(clz);
 
   AssetId _toInferenceAssetId(BuildStep buildStep) {
     return AssetId(
