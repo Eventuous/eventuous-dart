@@ -35,7 +35,7 @@ class FooState1 extends _$FooState1 {
 
 @JsonSerializable()
 @AggregateCommandType(Foo)
-class CreateFoo extends _$FooCreated {
+class CreateFoo extends _$CreateFoo {
   CreateFoo(this.title, this.author) : super([title, author]);
   final String title;
   final String author;

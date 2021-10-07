@@ -88,6 +88,7 @@ class ExampleValue extends _$ExampleValue {
 @AggregateStateType(Example)
 class ExampleState extends _$ExampleState {}
 
+@JsonSerializable()
 @AggregateCommandType(Example)
 class CreateExample extends _$CreateExample {}
 
@@ -129,6 +130,7 @@ class ExampleState1 extends _$ExampleState1 {
       : super(value, version);
 }
 
+@JsonSerializable()
 @AggregateCommandType(Example)
 class CreateExample extends _$CreateExample {}
 

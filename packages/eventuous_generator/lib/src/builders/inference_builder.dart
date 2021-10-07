@@ -135,6 +135,10 @@ class InferenceBuilder implements Builder {
                     usesJsonSerializable: usesJsonSerializable,
                     parameters: [
                       reader.toTypeModel('aggregate'),
+                      reader.toTypeModel(
+                        'data',
+                        usesJsonSerializable ? 'JsonMap' : 'Object',
+                      ),
                     ]).toJson(),
               );
               break;
@@ -245,7 +249,8 @@ class InferenceBuilder implements Builder {
       json['parameters'] = params.map((e) => e.toJson()).toList();
       annotations.add(AnnotationModel.fromJson(json));
 
-      // Add events and values in given aggregate
+      // Add commands, events and values for given aggregate
+      annotations.addAll(commands[name] ?? []);
       annotations.addAll(events[name] ?? []);
       annotations.addAll(values[name] ?? []);
 
@@ -259,9 +264,6 @@ class InferenceBuilder implements Builder {
         json['parameters'] = params.map((e) => e.toJson()).toList();
         annotations.add(AnnotationModel.fromJson(json));
       }
-
-      // Add commands on given aggregate
-      annotations.addAll(commands[name] ?? []);
     }
 
     if (configs.length > 1) {

@@ -18,6 +18,20 @@ abstract class _$Foo
 }
 
 // **************************************************************************
+// AggregateCommandGenerator
+// **************************************************************************
+
+abstract class _$CreateFoo extends JsonObject {
+  _$CreateFoo(List<Object?> props) : super(props);
+
+  // ignore: unused_element
+  static CreateFoo fromJson(JsonMap json) => _$CreateFooFromJson(json);
+
+  @override
+  JsonMap toJson() => _$CreateFooToJson(this as CreateFoo);
+}
+
+// **************************************************************************
 // AggregateEventGenerator
 // **************************************************************************
 
