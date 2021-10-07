@@ -1,6 +1,7 @@
 import 'package:build/build.dart';
 import 'package:build_test/build_test.dart';
 import 'package:eventuous_generator/eventuous_generator.dart';
+import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
 import 'code_generator_test.dart';
@@ -39,8 +40,8 @@ void main() {
       expect(result, isNull);
     });
 
-    test('should build inference from defaults in all files', () async {
-      final result = await testBuilder(
+    test('should throw when @AggregateType is defined twice', () async {
+      final result = testBuilder(
         inferenceBuilder(BuilderOptions({})),
         {
           'test_lib|lib/example.dart': ExampleSourceCodeDefaults,
@@ -54,7 +55,7 @@ void main() {
         },
         reader: await PackageAssetReader.currentIsolate(),
       );
-      expect(result, isNull);
+      await expectLater(result, throwsA(isA<InvalidGenerationSourceError>()));
     });
 
     test('should build inference data with default path', () async {
@@ -75,7 +76,7 @@ void main() {
     test('should build inference data with specified path', () async {
       final result = await testBuilder(
         inferenceBuilder(BuilderOptions(
-          {'inspect_pattern': 'lib/example/**'},
+          {'inspect_pattern': 'lib/example.dart'},
         )),
         {
           'test_lib|lib/example.dart': ExampleSourceCodeDefaults,
@@ -96,7 +97,6 @@ void main() {
         {
           'test_lib|lib/example.dart': ExampleSourceCodeDefaults,
           'test_lib|lib/eventuous.dart': InferenceSourceCodeDefaults,
-          'test_lib|lib/example/example.dart': ExampleSourceCodeDefaults,
         },
         outputs: {},
         reader: await PackageAssetReader.currentIsolate(),
@@ -139,10 +139,10 @@ const AnnotationJsonDefaults =
     '''{"type":"AggregateType","annotationOf":"Example","usesJsonSerializable":false,"parameters":[{"name":"id","value":"ExampleId"},{"name":"event","value":"Object"},{"name":"value","value":"ExampleValue"},{"name":"state","value":"ExampleState"}]},{"type":"AggregateEventType","annotationOf":"ExampleCreated","usesJsonSerializable":true,"parameters":[{"name":"aggregate","value":"Example"},{"name":"data","value":"Object"}]},{"type":"AggregateValueType","annotationOf":"ExampleValue","usesJsonSerializable":true,"parameters":[{"name":"aggregate","value":"Example"},{"name":"data","value":"Object"}]},{"type":"AggregateStateType","annotationOf":"ExampleState","usesJsonSerializable":false,"parameters":[{"name":"aggregate","value":"Example"},{"name":"value","value":"ExampleValue"}]},{"type":"AggregateCommandType","annotationOf":"CreateExample","usesJsonSerializable":false,"parameters":[{"name":"aggregate","value":"Example"}]}''';
 
 const AnnotationJsonInferred =
-    '''{"type":"AggregateType","annotationOf":"Example","usesJsonSerializable":false,"parameters":[{"name":"id","value":"ExampleId"},{"name":"event","value":"JsonObject"},{"name":"value","value":"ExampleValue"},{"name":"state","value":"ExampleState"}]},{"type":"AggregateCommandType","annotationOf":"CreateExample","usesJsonSerializable":true,"parameters":[{"name":"aggregate","value":"Example"},{"name":"data","value":"JsonMap"}]},{"type":"AggregateEventType","annotationOf":"ExampleCreated","usesJsonSerializable":true,"parameters":[{"name":"aggregate","value":"Example"},{"name":"data","value":"JsonMap"}]},{"type":"AggregateValueType","annotationOf":"ExampleValue","usesJsonSerializable":true,"parameters":[{"name":"aggregate","value":"Example"},{"name":"data","value":"JsonMap"}]},{"type":"AggregateStateType","annotationOf":"ExampleState","usesJsonSerializable":false,"parameters":[{"name":"aggregate","value":"Example"},{"name":"value","value":"ExampleValue"}]}''';
+    '''{"type":"AggregateType","annotationOf":"Example","location":"package:test_lib/example.dart;package:test_lib/example.dart;Example","usesJsonSerializable":false,"parameters":[{"name":"id","value":"ExampleId"},{"name":"event","value":"JsonObject"},{"name":"value","value":"ExampleValue"},{"name":"state","value":"ExampleState"}]},{"type":"AggregateCommandType","annotationOf":"CreateExample","location":"package:test_lib/example.dart;package:test_lib/example.dart;CreateExample","usesJsonSerializable":true,"parameters":[{"name":"aggregate","value":"Example"},{"name":"data","value":"JsonMap"}]},{"type":"AggregateEventType","annotationOf":"ExampleCreated","location":"package:test_lib/example.dart;package:test_lib/example.dart;ExampleCreated","usesJsonSerializable":true,"parameters":[{"name":"aggregate","value":"Example"},{"name":"data","value":"JsonMap"}]},{"type":"AggregateValueType","annotationOf":"ExampleValue","location":"package:test_lib/example.dart;package:test_lib/example.dart;ExampleValue","usesJsonSerializable":true,"parameters":[{"name":"aggregate","value":"Example"},{"name":"data","value":"JsonMap"}]},{"type":"AggregateStateType","annotationOf":"ExampleState","location":"package:test_lib/example.dart;package:test_lib/example.dart;ExampleState","usesJsonSerializable":false,"parameters":[{"name":"aggregate","value":"Example"},{"name":"value","value":"ExampleValue"}]}''';
 
 const AnnotationJsonTyped =
-    '''{"type":"AggregateType","annotationOf":"Example","usesJsonSerializable":false,"parameters":[{"name":"id","value":"ExampleId1"},{"name":"event","value":"JsonObject"},{"name":"value","value":"ExampleStateModel1"},{"name":"state","value":"ExampleState1"}]},{"type":"AggregateCommandType","annotationOf":"CreateExample","usesJsonSerializable":true,"parameters":[{"name":"aggregate","value":"Example"},{"name":"data","value":"JsonMap"}]},{"type":"AggregateEventType","annotationOf":"ExampleCreated","usesJsonSerializable":true,"parameters":[{"name":"aggregate","value":"Example"},{"name":"data","value":"JsonMap"}]},{"type":"AggregateValueType","annotationOf":"ExampleStateModel1","usesJsonSerializable":true,"parameters":[{"name":"aggregate","value":"Example"},{"name":"data","value":"JsonMap"}]},{"type":"AggregateStateType","annotationOf":"ExampleState1","usesJsonSerializable":false,"parameters":[{"name":"aggregate","value":"Example"},{"name":"value","value":"ExampleStateModel1"}]}''';
+    '''{"type":"AggregateType","annotationOf":"Example","location":"package:test_lib/example.dart;package:test_lib/example.dart;Example","usesJsonSerializable":false,"parameters":[{"name":"id","value":"ExampleId1"},{"name":"event","value":"JsonObject"},{"name":"value","value":"ExampleStateModel1"},{"name":"state","value":"ExampleState1"}]},{"type":"AggregateCommandType","annotationOf":"CreateExample","location":"package:test_lib/example.dart;package:test_lib/example.dart;CreateExample","usesJsonSerializable":true,"parameters":[{"name":"aggregate","value":"Example"},{"name":"data","value":"JsonMap"}]},{"type":"AggregateEventType","annotationOf":"ExampleCreated","location":"package:test_lib/example.dart;package:test_lib/example.dart;ExampleCreated","usesJsonSerializable":true,"parameters":[{"name":"aggregate","value":"Example"},{"name":"data","value":"JsonMap"}]},{"type":"AggregateValueType","annotationOf":"ExampleStateModel1","location":"package:test_lib/example.dart;package:test_lib/example.dart;ExampleStateModel1","usesJsonSerializable":true,"parameters":[{"name":"aggregate","value":"Example"},{"name":"data","value":"JsonMap"}]},{"type":"AggregateStateType","annotationOf":"ExampleState1","location":"package:test_lib/example.dart;package:test_lib/example.dart;ExampleState1","usesJsonSerializable":false,"parameters":[{"name":"aggregate","value":"Example"},{"name":"value","value":"ExampleStateModel1"}]}''';
 
 const InferenceGeneratedJsonDefaults = '''
 {"config":{"infer_types":true,"initialize_name":"_\$initEventuous"},"annotations":[$AnnotationJsonDefaults]}''';

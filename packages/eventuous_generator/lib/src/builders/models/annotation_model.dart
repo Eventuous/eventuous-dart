@@ -7,10 +7,12 @@ class AnnotationModel extends JsonObject {
   AnnotationModel(
     this.type,
     this.annotationOf, {
+    this.location,
     this.parameters = const [],
     this.usesJsonSerializable = false,
-  }) : super([type, annotationOf, parameters, usesJsonSerializable]);
+  }) : super([type, annotationOf, location, parameters, usesJsonSerializable]);
   final String type;
+  final String? location;
   final String annotationOf;
   final bool usesJsonSerializable;
   final List<ParameterizedTypeModel> parameters;
@@ -45,6 +47,7 @@ class AnnotationModel extends JsonObject {
   /// Factory constructor for creating a new `AnnotationModel` instance
   factory AnnotationModel.fromJson(Map<String, dynamic> json) =>
       AnnotationModel(json['type'] as String, json['annotationOf'] as String,
+          location: json['location'] as String?,
           usesJsonSerializable: json['usesJsonSerializable'] as bool,
           parameters: List.from(json['parameters'] ?? [])
               .map((p) => ParameterizedTypeModel.fromJson(p))
@@ -55,6 +58,7 @@ class AnnotationModel extends JsonObject {
   JsonMap toJson() => {
         'type': type,
         'annotationOf': annotationOf,
+        if (location != null) 'location': location,
         'usesJsonSerializable': usesJsonSerializable,
         'parameters': parameters.map((e) => e.toJson()).toList(),
       };

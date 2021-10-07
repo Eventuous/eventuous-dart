@@ -5,6 +5,7 @@ import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:build/src/builder/build_step.dart';
+import 'package:collection/collection.dart';
 import 'package:eventuous/eventuous.dart';
 import 'package:eventuous_generator/src/builders/models/config_model.dart';
 import 'package:eventuous_generator/src/builders/models/inference_model.dart';
@@ -84,6 +85,7 @@ class InferenceBuilder implements Builder {
             case AggregateType:
               inferences.add(
                 AnnotationModel('$AggregateType', clz.name,
+                    location: clz.location?.encoding,
                     usesJsonSerializable: usesJsonSerializable,
                     parameters: [
                       reader.toTypeModel('id', '${clz.name}Id'),
@@ -96,6 +98,7 @@ class InferenceBuilder implements Builder {
             case AggregateValueType:
               inferences.add(
                 AnnotationModel('$AggregateValueType', clz.name,
+                    location: clz.location?.encoding,
                     usesJsonSerializable: usesJsonSerializable,
                     parameters: [
                       reader.toTypeModel('aggregate'),
@@ -109,6 +112,7 @@ class InferenceBuilder implements Builder {
             case AggregateEventType:
               inferences.add(
                 AnnotationModel('$AggregateEventType', clz.name,
+                    location: clz.location?.encoding,
                     usesJsonSerializable: usesJsonSerializable,
                     parameters: [
                       reader.toTypeModel('aggregate'),
@@ -122,6 +126,7 @@ class InferenceBuilder implements Builder {
             case AggregateStateType:
               inferences.add(
                 AnnotationModel('$AggregateStateType', clz.displayName,
+                    location: clz.location?.encoding,
                     usesJsonSerializable: usesJsonSerializable,
                     parameters: [
                       reader.toTypeModel('aggregate'),
@@ -132,6 +137,7 @@ class InferenceBuilder implements Builder {
             case AggregateCommandType:
               inferences.add(
                 AnnotationModel('$AggregateCommandType', clz.name,
+                    location: clz.location?.encoding,
                     usesJsonSerializable: usesJsonSerializable,
                     parameters: [
                       reader.toTypeModel('aggregate'),
@@ -181,9 +187,16 @@ class InferenceBuilder implements Builder {
           final annotation = AnnotationModel.fromJson(
             inference,
           );
-          if (aggregates.contains(annotation)) {
+          final duplicate = aggregates.firstWhereOrNull(
+              (e) => e.annotationOf == annotation.annotationOf);
+          if (duplicate != null) {
             throw InvalidGenerationSourceError(
-              'Aggregate $annotation defined twice',
+              '${annotation.type} defined twice '
+              'for class ${annotation.annotationOf} in files: \n'
+              '- ${duplicate.location?.split(',').join().split(';')[0]}\n'
+              '- ${annotation.location?.split(',').join().split(';')[0]}',
+              todo: 'Only one @AggregateType can be '
+                  'defined for each aggregate class name',
             );
           }
           aggregates.add(annotation);
