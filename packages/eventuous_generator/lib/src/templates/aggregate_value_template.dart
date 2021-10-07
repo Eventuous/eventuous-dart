@@ -1,8 +1,9 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:eventuous/eventuous.dart';
+import 'package:eventuous_generator/src/builders/models/inference_model.dart';
+import 'package:eventuous_generator/src/builders/models/parameterized_type_model.dart';
 
 import '../extensions.dart';
-import '../inference.dart';
 
 class AggregateValueTemplate {
   AggregateValueTemplate({
@@ -13,27 +14,19 @@ class AggregateValueTemplate {
   });
 
   factory AggregateValueTemplate.from(
-    Eventuous eventuous,
+    InferenceModel inference,
     Element element,
     ElementAnnotation annotation,
   ) {
     final name = element.displayName;
-    final library = element.library!;
-    final aggregate = annotation
-        .computeConstantValue()!
-        .getField('aggregate')!
-        .toTypeValue()!
-        .toTypeName();
-    final events = library
-        .whereAggregateEventClasses(aggregate)
-        .map((c) => c.toAggregateEventTemplate(eventuous, aggregate)!)
-        .toList();
+    final aggregate = annotation.toTypeName('aggregate');
+    final inferred = inference.firstAnnotationOf<AggregateValueType>(aggregate);
 
     return AggregateValueTemplate(
       name: name,
       aggregate: aggregate,
-      data: inferTData(eventuous, element, annotation, events),
-      usesJsonSerializable: element.metadata.usesJsonSerializable(),
+      data: (inferred!['data'] as ParameterizedTypeModel).value,
+      usesJsonSerializable: inferred.usesJsonSerializable,
     );
   }
 

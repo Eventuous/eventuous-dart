@@ -12,7 +12,6 @@ configure:
 	pub global activate dhttpd
 
 test:
-	if [ ! -d test/certs ]; then . tool/gencert.sh test; fi
 	dart test -j 1
 
 models:
@@ -29,7 +28,3 @@ doc:
 release:
 	echo 'Release to pub.dev...'
 	pub_release --no-test
-
-release-multi:
-	echo 'Release all to pub.dev...'
-	pub_release multi --no-test

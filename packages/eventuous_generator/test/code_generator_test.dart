@@ -3,58 +3,64 @@ import 'package:build_test/build_test.dart';
 import 'package:eventuous_generator/eventuous_generator.dart';
 import 'package:test/test.dart';
 
+import 'inference_builder_test.dart';
+
 void main() {
-  group('When default annotations are given, generator should ', () {
-    test('create aggregate with default types', () async {
+  group('When @AggregateType is given, generator', () {
+    test('should create aggregate with default types', () async {
       final result = await testBuilder(
-        eventuous(BuilderOptions({'infer_types': false})),
+        codeBuilder(BuilderOptions({'infer_types': false})),
         {
           'test_lib|example.dart': ExampleSourceCodeDefaults,
+          'test_lib|lib/inference.json': '$InferenceGeneratedJsonDefaults',
         },
         outputs: {
-          'test_lib|example.eventuous.dart': ExampleGeneratedCodeDefaults,
+          'test_lib|example.aggregate.g.part': ExampleGeneratedCodeDefaults,
         },
         reader: await PackageAssetReader.currentIsolate(),
       );
       expect(result, isNull);
     });
 
-    test('create aggregate with types inferred', () async {
+    test('should create aggregate with types inferred', () async {
       final result = await testBuilder(
-        eventuous(BuilderOptions({'infer_types': true})),
+        codeBuilder(BuilderOptions({'infer_types': true})),
         {
           'test_lib|example.dart': ExampleSourceCodeDefaults,
+          'test_lib|lib/inference.json': '$InferenceGeneratedJsonInferred',
         },
         outputs: {
-          'test_lib|example.eventuous.dart': ExampleGeneratedCodeInferred,
+          'test_lib|example.aggregate.g.part': ExampleGeneratedCodeInferred,
         },
         reader: await PackageAssetReader.currentIsolate(),
       );
       expect(result, isNull);
     });
 
-    test('create aggregate with types and inferred == true', () async {
+    test('should create aggregate with types and inferred == true', () async {
       final result = await testBuilder(
-        eventuous(BuilderOptions({'infer_types': true})),
+        codeBuilder(BuilderOptions({'infer_types': true})),
         {
           'test_lib|example.dart': ExampleSourceCodeTyped,
+          'test_lib|lib/inference.json': '$InferenceGeneratedJsonTyped',
         },
         outputs: {
-          'test_lib|example.eventuous.dart': ExampleGeneratedCodeTyped,
+          'test_lib|example.aggregate.g.part': ExampleGeneratedCodeTyped,
         },
         reader: await PackageAssetReader.currentIsolate(),
       );
       expect(result, isNull);
     });
 
-    test('create aggregate with types and inferred == false', () async {
+    test('should create aggregate with types and inferred == false', () async {
       final result = await testBuilder(
-        eventuous(BuilderOptions({'infer_types': false})),
+        codeBuilder(BuilderOptions({'infer_types': false})),
         {
           'test_lib|example.dart': ExampleSourceCodeTyped,
+          'test_lib|lib/inference.json': '$InferenceGeneratedJsonTyped',
         },
         outputs: {
-          'test_lib|example.eventuous.dart': ExampleGeneratedCodeTyped,
+          'test_lib|example.aggregate.g.part': ExampleGeneratedCodeTyped,
         },
         reader: await PackageAssetReader.currentIsolate(),
       );
@@ -68,7 +74,7 @@ import 'package:eventuous/eventuous.dart';
 import 'package:eventuous/eventuous.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'example.eventuous.dart';
+part 'example.aggregate.dart';
 
 @AggregateType()
 class Example extends _$Example {}
@@ -79,8 +85,7 @@ class ExampleValue extends _$ExampleValue {
   ExampleValue() : super([]);
 }
 
-@JsonSerializable()
-@AggregateStateType(Example, value)
+@AggregateStateType(Example)
 class ExampleState extends _$ExampleState {}
 
 @AggregateCommandType(Example)
@@ -96,7 +101,7 @@ import 'package:eventuous/eventuous.dart';
 import 'package:eventuous/eventuous.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'example.eventuous.dart';
+part 'example.aggregate.dart';
 
 @AggregateType(
   id: ExampleId1,
@@ -124,6 +129,9 @@ class ExampleState1 extends _$ExampleState1 {
       : super(value, version);
 }
 
+@AggregateCommandType(Example)
+class CreateExample extends _$CreateExample {}
+
 @JsonSerializable()
 @AggregateEventType(Example, data: JsonMap)
 class ExampleCreated extends _$ExampleCreated {
@@ -131,31 +139,23 @@ class ExampleCreated extends _$ExampleCreated {
 }
 ''';
 
-const Header = r'''
-// coverage:ignore-file
-// GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
-''';
-
 const ExampleGeneratedCodeDefaults = '''
-$Header
-part of 'example.dart';
-
 // **************************************************************************
-// EventuousGenerator
+// CodeGenerator
 // **************************************************************************
 
 abstract class _\$Example
     extends Aggregate<Object, ExampleValue, ExampleId, ExampleState> {
   _\$Example(ExampleId id, ExampleState? state)
       : super(id, state ?? ExampleState());
+  // ignore: unused_element
   static Example from(String id) => Example(ExampleId(id));
 }
 
 abstract class _\$ExampleValue extends JsonObject {
   _\$ExampleValue(List<Object?> props) : super(props);
 
-  static ExampleValue fromJson(JsonMap json) => _\$ExampleValueFromJson(json);
+  static ExampleValue fromJson(Object json) => _\$ExampleValueFromJson(json);
 
   @override
   JsonMap toJson() => _\$ExampleValueToJson(this as ExampleValue);
@@ -177,8 +177,7 @@ abstract class _\$ExampleState extends AggregateState<ExampleValue> {
 abstract class _\$ExampleCreated extends JsonObject {
   _\$ExampleCreated(List<Object?> props) : super(props);
 
-  static ExampleCreated fromJson(JsonMap json) =>
-      _\$ExampleCreatedFromJson(json);
+  static ExampleCreated fromJson(Object json) => _\$ExampleCreatedFromJson(json);
 
   @override
   JsonMap toJson() => _\$ExampleCreatedToJson(this as ExampleCreated);
@@ -190,24 +189,22 @@ void defineExampleTypes() {
   AggregateStateTypes.define<ExampleValue, ExampleState>(
     ([value, version]) => ExampleState(value, version),
   );
-  AggregateEventTypes.define<JsonMap, ExampleCreated>(
+  AggregateEventTypes.define<Object, ExampleCreated>(
     (data) => _\$ExampleCreated.fromJson(data),
   );
 }
 ''';
 
 const ExampleGeneratedCodeInferred = '''
-$Header
-part of 'example.dart';
-
 // **************************************************************************
-// EventuousGenerator
+// CodeGenerator
 // **************************************************************************
 
 abstract class _\$Example
-    extends Aggregate<Object, ExampleValue, ExampleId, ExampleState> {
+    extends Aggregate<JsonObject, ExampleValue, ExampleId, ExampleState> {
   _\$Example(ExampleId id, ExampleState? state)
       : super(id, state ?? ExampleState());
+  // ignore: unused_element
   static Example from(String id) => Example(ExampleId(id));
 }
 
@@ -244,8 +241,8 @@ abstract class _\$ExampleCreated extends JsonObject {
 }
 
 void defineExampleTypes() {
-  AggregateTypes.define<Object, ExampleValue, ExampleId, ExampleState, Example>(
-      (id, [state]) => Example(id, state));
+  AggregateTypes.define<JsonObject, ExampleValue, ExampleId, ExampleState,
+      Example>((id, [state]) => Example(id, state));
   AggregateStateTypes.define<ExampleValue, ExampleState>(
     ([value, version]) => ExampleState(value, version),
   );
@@ -256,17 +253,15 @@ void defineExampleTypes() {
 ''';
 
 const ExampleGeneratedCodeTyped = '''
-$Header
-part of 'example.dart';
-
 // **************************************************************************
-// EventuousGenerator
+// CodeGenerator
 // **************************************************************************
 
 abstract class _\$Example extends Aggregate<JsonObject, ExampleStateModel1,
     ExampleId1, ExampleState1> {
   _\$Example(ExampleId1 id, ExampleState1? state)
       : super(id, state ?? ExampleState1());
+  // ignore: unused_element
   static Example from(String id) => Example(ExampleId1(id));
 }
 

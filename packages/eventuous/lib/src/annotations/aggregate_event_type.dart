@@ -1,3 +1,5 @@
+import '../json/json_typedefs.dart';
+
 class AggregateEventType {
   const AggregateEventType(
     this.aggregate, {
@@ -6,4 +8,10 @@ class AggregateEventType {
 
   final Type? data;
   final Type aggregate;
+
+  JsonMap toJson() => {
+        'aggregate': aggregate.toString(),
+        'annotation': '$AggregateEventType',
+        if (data != null) 'data': data?.toString(),
+      };
 }

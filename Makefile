@@ -5,6 +5,11 @@
 	configure generate verify update action
 
 configure:
+	dart pub global activate pub_release
+	dart pub global activate critical_test
+	pub global activate dcli
+	pub global activate dartdoc
+	pub global activate dhttpd
 	dart pub global activate mono_repo
 	brew install act
 
@@ -24,3 +29,7 @@ upgrade:
 action:
 	echo "Running github actions..."
 	act
+
+release:
+	echo 'Release all to pub.dev...'
+	cd packages/eventuous && pub_release multi --no-test

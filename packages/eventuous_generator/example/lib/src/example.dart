@@ -2,7 +2,6 @@ import 'package:eventuous/eventuous.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'example.g.dart';
-part 'example.eventuous.dart';
 
 @AggregateType(
   id: ExampleId1,
@@ -36,7 +35,7 @@ class ExampleState1 extends _$ExampleState1 {
 }
 
 @JsonSerializable()
-@AggregateEventType(Example)
+@AggregateEventType(Example, data: JsonMap)
 class ExampleCreated extends _$ExampleCreated {
   ExampleCreated(this.title, this.author) : super([title, author]);
   final String title;

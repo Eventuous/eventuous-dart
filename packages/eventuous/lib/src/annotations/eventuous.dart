@@ -1,7 +1,13 @@
+import 'package:eventuous/eventuous.dart';
+
 class Eventuous {
   const Eventuous({
     this.inferTypes = true,
+    this.initializerName = r'_$initEventuous',
   });
+
+  /// Name of the generated initializer method
+  final String initializerName;
 
   /// Determines if parameterized types should be inferred from
   /// annotated classes. If true (default) the following
@@ -54,6 +60,11 @@ class Eventuous {
   /// * [AggregateCommandAnnotation] - defines aggregate command types
   ///
   final bool inferTypes;
+
+  JsonMap toJson() => {
+        'infer_types': inferTypes,
+        'initializer_name': initializerName,
+      };
 }
 
-const eventuousAnnotation = Eventuous();
+const eventuous = Eventuous();

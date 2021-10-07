@@ -1,18 +1,67 @@
 targets:
   $default:
     builders:
-      eventuous:
+      source_gen|combining_builder:
         enabled: true
-#        generate_for:
-#          exclude:
-#            - test
-#            - example
+      json_serializable|json_serializable:
+        enabled: true
+      eventuous_generator|inference_builder:
+        enabled: true
+      eventuous_generator|code_builder:
+        enabled: true
+      eventuous_generator|config_builder:
+        enabled: true
 
 builders:
-  eventuous:
+  # Analyse all code in target libraries for inference
+  # data about types when not given explictly with annotations
+  inference_builder:
     import: "package:eventuous_generator/eventuous_generator.dart"
-    builder_factories: ["eventuous"]
-    build_extensions: { ".dart": [".eventuous.dart"] }
+    builder_factories: ["inferenceBuilder"]
+    build_extensions: { ".dart": [".inference.json"] }
     auto_apply: dependents
-    build_to: source
-    runs_before: ["json_serializable|json_serializable"]
+    build_to: cache
+    applies_builders: ["eventuous_generator|code_builder"]
+    runs_before:
+      - "eventuous_generator|code_builder"
+      - "eventuous_generator|config_builder"
+  code_builder:
+    import: "package:eventuous_generator/eventuous_generator.dart"
+    builder_factories: ["codeBuilder"]
+    build_extensions: { ".dart": [".code.g.dart"] }
+    auto_apply: dependents
+    build_to: cache
+    applies_builders: ["eventuous_generator|config_builder"]
+    runs_before:
+      - "eventuous_generator|config_builder"
+  config_builder:
+    import: "package:eventuous_generator/eventuous_generator.dart"
+    builder_factories: ["configBuilder"]
+    build_extensions: { ".dart": [".config.g.dart"] }
+    auto_apply: dependents
+    build_to: cache
+    applies_builders:
+      - "json_serializable|json_serializable"
+    runs_before:
+      - "json_serializable|json_serializable"
+      - "source_gen|combining_builder"
+      - "eventuous_generator|cleanup_builder"
+#  json_serializable:
+#    import: "package:json_serializable/builder.dart"
+#    builder_factories: ["jsonSerializable"]
+#    build_extensions: {".dart": [".json_serializable.g.part"]}
+#    auto_apply: dependents
+#    build_to: cache
+#    applies_builders:
+#      - "source_gen|combining_builder"
+#      - "eventuous_generator|cleanup_builder"
+#    runs_before:
+#      - "source_gen|combining_builder"
+#      - "eventuous_generator|cleanup_builder"
+post_process_builders:
+  cleanup_builder:
+    import: "package:eventuous_generator/eventuous_generator.dart"
+    builder_factory: "cleanupBuilder"
+    defaults:
+      release_options:
+        enabled: true

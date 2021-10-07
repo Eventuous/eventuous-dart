@@ -1,6 +1,7 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:eventuous/eventuous.dart';
-import 'package:eventuous_generator/src/inference.dart';
+import 'package:eventuous_generator/src/builders/models/inference_model.dart';
+import 'package:eventuous_generator/src/builders/models/parameterized_type_model.dart';
 
 import '../extensions.dart';
 import 'aggregate_event_template.dart';
@@ -16,39 +17,25 @@ class AggregateStateTemplate {
   });
 
   factory AggregateStateTemplate.from(
-    Eventuous eventuous,
+    InferenceModel inference,
     Element element,
     ElementAnnotation annotation,
   ) {
-    final name = element.displayName;
-    final library = element.library!;
-    final aggregate = annotation
-        .computeConstantValue()!
-        .getField('aggregate')!
-        .toTypeValue()!
-        .toTypeName();
-    final values = library
-        .whereAggregateValueClasses(aggregate)
-        .map((c) => c.toAggregateValueTemplate(eventuous, aggregate)!)
-        .toList();
-    final events = library
-        .whereAggregateEventClasses(aggregate)
-        .map((c) => c.toAggregateEventTemplate(eventuous, aggregate)!)
+    final aggregate = annotation.toTypeName('aggregate');
+    final inferred = inference.firstAnnotationOf<AggregateType>(aggregate)!;
+    final events = inference
+        .annotationsOf<AggregateEventType>(aggregate)
+        .map((a) => a.toAggregateEventTemplate(aggregate))
         .toList();
 
     return AggregateStateTemplate(
-      name: name,
+      name: element.displayName,
       events: events,
       aggregate: aggregate,
-      event: inferTEvent(eventuous, element, annotation, events),
-      value: inferTValue(
-        eventuous,
-        element,
-        annotation.computeConstantValue()!.getField('value')!.toTypeValue(),
-        aggregate,
-        values,
-      ),
-      usesJsonSerializable: events.any((e) => e.usesJsonSerializable),
+      event: (inferred['event'] as ParameterizedTypeModel).value,
+      value: (inferred['value'] as ParameterizedTypeModel).value,
+      usesJsonSerializable: inferred.usesJsonSerializable ||
+          events.any((e) => e.usesJsonSerializable),
     );
   }
 

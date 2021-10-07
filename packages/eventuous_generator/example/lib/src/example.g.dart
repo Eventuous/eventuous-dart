@@ -1,17 +1,16 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
 
 part of 'example.dart';
 
 // **************************************************************************
-// EventuousGenerator
+// CodeGenerator
 // **************************************************************************
 
 abstract class _$Example extends Aggregate<JsonObject, ExampleStateModel1,
     ExampleId1, ExampleState1> {
   _$Example(ExampleId1 id, ExampleState1? state)
       : super(id, state ?? ExampleState1());
+  // ignore: unused_element
   static Example from(String id) => Example(ExampleId1(id));
 }
 
@@ -58,3 +57,31 @@ void defineExampleTypes() {
     (data) => _$ExampleCreated.fromJson(data),
   );
 }
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+ExampleStateModel1 _$ExampleStateModel1FromJson(Map<String, dynamic> json) =>
+    ExampleStateModel1(
+      title: json['title'] as String?,
+      author: json['author'] as String?,
+    );
+
+Map<String, dynamic> _$ExampleStateModel1ToJson(ExampleStateModel1 instance) =>
+    <String, dynamic>{
+      'title': instance.title,
+      'author': instance.author,
+    };
+
+ExampleCreated _$ExampleCreatedFromJson(Map<String, dynamic> json) =>
+    ExampleCreated(
+      json['title'] as String,
+      json['author'] as String,
+    );
+
+Map<String, dynamic> _$ExampleCreatedToJson(ExampleCreated instance) =>
+    <String, dynamic>{
+      'title': instance.title,
+      'author': instance.author,
+    };
