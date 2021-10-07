@@ -38,6 +38,10 @@ class AnnotationModel extends JsonObject {
   Object? operator [](Object? name) =>
       toJson()[name] ?? parameters.firstWhereOrNull((p) => p.name == name);
 
+  T elementAt<T>(Object? name) => this[name] as T;
+  String parameterValueAt<T>(Object? name) =>
+      elementAt<ParameterizedTypeModel>(name).value;
+
   /// Factory constructor for creating a new `AnnotationModel` instance
   factory AnnotationModel.fromJson(Map<String, dynamic> json) =>
       AnnotationModel(json['type'] as String, json['annotationOf'] as String,

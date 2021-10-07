@@ -1,9 +1,10 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:eventuous/eventuous.dart';
-import 'package:eventuous_generator/src/builders/models/parameterized_type_model.dart';
+import 'package:source_gen/source_gen.dart';
 
 import '../extensions.dart';
 import '../builders/models/inference_model.dart';
+import '../builders/models/parameterized_type_model.dart';
 
 class AggregateEventTemplate {
   AggregateEventTemplate({
@@ -16,10 +17,10 @@ class AggregateEventTemplate {
   factory AggregateEventTemplate.from(
     InferenceModel inference,
     Element element,
-    ElementAnnotation annotation,
+    ConstantReader annotation,
   ) {
     final name = element.displayName;
-    final aggregate = annotation.toTypeName('aggregate');
+    final aggregate = annotation.toFieldTypeName('aggregate');
     final event = inference.firstAnnotationOf<AggregateEventType>(aggregate)!;
     return AggregateEventTemplate(
       name: name,
@@ -51,7 +52,9 @@ class AggregateEventTemplate {
   String toAggregateEventString() {
     return '''
 abstract class _\$$name${withJsonObject ? ' extends JsonObject' : ''}{
-  _\$$name(List<Object?> props)${withJsonObject ? ' : super(props)' : ''};
+  _\$$name(List<Object?> props)${withJsonObject ? ' : super(props)' : ''}{
+    ${toDefineAggregateEventTypeString()}
+  }
 
   ${usesJsonSerializable ? toAggregateJsonString() : ''}
 }
@@ -76,7 +79,7 @@ on<$name>(patch);
   String toDefineAggregateEventTypeString() {
     return '''
 $AggregateEventTypes.define<$data, $name>(
-    (data) => _\$$name.fromJson(data),
+  _\$$name.fromJson,
 );''';
   }
 }

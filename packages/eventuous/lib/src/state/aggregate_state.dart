@@ -1,8 +1,14 @@
 part of 'aggregate.dart';
 
+/// New aggregate state [TValue] instance creator method.
+/// If [data] is not given, a default value must
+/// be AggregateState.
+typedef AggregateValueCreator<TData extends Object, TValue extends Object>
+    = TValue Function([TData? data]);
+
 /// New [AggregateState] instance creator method.
 /// If [value] is not given, a default value must
-/// be given.
+/// be returned.
 typedef AggregateStateCreator<TValue extends Object,
         TState extends AggregateState<TValue>>
     = TState Function([TValue? value, int? version]);

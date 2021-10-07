@@ -1,16 +1,15 @@
 import 'package:eventuous/eventuous.dart';
 
-class AggregateStateTypes {
+class AggregateValueTypes {
   static final Map<Type, Object> _creators = {};
   static final Map<Type, String> _map = <Type, String>{};
   static final Map<String, Type> _reverseMap = <String, Type>{};
 
-  static void
-      define<TValue extends Object, TState extends AggregateState<TValue>>(
-    AggregateStateCreator<TValue, TState> creator, {
+  static void define<TData extends Object, TValue extends Object>(
+    AggregateValueCreator<TData, TValue> creator, {
     String? name,
   }) {
-    final type = typeOf<TState>();
+    final type = typeOf<TValue>();
     final _name = name ?? type.toString();
     if (!containsTypeName(_name)) {
       _reverseMap[_name] = type;
@@ -19,12 +18,11 @@ class AggregateStateTypes {
     }
   }
 
-  /// Create [AggregateState] of [TState] from given [value]
-  static TState
-      create<TValue extends Object, TState extends AggregateState<TValue>>(
-              [TValue? value, int? version]) =>
-          (_creators[typeOf<TState>()]!
-              as AggregateStateCreator<TValue, TState>)(value, version);
+  /// Create aggregate state value of [TValue] from given [data]
+  static TValue create<TData extends Object, TValue extends Object>(
+          [TData? data]) =>
+      (_creators[typeOf<TValue>()]!
+          as AggregateValueCreator<TData, TValue>)(data);
 
   static bool containsType(Type type) => _map.containsKey(type);
 

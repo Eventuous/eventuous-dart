@@ -2,6 +2,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:eventuous/eventuous.dart';
 import 'package:eventuous_generator/src/builders/models/inference_model.dart';
 import 'package:eventuous_generator/src/builders/models/parameterized_type_model.dart';
+import 'package:source_gen/source_gen.dart';
 
 import '../extensions.dart';
 
@@ -16,10 +17,10 @@ class AggregateValueTemplate {
   factory AggregateValueTemplate.from(
     InferenceModel inference,
     Element element,
-    ElementAnnotation annotation,
+    ConstantReader annotation,
   ) {
     final name = element.displayName;
-    final aggregate = annotation.toTypeName('aggregate');
+    final aggregate = annotation.toFieldTypeName('aggregate');
     final inferred = inference.firstAnnotationOf<AggregateValueType>(aggregate);
 
     return AggregateValueTemplate(
@@ -52,7 +53,9 @@ class AggregateValueTemplate {
   String toAggregateValueString() {
     return '''
 abstract class _\$$name${withJsonObject ? ' extends JsonObject' : ''}{
-  _\$$name(List<Object?> props)${withJsonObject ? ' : super(props)' : ''};
+  _\$$name(List<Object?> props)${withJsonObject ? ' : super(props)' : ''}{
+    ${toDefineAggregateValueTypeString()}
+  }
   
   ${usesJsonSerializable ? toAggregateJsonString() : ''}
 }
@@ -61,10 +64,17 @@ abstract class _\$$name${withJsonObject ? ' extends JsonObject' : ''}{
 
   String toAggregateJsonString() {
     return '''
-static $name fromJson($data json) => _\$${name}FromJson(json);
+static $name fromJson([$data? json]) => _\$${name}FromJson(json ?? {});
 
 @override
 JsonMap toJson() => _\$${name}ToJson(this as $name);  
 ''';
+  }
+
+  String toDefineAggregateValueTypeString() {
+    return '''
+$AggregateValueTypes.define<$data, $name>(
+  _\$$name.fromJson,
+);''';
   }
 }

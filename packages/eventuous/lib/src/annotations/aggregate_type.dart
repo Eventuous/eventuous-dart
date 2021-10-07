@@ -6,10 +6,10 @@ import '../json/json_typedefs.dart';
 
 class AggregateType {
   const AggregateType({
-    this.id,
-    this.event,
-    this.value,
-    this.state,
+    required this.id,
+    required this.event,
+    required this.value,
+    required this.state,
   });
 
   final Type? id;

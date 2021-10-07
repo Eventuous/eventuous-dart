@@ -141,41 +141,32 @@ class ExampleCreated extends _$ExampleCreated {
 
 const ExampleGeneratedCodeDefaults = '''
 // **************************************************************************
-// CodeGenerator
+// AggregateGenerator
 // **************************************************************************
 
 abstract class _\$Example
     extends Aggregate<Object, ExampleValue, ExampleId, ExampleState> {
   _\$Example(ExampleId id, ExampleState? state)
-      : super(id, state ?? ExampleState());
+      : super(id, state ?? ExampleState()) {
+    AggregateTypes.define<Object, ExampleValue, ExampleId, ExampleState,
+        Example>(
+      (id, [state]) => Example(id, state),
+    );
+  }
   // ignore: unused_element
   static Example from(String id) => Example(ExampleId(id));
 }
 
-abstract class _\$ExampleValue extends JsonObject {
-  _\$ExampleValue(List<Object?> props) : super(props);
-
-  static ExampleValue fromJson(Object json) => _\$ExampleValueFromJson(json);
-
-  @override
-  JsonMap toJson() => _\$ExampleValueToJson(this as ExampleValue);
-}
-
-abstract class _\$ExampleState extends AggregateState<ExampleValue> {
-  _\$ExampleState(ExampleValue? value, int? version)
-      : super(value ?? ExampleValue(), version) {
-    on<ExampleCreated>(patch);
-  }
-  ExampleState patch(JsonObject event, ExampleValue value) {
-    return ExampleState(_\$ExampleValue.fromJson(JsonUtils.patch(
-      value,
-      event,
-    )));
-  }
-}
+// **************************************************************************
+// AggregateEventGenerator
+// **************************************************************************
 
 abstract class _\$ExampleCreated extends JsonObject {
-  _\$ExampleCreated(List<Object?> props) : super(props);
+  _\$ExampleCreated(List<Object?> props) : super(props) {
+    AggregateEventTypes.define<Object, ExampleCreated>(
+      _\$ExampleCreated.fromJson,
+    );
+  }
 
   static ExampleCreated fromJson(Object json) => _\$ExampleCreatedFromJson(json);
 
@@ -183,55 +174,76 @@ abstract class _\$ExampleCreated extends JsonObject {
   JsonMap toJson() => _\$ExampleCreatedToJson(this as ExampleCreated);
 }
 
-void defineExampleTypes() {
-  AggregateTypes.define<Object, ExampleValue, ExampleId, ExampleState, Example>(
-      (id, [state]) => Example(id, state));
-  AggregateStateTypes.define<ExampleValue, ExampleState>(
-    ([value, version]) => ExampleState(value, version),
-  );
-  AggregateEventTypes.define<Object, ExampleCreated>(
-    (data) => _\$ExampleCreated.fromJson(data),
-  );
-}
-''';
-
-const ExampleGeneratedCodeInferred = '''
 // **************************************************************************
-// CodeGenerator
+// AggregateValueGenerator
 // **************************************************************************
-
-abstract class _\$Example
-    extends Aggregate<JsonObject, ExampleValue, ExampleId, ExampleState> {
-  _\$Example(ExampleId id, ExampleState? state)
-      : super(id, state ?? ExampleState());
-  // ignore: unused_element
-  static Example from(String id) => Example(ExampleId(id));
-}
 
 abstract class _\$ExampleValue extends JsonObject {
-  _\$ExampleValue(List<Object?> props) : super(props);
+  _\$ExampleValue(List<Object?> props) : super(props) {
+    AggregateValueTypes.define<Object, ExampleValue>(
+      _\$ExampleValue.fromJson,
+    );
+  }
 
-  static ExampleValue fromJson(JsonMap json) => _\$ExampleValueFromJson(json);
+  static ExampleValue fromJson([Object? json]) =>
+      _\$ExampleValueFromJson(json ?? {});
 
   @override
   JsonMap toJson() => _\$ExampleValueToJson(this as ExampleValue);
 }
 
+// **************************************************************************
+// AggregateStateGenerator
+// **************************************************************************
+
 abstract class _\$ExampleState extends AggregateState<ExampleValue> {
   _\$ExampleState(ExampleValue? value, int? version)
       : super(value ?? ExampleValue(), version) {
+    AggregateStateTypes.define<ExampleValue, ExampleState>(
+      ([value, version]) => ExampleState(value, version),
+    );
     on<ExampleCreated>(patch);
   }
-  ExampleState patch(JsonObject event, ExampleValue value) {
-    return ExampleState(_\$ExampleValue.fromJson(JsonUtils.patch(
-      value,
-      event,
-    )));
+
+  ExampleState patch(Object event, ExampleValue value) {
+    return ExampleState(AggregateValueTypes.create<JsonMap, ExampleValue>(
+      JsonUtils.patch(
+        value,
+        event,
+      ),
+    ));
   }
 }
+''';
+
+const ExampleGeneratedCodeInferred = '''
+// **************************************************************************
+// AggregateGenerator
+// **************************************************************************
+
+abstract class _\$Example
+    extends Aggregate<JsonObject, ExampleValue, ExampleId, ExampleState> {
+  _\$Example(ExampleId id, ExampleState? state)
+      : super(id, state ?? ExampleState()) {
+    AggregateTypes.define<JsonObject, ExampleValue, ExampleId, ExampleState,
+        Example>(
+      (id, [state]) => Example(id, state),
+    );
+  }
+  // ignore: unused_element
+  static Example from(String id) => Example(ExampleId(id));
+}
+
+// **************************************************************************
+// AggregateEventGenerator
+// **************************************************************************
 
 abstract class _\$ExampleCreated extends JsonObject {
-  _\$ExampleCreated(List<Object?> props) : super(props);
+  _\$ExampleCreated(List<Object?> props) : super(props) {
+    AggregateEventTypes.define<JsonMap, ExampleCreated>(
+      _\$ExampleCreated.fromJson,
+    );
+  }
 
   static ExampleCreated fromJson(JsonMap json) =>
       _\$ExampleCreatedFromJson(json);
@@ -240,56 +252,76 @@ abstract class _\$ExampleCreated extends JsonObject {
   JsonMap toJson() => _\$ExampleCreatedToJson(this as ExampleCreated);
 }
 
-void defineExampleTypes() {
-  AggregateTypes.define<JsonObject, ExampleValue, ExampleId, ExampleState,
-      Example>((id, [state]) => Example(id, state));
-  AggregateStateTypes.define<ExampleValue, ExampleState>(
-    ([value, version]) => ExampleState(value, version),
-  );
-  AggregateEventTypes.define<JsonMap, ExampleCreated>(
-    (data) => _\$ExampleCreated.fromJson(data),
-  );
+// **************************************************************************
+// AggregateValueGenerator
+// **************************************************************************
+
+abstract class _\$ExampleValue extends JsonObject {
+  _\$ExampleValue(List<Object?> props) : super(props) {
+    AggregateValueTypes.define<JsonMap, ExampleValue>(
+      _\$ExampleValue.fromJson,
+    );
+  }
+
+  static ExampleValue fromJson([JsonMap? json]) =>
+      _\$ExampleValueFromJson(json ?? {});
+
+  @override
+  JsonMap toJson() => _\$ExampleValueToJson(this as ExampleValue);
+}
+
+// **************************************************************************
+// AggregateStateGenerator
+// **************************************************************************
+
+abstract class _\$ExampleState extends AggregateState<ExampleValue> {
+  _\$ExampleState(ExampleValue? value, int? version)
+      : super(value ?? ExampleValue(), version) {
+    AggregateStateTypes.define<ExampleValue, ExampleState>(
+      ([value, version]) => ExampleState(value, version),
+    );
+    on<ExampleCreated>(patch);
+  }
+
+  ExampleState patch(JsonObject event, ExampleValue value) {
+    return ExampleState(AggregateValueTypes.create<JsonMap, ExampleValue>(
+      JsonUtils.patch(
+        value,
+        event,
+      ),
+    ));
+  }
 }
 ''';
 
 const ExampleGeneratedCodeTyped = '''
 // **************************************************************************
-// CodeGenerator
+// AggregateGenerator
 // **************************************************************************
 
 abstract class _\$Example extends Aggregate<JsonObject, ExampleStateModel1,
     ExampleId1, ExampleState1> {
   _\$Example(ExampleId1 id, ExampleState1? state)
-      : super(id, state ?? ExampleState1());
+      : super(id, state ?? ExampleState1()) {
+    AggregateTypes.define<JsonObject, ExampleStateModel1, ExampleId1,
+        ExampleState1, Example>(
+      (id, [state]) => Example(id, state),
+    );
+  }
   // ignore: unused_element
   static Example from(String id) => Example(ExampleId1(id));
 }
 
-abstract class _\$ExampleStateModel1 extends JsonObject {
-  _\$ExampleStateModel1(List<Object?> props) : super(props);
-
-  static ExampleStateModel1 fromJson(JsonMap json) =>
-      _\$ExampleStateModel1FromJson(json);
-
-  @override
-  JsonMap toJson() => _\$ExampleStateModel1ToJson(this as ExampleStateModel1);
-}
-
-abstract class _\$ExampleState1 extends AggregateState<ExampleStateModel1> {
-  _\$ExampleState1(ExampleStateModel1? value, int? version)
-      : super(value ?? ExampleStateModel1(), version) {
-    on<ExampleCreated>(patch);
-  }
-  ExampleState1 patch(JsonObject event, ExampleStateModel1 value) {
-    return ExampleState1(_\$ExampleStateModel1.fromJson(JsonUtils.patch(
-      value,
-      event,
-    )));
-  }
-}
+// **************************************************************************
+// AggregateEventGenerator
+// **************************************************************************
 
 abstract class _\$ExampleCreated extends JsonObject {
-  _\$ExampleCreated(List<Object?> props) : super(props);
+  _\$ExampleCreated(List<Object?> props) : super(props) {
+    AggregateEventTypes.define<JsonMap, ExampleCreated>(
+      _\$ExampleCreated.fromJson,
+    );
+  }
 
   static ExampleCreated fromJson(JsonMap json) =>
       _\$ExampleCreatedFromJson(json);
@@ -298,14 +330,45 @@ abstract class _\$ExampleCreated extends JsonObject {
   JsonMap toJson() => _\$ExampleCreatedToJson(this as ExampleCreated);
 }
 
-void defineExampleTypes() {
-  AggregateTypes.define<JsonObject, ExampleStateModel1, ExampleId1,
-      ExampleState1, Example>((id, [state]) => Example(id, state));
-  AggregateStateTypes.define<ExampleStateModel1, ExampleState1>(
-    ([value, version]) => ExampleState1(value, version),
-  );
-  AggregateEventTypes.define<JsonMap, ExampleCreated>(
-    (data) => _\$ExampleCreated.fromJson(data),
-  );
+// **************************************************************************
+// AggregateValueGenerator
+// **************************************************************************
+
+abstract class _\$ExampleStateModel1 extends JsonObject {
+  _\$ExampleStateModel1(List<Object?> props) : super(props) {
+    AggregateValueTypes.define<JsonMap, ExampleStateModel1>(
+      _\$ExampleStateModel1.fromJson,
+    );
+  }
+
+  static ExampleStateModel1 fromJson([JsonMap? json]) =>
+      _\$ExampleStateModel1FromJson(json ?? {});
+
+  @override
+  JsonMap toJson() => _\$ExampleStateModel1ToJson(this as ExampleStateModel1);
+}
+
+// **************************************************************************
+// AggregateStateGenerator
+// **************************************************************************
+
+abstract class _\$ExampleState1 extends AggregateState<ExampleStateModel1> {
+  _\$ExampleState1(ExampleStateModel1? value, int? version)
+      : super(value ?? ExampleStateModel1(), version) {
+    AggregateStateTypes.define<ExampleStateModel1, ExampleState1>(
+      ([value, version]) => ExampleState1(value, version),
+    );
+    on<ExampleCreated>(patch);
+  }
+
+  ExampleState1 patch(JsonObject event, ExampleStateModel1 value) {
+    return ExampleState1(
+        AggregateValueTypes.create<JsonMap, ExampleStateModel1>(
+      JsonUtils.patch(
+        value,
+        event,
+      ),
+    ));
+  }
 }
 ''';

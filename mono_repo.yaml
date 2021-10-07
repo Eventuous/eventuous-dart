@@ -47,5 +47,5 @@ github:
 self_validate: analyze
 
 # Use this key to merge stages across packages to create fewer jobs
-#merge_stages:
-#  - analyze_and_format
+merge_stages:
+  - analyze_and_format

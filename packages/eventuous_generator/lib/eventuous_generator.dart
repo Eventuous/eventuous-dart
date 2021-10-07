@@ -5,8 +5,11 @@ import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
 
 import 'src/builders/inference_builder.dart';
-import 'src/generators/code_generator.dart';
+import 'src/generators/aggregate_generator.dart';
 import 'src/generators/config_generator.dart';
+import 'src/generators/aggregate_event_generator.dart';
+import 'src/generators/aggregate_state_generator.dart';
+import '/src/generators/aggregate_value_generator.dart';
 
 const Header = '''
 // coverage:ignore-file
@@ -22,8 +25,14 @@ Builder inferenceBuilder(BuilderOptions options) {
 /// Builds code based on annotations and inference data
 Builder codeBuilder(BuilderOptions options) {
   return SharedPartBuilder(
-    [CodeGenerator(options.config)],
+    [
+      AggregateGenerator(options.config),
+      AggregateEventGenerator(options.config),
+      AggregateValueGenerator(options.config),
+      AggregateStateGenerator(options.config),
+    ],
     'aggregate',
+    allowSyntaxErrors: true,
   );
 }
 

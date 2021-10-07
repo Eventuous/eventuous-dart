@@ -1,8 +1,9 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:eventuous/eventuous.dart';
-import 'package:eventuous_generator/src/builders/models/inference_model.dart';
-import 'package:eventuous_generator/src/builders/models/parameterized_type_model.dart';
+import 'package:source_gen/source_gen.dart';
 
+import '../builders/models/inference_model.dart';
+import '../builders/models/parameterized_type_model.dart';
 import '../extensions.dart';
 import 'aggregate_event_template.dart';
 
@@ -19,13 +20,13 @@ class AggregateStateTemplate {
   factory AggregateStateTemplate.from(
     InferenceModel inference,
     Element element,
-    ElementAnnotation annotation,
+    ConstantReader annotation,
   ) {
-    final aggregate = annotation.toTypeName('aggregate');
+    final aggregate = annotation.toFieldTypeName('aggregate');
     final inferred = inference.firstAnnotationOf<AggregateType>(aggregate)!;
     final events = inference
         .annotationsOf<AggregateEventType>(aggregate)
-        .map((a) => a.toAggregateEventTemplate(aggregate))
+        .map((a) => a.toAggregateEventTemplate())
         .toList();
 
     return AggregateStateTemplate(
@@ -56,7 +57,12 @@ class AggregateStateTemplate {
   String toAggregateStateString() {
     return '''
 abstract class _\$$name extends AggregateState<$value>{
-  _\$$name($value? value, int? version) : super(value ?? $value(), version)${_toAggregatePatchString()}
+  _\$$name($value? value, int? version) : super(value ?? $value(), version){
+    ${toDefineAggregateStateTypeString()}
+    ${_toAggregatePatchString()}
+  }
+    
+  ${toAggregateEventPatchMethodString()}
 }
 ''';
   }
@@ -70,21 +76,19 @@ $AggregateStateTypes.define<$value, $name>(
 
   String _toAggregatePatchString() {
     return usesJsonSerializable && events.isNotEmpty
-        ? '''{
-    ${events.map((e) => e.toAggregateEventPatchString()).join('\n')}
-  }
-  ${toAggregateEventPatchMethodString()}  
-  '''
-        : ';';
+        ? '''${events.map((e) => e.toAggregateEventPatchString()).join('\n')}'''
+        : '';
   }
 
   String toAggregateEventPatchMethodString() {
     return '''
 $name patch($event event, $value value) {
-  return $name(_\$$value.fromJson(JsonUtils.patch(
-    value,
-    event,
-  )));
+  return $name($AggregateValueTypes.create<JsonMap, $value>(
+    JsonUtils.patch(
+      value,
+      event,
+    ),
+  ));
 }
 ''';
   }

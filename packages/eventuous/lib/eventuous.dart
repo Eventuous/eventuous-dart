@@ -25,6 +25,7 @@ export 'src/state/aggregate_id.dart';
 export 'src/state/aggregate_state_storage.dart';
 export 'src/state/aggregate_state_types.dart';
 export 'src/state/aggregate_types.dart';
+export 'src/state/aggregate_value_types.dart';
 export 'src/state/models/aggregate_state_snapshot_model.dart';
 export 'src/store/esdb/extensions.dart';
 export 'src/store/esdb/snapshot_storage.dart';

@@ -4,14 +4,12 @@ import 'dart:convert';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:build/src/builder/build_step.dart';
-import 'package:eventuous/eventuous.dart';
 import 'package:path/path.dart' as p;
 import 'package:source_gen/source_gen.dart';
 
-import '../templates/aggregate_template.dart';
 import '../builders/models/inference_model.dart';
 
-class CodeGenerator extends GeneratorForAnnotation<AggregateType> {
+abstract class CodeGenerator<T> extends GeneratorForAnnotation<T> {
   CodeGenerator(this.config);
 
   final Map<String, Object?> config;
@@ -23,9 +21,14 @@ class CodeGenerator extends GeneratorForAnnotation<AggregateType> {
     BuildStep buildStep,
   ) async {
     final inference = await _read(element, buildStep);
-    log.warning(element);
-    return AggregateTemplate.from(inference, element, annotation).toString();
+    return generateForType(inference, element, annotation).toString();
   }
+
+  String generateForType(
+    InferenceModel inference,
+    Element element,
+    ConstantReader annotation,
+  );
 
   Future<InferenceModel> _read(Element element, BuildStep buildStep) async {
     final json = await buildStep.readAsString(_toInferenceAssetId(buildStep));

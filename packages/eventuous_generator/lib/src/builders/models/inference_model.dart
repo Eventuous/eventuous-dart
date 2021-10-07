@@ -13,6 +13,12 @@ class InferenceModel extends JsonObject {
   final ConfigModel config;
   final List<AnnotationModel> annotations;
 
+  List<AnnotationModel> get aggregates => where<AggregateType>();
+  List<AnnotationModel> get events => where<AggregateEventType>();
+  List<AnnotationModel> get values => where<AggregateValueType>();
+  List<AnnotationModel> get states => where<AggregateStateType>();
+  List<AnnotationModel> get commands => where<AggregateCommandType>();
+
   List<AnnotationModel> where<T>([String? aggregate]) => annotations
       .map((a) => a)
       .where((a) => a.type == '$T')

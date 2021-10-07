@@ -11,9 +11,11 @@ class AggregateEventTypes {
   }) {
     final type = typeOf<TEvent>();
     final _name = name ?? type.toString();
-    _reverseMap[_name] = type;
-    _map[type] = _name;
-    _creators[type] = creator;
+    if (!containsTypeName(_name)) {
+      _reverseMap[_name] = type;
+      _map[type] = _name;
+      _creators[type] = creator;
+    }
   }
 
   /// Create event with given type [name] from given [data]

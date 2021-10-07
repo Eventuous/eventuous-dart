@@ -16,9 +16,11 @@ class AggregateTypes {
   }) {
     final type = typeOf<TAggregate>();
     final _name = name ?? type.toString();
-    _reverseMap[_name] = type;
-    _map[type] = _name;
-    _creators[type] = creator;
+    if (!containsTypeName(_name)) {
+      _reverseMap[_name] = type;
+      _map[type] = _name;
+      _creators[type] = creator;
+    }
   }
 
   /// Create [Aggregate] of [type] from given [event]

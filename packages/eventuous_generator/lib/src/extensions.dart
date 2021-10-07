@@ -27,46 +27,34 @@ extension AnnotationModelX on AnnotationModel {
       event: (this['event'] as ParameterizedTypeModel).value,
       value: (this['value'] as ParameterizedTypeModel).value,
       state: (this['state'] as ParameterizedTypeModel).value,
-      events: inference
-          .annotationsOf<AggregateEventType>()
-          .map((a) => a.toAggregateEventTemplate(name))
-          .toList(),
-      values: inference
-          .annotationsOf<AggregateValueType>()
-          .map((a) => a.toAggregateValueTemplate(name))
-          .toList(),
-      states: inference
-          .annotationsOf<AggregateStateType>()
-          .map((a) => a.toAggregateStateTemplate(name, inference))
-          .toList(),
     );
   }
 
-  AggregateEventTemplate toAggregateEventTemplate(String aggregate) {
+  AggregateEventTemplate toAggregateEventTemplate() {
     return AggregateEventTemplate(
       name: annotationOf,
-      aggregate: aggregate,
+      aggregate: parameterValueAt('aggregate'),
       usesJsonSerializable: usesJsonSerializable,
       data: (this['data'] as ParameterizedTypeModel).value,
     );
   }
 
-  AggregateValueTemplate toAggregateValueTemplate(String aggregate) {
+  AggregateValueTemplate toAggregateValueTemplate() {
     return AggregateValueTemplate(
       name: annotationOf,
-      aggregate: aggregate,
+      aggregate: parameterValueAt('aggregate'),
       usesJsonSerializable: usesJsonSerializable,
       data: (this['data'] as ParameterizedTypeModel).value,
     );
   }
 
   AggregateStateTemplate toAggregateStateTemplate(
-    String aggregate,
     InferenceModel inference,
   ) {
+    final aggregate = parameterValueAt('aggregate');
     final events = inference
         .annotationsOf<AggregateEventType>()
-        .map((a) => a.toAggregateEventTemplate(aggregate))
+        .map((a) => a.toAggregateEventTemplate())
         .toList();
     final event = inference.firstAnnotationOf<AggregateEventType>(aggregate);
     return AggregateStateTemplate(
@@ -95,7 +83,7 @@ extension DartObjectX on DartObject {
 
 extension ConstantReaderX on ConstantReader {
   DartType? toFieldType(String field, [String defaultName = 'Object']) {
-    return read('value').isNull ? null : read('value').typeValue;
+    return read(field).isNull ? null : read(field).typeValue;
   }
 
   ParameterizedTypeModel toTypeModel(String field,
@@ -103,11 +91,7 @@ extension ConstantReaderX on ConstantReader {
       ParameterizedTypeModel(field, toFieldTypeName(field, defaultName));
 
   String toFieldTypeName(String field, [String defaultName = 'Object']) {
-    return read(field).toTypeName(defaultName);
-  }
-
-  String toTypeName([String defaultName = 'Object']) {
-    return isNull ? defaultName : typeValue.toTypeName();
+    return toFieldType(field)?.toTypeName() ?? defaultName;
   }
 }
 

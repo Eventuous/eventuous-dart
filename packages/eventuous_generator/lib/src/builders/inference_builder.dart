@@ -162,53 +162,57 @@ class InferenceBuilder implements Builder {
 
   InferenceModel _introspect(Map<AssetId, List<JsonMap>> found) {
     final configs = <ConfigModel>[];
+    final aggregates = <AnnotationModel>[];
     final annotations = <AnnotationModel>[];
+    final events = <String, Set<AnnotationModel>>{};
+    final values = <String, Set<AnnotationModel>>{};
+    final states = <String, Set<AnnotationModel>>{};
+    final commands = <String, Set<AnnotationModel>>{};
 
     // Collect annotations in order of appearance
     for (var inferences in found.values) {
-      final aggregates = <AnnotationModel>[];
-      final events = <String, Set<AnnotationModel>>{};
-      final values = <String, Set<AnnotationModel>>{};
-      final states = <String, Set<AnnotationModel>>{};
-      final commands = <String, Set<AnnotationModel>>{};
-
       for (var inference in inferences) {
         final type = inference.elementAt<String>('type');
         if (type == 'AggregateType') {
           final annotation = AnnotationModel.fromJson(
             inference,
           );
+          if (aggregates.contains(annotation)) {
+            throw InvalidGenerationSourceError(
+              'Aggregate $annotation defined twice',
+            );
+          }
           aggregates.add(annotation);
         } else if (type != null) {
           final annotation = AnnotationModel.fromJson(
             inference,
           );
-          final aggregate = annotation['aggregate'] as ParameterizedTypeModel;
+          final aggregate = annotation.parameterValueAt('aggregate');
           switch (inference['type']) {
             case 'AggregateEventType':
               events.update(
-                aggregate.value,
+                aggregate,
                 (events) => events..add(annotation),
                 ifAbsent: () => {annotation},
               );
               break;
             case 'AggregateValueType':
               values.update(
-                aggregate.value,
+                aggregate,
                 (values) => values..add(annotation),
                 ifAbsent: () => {annotation},
               );
               break;
             case 'AggregateStateType':
               states.update(
-                aggregate.value,
+                aggregate,
                 (states) => states..add(annotation),
                 ifAbsent: () => {annotation},
               );
               break;
             case 'AggregateCommandType':
               commands.update(
-                aggregate.value,
+                aggregate,
                 (commands) => commands..add(annotation),
                 ifAbsent: () => {annotation},
               );
@@ -226,41 +230,38 @@ class InferenceBuilder implements Builder {
           );
         }
       }
+    }
 
-      // Perform introspections on aggregates
-      for (var aggregate in aggregates) {
-        final json = aggregate.toJson();
-        final name = aggregate.annotationOf;
+    // Perform introspections on aggregates
+    for (var aggregate in aggregates) {
+      final json = aggregate.toJson();
+      final name = aggregate.annotationOf;
+      final params = <ParameterizedTypeModel>[
+        aggregate['id'] as ParameterizedTypeModel,
+        ParameterizedTypeModel('event', _inferTEvent(aggregate, events[name])),
+        ParameterizedTypeModel('value', _inferTValue(aggregate, values[name])),
+        ParameterizedTypeModel('state', _inferTState(aggregate, states[name])),
+      ];
+      json['parameters'] = params.map((e) => e.toJson()).toList();
+      annotations.add(AnnotationModel.fromJson(json));
+
+      // Add events and values in given aggregate
+      annotations.addAll(events[name] ?? []);
+      annotations.addAll(values[name] ?? []);
+
+      // Perform introspections of value type in states of given aggregate
+      for (var state in (states[name] ?? {})) {
+        final json = state.toJson();
         final params = <ParameterizedTypeModel>[
-          aggregate['id'] as ParameterizedTypeModel,
-          ParameterizedTypeModel(
-              'event', _inferTEvent(aggregate, events[name])),
-          ParameterizedTypeModel(
-              'value', _inferTValue(aggregate, values[name])),
-          ParameterizedTypeModel(
-              'state', _inferTState(aggregate, states[name])),
+          ParameterizedTypeModel('aggregate', name),
+          ParameterizedTypeModel('value', _inferTValue(state, values[name])),
         ];
         json['parameters'] = params.map((e) => e.toJson()).toList();
         annotations.add(AnnotationModel.fromJson(json));
-
-        // Add events and values in given aggregate
-        annotations.addAll(events[name] ?? []);
-        annotations.addAll(values[name] ?? []);
-
-        // Perform introspections of value type in states of given aggregate
-        for (var state in (states[name] ?? {})) {
-          final json = state.toJson();
-          final params = <ParameterizedTypeModel>[
-            ParameterizedTypeModel('aggregate', name),
-            ParameterizedTypeModel('value', _inferTValue(state, values[name])),
-          ];
-          json['parameters'] = params.map((e) => e.toJson()).toList();
-          annotations.add(AnnotationModel.fromJson(json));
-        }
-
-        // Add commands on given aggregate
-        annotations.addAll(commands[name] ?? []);
       }
+
+      // Add commands on given aggregate
+      annotations.addAll(commands[name] ?? []);
     }
 
     if (configs.length > 1) {
