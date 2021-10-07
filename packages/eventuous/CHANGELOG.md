@@ -1,3 +1,6 @@
+# 0.0.6
+- Added type inference support
+
 # 0.0.5
 - Added generation for events, values, states and aggregates
 
