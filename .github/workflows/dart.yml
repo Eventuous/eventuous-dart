@@ -82,7 +82,7 @@ jobs:
     needs:
       - job_001
   job_003:
-    name: "unit_test; PKG: packages/eventuous_generator; `dart test -j 1`"
+    name: "unit_test; PKG: packages/eventuous_generator; `dart test -j 1 --reporter=expanded`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -105,10 +105,10 @@ jobs:
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: packages/eventuous_generator
         run: dart pub upgrade
-      - name: "packages/eventuous_generator; dart test -j 1"
+      - name: "packages/eventuous_generator; dart test -j 1 --reporter=expanded"
         if: "always() && steps.packages_eventuous_generator_pub_upgrade.conclusion == 'success'"
         working-directory: packages/eventuous_generator
-        run: dart test -j 1
+        run: "dart test -j 1 --reporter=expanded"
     needs:
       - job_001
       - job_002
