@@ -1,4 +1,4 @@
-#Example code
+# Example code
 
 Eventuous code in library [test_lib](lib/test_lib.dart) is generated with the command:
 ```bash
@@ -11,7 +11,7 @@ This will generate the following files
 * [lib/src/foo.g.dart](lib/src/foo.g.dart) - Foo example aggregate with all classes in one file
 * [lib/src/bar/bar.g.dart](lib/src/bar) - Bar example aggregate with all classes in separate files
 
-###Configuring code generation in a dart project 
+### Configuring code generation in a dart project 
 
 When using in a new dart project, the following dependencies must be added to `pubspec.yaml`:
 

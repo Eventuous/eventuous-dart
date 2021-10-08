@@ -21,10 +21,14 @@ within each major version.
 ## Usage and documentation
 This package is not yet properly documented, use 
 [docs](https://eventuous.dev) (incomplete) written for 
-the [.NET version](https://github.com/Eventuous/eventuous/).
+the [.NET version](https://github.com/Eventuous/eventuous/) for an introduction to 
+core principles for developing event sourced applications. We also highly recommend
+that you use the [code generation tool][generator] to remove the
+boilerplate code needed to build you application using event sourcing using this library. 
 
 ## Features and bugs
 
 Please file feature requests and bugs at the [issue tracker][tracker].
 
+[generator]: https://pub.dev/packages/eventuous_generator
 [tracker]: https://github.com/Eventuous/eventuous-dart/issues
