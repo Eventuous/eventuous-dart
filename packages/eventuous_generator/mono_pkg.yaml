@@ -6,4 +6,6 @@ stages:
       - group:
           - analyze: --fatal-infos .
           - format: --output=none --set-exit-if-changed .
+  - unit_test:
+      - test: -j 1
 
