@@ -3,7 +3,7 @@
 Provides [Dart Build System] builders for generating code.
 
 The builders generate code when they find members annotated with classes defined
-in [package:eventuous_annotation].
+in [package:eventuous].
 
 ## Features and bugs
 
@@ -13,4 +13,4 @@ Please file feature requests and bugs at the [issue tracker][tracker].
 [tracker]: https://github.com/eventuous/eventuous-dart/issues
 [eventuous_generator]: https://pub.dev/packages/eventuous_generator
 [example]: https://github.com/eventuous/eventuous-dart/tree/master/example
-[package:eventuous_annotation]: https://pub.dev/packages/eventuous_annotation
+[package:eventuous]: https://pub.dev/packages/eventuous_annotation
