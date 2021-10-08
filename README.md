@@ -16,8 +16,7 @@ Authors:
 ## Usage and documentation
 This mono-repo contains the following packages
 * [Eventuous for Dart](packages/eventuous/README.md) - used by application
-* [Eventuous for Dart Annotation](packages/eventuous_annotation/README.md) - used for code generation
-* [Eventuous for Dart Generator](packages/eventuous_generator/README.md) - generate code from annotations
+* [Eventuous for Dart Code Generator](packages/eventuous_generator/README.md) - generate code from annotations
 
 
 These packages are not yet properly documented, use
