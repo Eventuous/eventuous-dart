@@ -1,3 +1,6 @@
+# 0.0.7
+- Refactored annotations for code generation
+
 # 0.0.6
 - Added type inference support
 
