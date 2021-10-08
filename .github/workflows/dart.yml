@@ -82,7 +82,38 @@ jobs:
     needs:
       - job_001
   job_003:
-    name: "Test Eventuous & Publish coverage"
+    name: "unit_test; PKG: packages/eventuous; `dart test -j 1`"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v2.1.6
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:packages/eventuous;commands:test"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:packages/eventuous
+            os:ubuntu-latest;pub-cache-hosted;dart:stable
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - uses: dart-lang/setup-dart@v1.2
+        with:
+          sdk: stable
+      - id: checkout
+        uses: actions/checkout@v2.3.4
+      - id: packages_eventuous_pub_upgrade
+        name: packages/eventuous; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: packages/eventuous
+        run: dart pub upgrade
+      - name: "packages/eventuous; dart test -j 1"
+        if: "always() && steps.packages_eventuous_pub_upgrade.conclusion == 'success'"
+        working-directory: packages/eventuous
+        run: dart test -j 1
+    needs:
+      - job_001
+      - job_002
+  job_004:
+    name: "Test & Publish coverage"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -103,10 +134,10 @@ jobs:
       - name: "packages/eventuous; dart pub upgrade && pub global activate coverage"
         working-directory: packages/eventuous
         run: "dart pub upgrade && pub global activate coverage"
-      - name: Run tests with coverage
+      - name: packages/eventuous; Run tests with coverage
         working-directory: packages/eventuous
         run: "dart test -j 1 --reporter=expanded --coverage=\"coverage\""
-      - name: Collect test coverage
+      - name: packages/eventuous; Collect test coverage
         working-directory: packages/eventuous
         run: "format_coverage --lcov --in=coverage --out=coverage.lcov --packages=.packages --report-on=lib"
       - name: Publish test coverage
@@ -116,3 +147,4 @@ jobs:
     needs:
       - job_001
       - job_002
+      - job_003

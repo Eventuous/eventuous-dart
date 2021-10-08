@@ -3,7 +3,7 @@
 # empty.
 github:
   on_completion:
-    - name: Test Eventuous & Publish coverage
+    - name: Test & Publish coverage
       runs-on: ubuntu-latest
       steps:
         - name: Cache Pub hosted dependencies
@@ -27,11 +27,11 @@ github:
           working-directory: packages/eventuous
           run: dart pub upgrade && pub global activate coverage
 
-        - name: Run tests with coverage
+        - name: packages/eventuous; Run tests with coverage
           working-directory: packages/eventuous
           run: dart test -j 1 --reporter=expanded --coverage="coverage"
 
-        - name: Collect test coverage
+        - name: packages/eventuous; Collect test coverage
           working-directory: packages/eventuous
           run: format_coverage --lcov --in=coverage --out=coverage.lcov --packages=.packages --report-on=lib
 
