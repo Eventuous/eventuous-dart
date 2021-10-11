@@ -3,49 +3,113 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:eventuous/eventuous.dart';
 import 'package:eventuous_generator/src/builders/models/inference_model.dart';
+import 'package:eventuous_generator/src/builders/models/method_model.dart';
+import 'package:eventuous_generator/src/helpers.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:source_gen/source_gen.dart';
 
 import 'builders/models/annotation_model.dart';
-import 'builders/models/parameterized_type_model.dart';
+import 'builders/models/parameter_model.dart';
+import 'templates/aggregate_command_template.dart';
 import 'templates/aggregate_event_template.dart';
 import 'templates/aggregate_state_template.dart';
 import 'templates/aggregate_template.dart';
 import 'templates/aggregate_value_template.dart';
+import 'templates/application_template.dart';
 
 extension StringX on String {
   String capitalize() => '${this[0].toUpperCase()}${substring(1)}';
+  String toMemberCase() => '${this[0].toLowerCase()}${substring(1)}';
 }
 
 extension AnnotationModelX on AnnotationModel {
-  AggregateTemplate toAggregateTemplate(
-    String name,
+  ApplicationTemplate toApplicationTemplate(
     InferenceModel inference,
   ) {
+    final aggregate = parameterValueAt('aggregate');
+    final commands = inference
+        .annotationsOf<AggregateCommandType>(aggregate)
+        .map((a) => a.toAggregateCommandTemplate(inference))
+        .toList();
+
+    return ApplicationTemplate(
+      name: annotationOf,
+      commands: commands,
+      aggregate: aggregate,
+      id: parameterValueAt('id'),
+      data: parameterValueAt('data'),
+      event: parameterValueAt('event'),
+      value: parameterValueAt('value'),
+      state: parameterValueAt('state'),
+    );
+  }
+
+  AggregateTemplate toAggregateTemplate(
+    InferenceModel inference,
+  ) {
+    final commands = inference
+        .annotationsOf<AggregateCommandType>(annotationOf)
+        .map((a) => a.toAggregateCommandTemplate(inference))
+        .toList();
+
     return AggregateTemplate(
-      name: name,
-      id: (this['id'] as ParameterizedTypeModel).value,
-      event: (this['event'] as ParameterizedTypeModel).value,
-      value: (this['value'] as ParameterizedTypeModel).value,
-      state: (this['state'] as ParameterizedTypeModel).value,
+      name: annotationOf,
+      commands: commands,
+      id: parameterValueAt('id'),
+      data: parameterValueAt('data'),
+      event: parameterValueAt('event'),
+      value: parameterValueAt('value'),
+      state: parameterValueAt('state'),
+    );
+  }
+
+  AggregateCommandTemplate toAggregateCommandTemplate(
+      InferenceModel inference) {
+    final event = parameterValueAt('event');
+    final expected = parameterValueAt('expected');
+    final aggregate = parameterValueAt('aggregate');
+    return AggregateCommandTemplate(
+      name: annotationOf,
+      aggregate: aggregate,
+      data: parameterValueAt('data'),
+      event: inference
+          .where<AggregateEventType>(aggregate)
+          .firstWhere(
+            (e) => e.annotationOf == event,
+            orElse: () => AnnotationModel(
+              '$AggregateEventType',
+              event,
+              parameters: [
+                elementAt<ParameterModel>('data'),
+                ParameterModel('aggregate', aggregate),
+                elementAt<ParameterModel>('constructor'),
+              ],
+            ),
+          )
+          .toAggregateEventTemplate(),
+      constructor: methodAt('constructor'),
+      usesJsonSerializable: usesJsonSerializable,
+      expected: ExpectedState.values.firstWhere((e) => enumName(e) == expected,
+          orElse: () => ExpectedState.any),
     );
   }
 
   AggregateEventTemplate toAggregateEventTemplate() {
     return AggregateEventTemplate(
       name: annotationOf,
+      data: parameterValueAt('data'),
+      constructor: methodAt('constructor'),
       aggregate: parameterValueAt('aggregate'),
       usesJsonSerializable: usesJsonSerializable,
-      data: (this['data'] as ParameterizedTypeModel).value,
     );
   }
 
   AggregateValueTemplate toAggregateValueTemplate() {
     return AggregateValueTemplate(
       name: annotationOf,
+      data: parameterValueAt('data'),
       aggregate: parameterValueAt('aggregate'),
       usesJsonSerializable: usesJsonSerializable,
-      data: (this['data'] as ParameterizedTypeModel).value,
     );
   }
 
@@ -62,7 +126,7 @@ extension AnnotationModelX on AnnotationModel {
       events: events,
       name: annotationOf,
       aggregate: aggregate,
-      value: (this['value'] as ParameterizedTypeModel).value,
+      value: parameterValueAt('value'),
       event: event?.usesJsonSerializable == true ? 'JsonObject' : 'Object',
       usesJsonSerializable:
           usesJsonSerializable || events.any((e) => e.usesJsonSerializable),
@@ -72,7 +136,8 @@ extension AnnotationModelX on AnnotationModel {
 
 extension DartTypeX on DartType {
   String toTypeName() {
-    return alias?.element.name ?? getDisplayString(withNullability: false);
+    final type = alias?.element.name ?? getDisplayString(withNullability: true);
+    return type.endsWith('*') ? type.substring(0, type.length - 1) : type;
   }
 }
 
@@ -88,9 +153,20 @@ extension ConstantReaderX on ConstantReader {
     return reader == null || reader.isNull ? null : reader.typeValue;
   }
 
-  ParameterizedTypeModel toTypeModel(String field,
-          [String defaultName = 'Object']) =>
-      ParameterizedTypeModel(field, toFieldTypeName(field, defaultName));
+  DartObject? toFieldObject(String field) {
+    final reader = peek(field);
+    return reader == null || reader.isNull ? null : reader.objectValue;
+  }
+
+  ParameterModel toTypeModel(String field, [String defaultName = 'Object']) =>
+      ParameterModel(field, toFieldTypeName(field, defaultName));
+
+  ParameterModel toExpectedStateModel(String field) {
+    return ParameterModel(
+      field,
+      enumName(parameterExpectedStateAt(field, this)),
+    );
+  }
 
   String toFieldTypeName(String field, [String defaultName = 'Object']) {
     return toFieldType(field)?.toTypeName() ?? defaultName;
@@ -104,17 +180,9 @@ extension ElementX on Element {
       _jsonSerializableChecker.hasAnnotationOfExact(this);
 }
 
-extension ElementAnnotationX on ElementAnnotation {
-  String toTypeName(String field) {
-    return computeConstantValue()!.toTypeName(field);
+extension ClassElementX on ClassElement {
+  MethodModel toConstructorArgumentsModel() {
+    // TODO: Validate constructor
+    return MethodModel.from('constructor', constructors.first);
   }
-
-  DartType toType(String field) {
-    return computeConstantValue()!.getField(field)!.toTypeValue()!;
-  }
-}
-
-extension ListElementAnnotationX on List<ElementAnnotation> {
-  bool usesJsonSerializable() => any(
-      (e) => e.computeConstantValue()?.type.toString() == 'JsonSerializable');
 }

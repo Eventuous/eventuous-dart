@@ -13,6 +13,10 @@ abstract class _$BarState extends AggregateState<BarValue> {
       ([value, version]) => BarState(value, version),
     );
     on<BarCreated>(patch);
+
+    on<BarUpdated>(patch);
+
+    on<BarImported>(patch);
   }
 
   BarState patch(JsonObject event, BarValue value) {

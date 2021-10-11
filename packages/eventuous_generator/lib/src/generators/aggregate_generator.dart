@@ -11,8 +11,8 @@ class AggregateGenerator extends CodeGenerator<AggregateType> {
   AggregateGenerator(Map<String, Object?> config) : super(config);
 
   @override
-  String generateForType(
-      InferenceModel inference, Element element, ConstantReader annotation) {
+  String generateForClass(InferenceModel inference, ClassElement element,
+      ConstantReader annotation) {
     return AggregateTemplate.from(inference, element, annotation).toString();
   }
 }

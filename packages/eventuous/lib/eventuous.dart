@@ -7,6 +7,7 @@ export 'src/annotations/aggregate_event_type.dart';
 export 'src/annotations/aggregate_state_type.dart';
 export 'src/annotations/aggregate_type.dart';
 export 'src/annotations/aggregate_value_type.dart';
+export 'src/annotations/application_type.dart';
 export 'src/annotations/eventuous.dart';
 export 'src/app/enums.dart';
 export 'src/app/handlers.dart';

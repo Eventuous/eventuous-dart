@@ -1,5 +1,9 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:eventuous/eventuous.dart';
+import 'package:eventuous_generator/src/builders/models/annotation_model.dart';
+import 'package:eventuous_generator/src/builders/models/method_model.dart';
+import 'package:eventuous_generator/src/builders/models/parameter_model.dart';
+import 'package:eventuous_generator/src/templates/aggregate_event_template.dart';
 import 'package:source_gen/source_gen.dart';
 
 import '../extensions.dart';
@@ -10,23 +14,49 @@ class AggregateCommandTemplate {
   AggregateCommandTemplate({
     required this.name,
     required this.data,
+    required this.event,
     required this.aggregate,
+    required this.constructor,
     required this.usesJsonSerializable,
+    this.expected = ExpectedState.any,
   });
 
   factory AggregateCommandTemplate.from(
     InferenceModel inference,
-    Element element,
+    ClassElement element,
     ConstantReader annotation,
   ) {
     final name = element.displayName;
     final aggregate = annotation.toFieldTypeName('aggregate');
     final command =
         inference.firstAnnotationOf<AggregateCommandType>(aggregate);
+    final expected = parameterExpectedStateAt(
+      'expected',
+      annotation,
+      model: command,
+    );
+    final data = parameterTypeAt('data', command, annotation);
+    final event = parameterTypeAt('event', command, annotation);
+
     return AggregateCommandTemplate(
       name: name,
+      data: data,
+      expected: expected,
       aggregate: aggregate,
-      data: parameterValueAt('data', command, annotation),
+      constructor: element.toConstructorArgumentsModel(),
+      event: inference
+          .where<AggregateEventType>(aggregate)
+          .firstWhere(
+            (e) => e.annotationOf == event,
+            orElse: () =>
+                AnnotationModel('$AggregateEventType', event, parameters: [
+              element.toConstructorArgumentsModel(),
+              ParameterModel('aggregate', aggregate),
+              command?.elementAt<ParameterModel>('data') ??
+                  ParameterModel('data', data),
+            ]),
+          )
+          .toAggregateEventTemplate(),
       usesJsonSerializable:
           command?.usesJsonSerializable ?? element.usesJsonSerializable,
     );
@@ -35,7 +65,11 @@ class AggregateCommandTemplate {
   final String name;
   final String data;
   final String aggregate;
+  final ExpectedState expected;
+  final MethodModel constructor;
   final bool usesJsonSerializable;
+  final AggregateEventTemplate event;
+
   bool get withJsonObject =>
       usesJsonSerializable ||
       const [
@@ -47,21 +81,21 @@ class AggregateCommandTemplate {
   @override
   String toString() {
     final buffer = StringBuffer();
-    buffer.writeln(toAggregateCommandString());
+    buffer.writeln(toAggregateCommandClassString());
     return buffer.toString();
   }
 
-  String toAggregateCommandString() {
+  String toAggregateCommandClassString() {
     return '''
 abstract class _\$$name${withJsonObject ? ' extends JsonObject' : ''}{
   _\$$name(List<Object?> props)${withJsonObject ? ' : super(props)' : ''};
 
-  ${usesJsonSerializable ? toAggregateJsonString() : ''}
+  ${usesJsonSerializable ? toAggregateCommandJsonString() : ''}
 }
 ''';
   }
 
-  String toAggregateJsonString() {
+  String toAggregateCommandJsonString() {
     return '''
 // ignore: unused_element
 static $name fromJson($data json) => _\$${name}FromJson(json);
@@ -69,5 +103,32 @@ static $name fromJson($data json) => _\$${name}FromJson(json);
 @override
 JsonMap toJson() => _\$${name}ToJson(this as $name);  
 ''';
+  }
+
+  String toAggregateCommandHandlerString(String tid) {
+    final _aggregate = aggregate.toMemberCase();
+    final methodArgs = constructor.toArgumentsInvocationString(
+      where: (e) => '${_aggregate}Id' != e.name,
+      use: constructor.arguments.fold(
+          {}, (use, e) => use..putIfAbsent(e.name, () => 'cmd.${e.name}')),
+    );
+
+    return '''
+$_on<$name>(
+  (cmd) => $tid(cmd.${_aggregate}Id),
+  (cmd, $_aggregate) => $_aggregate.${name.toMemberCase()}($methodArgs),
+);
+''';
+  }
+
+  String get _on {
+    switch (expected) {
+      case ExpectedState.notExists:
+        return 'onNew';
+      case ExpectedState.exists:
+        return 'onExisting';
+      case ExpectedState.any:
+        return 'onAny';
+    }
   }
 }

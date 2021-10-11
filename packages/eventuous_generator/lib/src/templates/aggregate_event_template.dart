@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:eventuous/eventuous.dart';
+import 'package:eventuous_generator/src/builders/models/method_model.dart';
 import 'package:source_gen/source_gen.dart';
 
 import '../extensions.dart';
@@ -11,12 +12,13 @@ class AggregateEventTemplate {
     required this.name,
     required this.data,
     required this.aggregate,
+    required this.constructor,
     required this.usesJsonSerializable,
   });
 
   factory AggregateEventTemplate.from(
     InferenceModel inference,
-    Element element,
+    ClassElement element,
     ConstantReader annotation,
   ) {
     final name = element.displayName;
@@ -25,7 +27,8 @@ class AggregateEventTemplate {
     return AggregateEventTemplate(
       name: name,
       aggregate: aggregate,
-      data: parameterValueAt('data', event, annotation),
+      data: parameterTypeAt('data', event, annotation),
+      constructor: element.toConstructorArgumentsModel(),
       usesJsonSerializable:
           event?.usesJsonSerializable ?? element.usesJsonSerializable,
     );
@@ -34,7 +37,9 @@ class AggregateEventTemplate {
   final String name;
   final String data;
   final String aggregate;
+  final MethodModel constructor;
   final bool usesJsonSerializable;
+
   bool get withJsonObject =>
       usesJsonSerializable ||
       const [

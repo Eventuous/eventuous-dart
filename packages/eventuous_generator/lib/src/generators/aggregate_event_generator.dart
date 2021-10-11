@@ -11,8 +11,8 @@ class AggregateEventGenerator extends CodeGenerator<AggregateEventType> {
   AggregateEventGenerator(Map<String, Object?> config) : super(config);
 
   @override
-  String generateForType(
-      InferenceModel inference, Element element, ConstantReader annotation) {
+  String generateForClass(InferenceModel inference, ClassElement element,
+      ConstantReader annotation) {
     return AggregateEventTemplate.from(inference, element, annotation)
         .toString();
   }

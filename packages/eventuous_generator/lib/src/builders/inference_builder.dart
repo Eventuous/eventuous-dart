@@ -9,7 +9,7 @@ import 'package:collection/collection.dart';
 import 'package:eventuous/eventuous.dart';
 import 'package:eventuous_generator/src/builders/models/config_model.dart';
 import 'package:eventuous_generator/src/builders/models/inference_model.dart';
-import 'package:eventuous_generator/src/builders/models/parameterized_type_model.dart';
+import 'package:eventuous_generator/src/builders/models/parameter_model.dart';
 import 'package:glob/glob.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:path/path.dart' as p;
@@ -22,6 +22,7 @@ import 'models/annotation_model.dart';
 const Map<Type, TypeChecker> checkers = {
   Eventuous: TypeChecker.fromRuntime(Eventuous),
   AggregateType: TypeChecker.fromRuntime(AggregateType),
+  ApplicationType: TypeChecker.fromRuntime(ApplicationType),
   JsonSerializable: TypeChecker.fromRuntime(JsonSerializable),
   AggregateValueType: TypeChecker.fromRuntime(AggregateValueType),
   AggregateEventType: TypeChecker.fromRuntime(AggregateEventType),
@@ -80,6 +81,17 @@ class InferenceBuilder implements Builder {
                 parseConfig(config, annotation).toJson(),
               )).toJson());
               break;
+            case ApplicationType:
+              inferences.add(
+                AnnotationModel(
+                  '$ApplicationType',
+                  clz.name,
+                  location: clz.location?.encoding,
+                  usesJsonSerializable: usesJsonSerializable,
+                  parameters: [reader.toTypeModel('aggregate')],
+                ).toJson(),
+              );
+              break;
             case AggregateType:
               inferences.add(
                 AnnotationModel('$AggregateType', clz.name,
@@ -114,6 +126,7 @@ class InferenceBuilder implements Builder {
                     usesJsonSerializable: usesJsonSerializable,
                     parameters: [
                       reader.toTypeModel('aggregate'),
+                      clz.toConstructorArgumentsModel(),
                       reader.toTypeModel(
                         'data',
                         usesJsonSerializable ? 'JsonMap' : 'Object',
@@ -138,7 +151,10 @@ class InferenceBuilder implements Builder {
                     location: clz.location?.encoding,
                     usesJsonSerializable: usesJsonSerializable,
                     parameters: [
+                      reader.toTypeModel('event'),
                       reader.toTypeModel('aggregate'),
+                      clz.toConstructorArgumentsModel(),
+                      reader.toExpectedStateModel('expected'),
                       reader.toTypeModel(
                         'data',
                         usesJsonSerializable ? 'JsonMap' : 'Object',
@@ -169,6 +185,7 @@ class InferenceBuilder implements Builder {
     final configs = <ConfigModel>[];
     final aggregates = <AnnotationModel>[];
     final annotations = <AnnotationModel>[];
+    final apps = <String, Set<AnnotationModel>>{};
     final events = <String, Set<AnnotationModel>>{};
     final values = <String, Set<AnnotationModel>>{};
     final states = <String, Set<AnnotationModel>>{};
@@ -188,8 +205,8 @@ class InferenceBuilder implements Builder {
             throw InvalidGenerationSourceError(
               '${annotation.type} defined twice '
               'for class ${annotation.annotationOf} in files: \n'
-              '- ${duplicate.location?.split(',').join().split(';')[0]}\n'
-              '- ${annotation.location?.split(',').join().split(';')[0]}',
+              '- ${duplicate.location?.split(',').join().split(';').first}\n'
+              '- ${annotation.location?.split(',').join().split(';').first}',
               todo: 'Only one @AggregateType can be '
                   'defined for each aggregate class name',
             );
@@ -201,6 +218,13 @@ class InferenceBuilder implements Builder {
           );
           final aggregate = annotation.parameterValueAt('aggregate');
           switch (inference['type']) {
+            case 'ApplicationType':
+              apps.update(
+                aggregate,
+                (apps) => apps..add(annotation),
+                ifAbsent: () => {annotation},
+              );
+              break;
             case 'AggregateEventType':
               events.update(
                 aggregate,
@@ -248,16 +272,27 @@ class InferenceBuilder implements Builder {
     for (var aggregate in aggregates) {
       final json = aggregate.toJson();
       final name = aggregate.annotationOf;
-      final params = <ParameterizedTypeModel>[
-        aggregate['id'] as ParameterizedTypeModel,
-        ParameterizedTypeModel('event', _inferTEvent(aggregate, events[name])),
-        ParameterizedTypeModel('value', _inferTValue(aggregate, values[name])),
-        ParameterizedTypeModel('state', _inferTState(aggregate, states[name])),
+      final params = <ParameterModel>[
+        aggregate['id'] as ParameterModel,
+        ParameterModel('data', _inferTData(aggregate, events[name])),
+        ParameterModel('event', _inferTEvent(aggregate, events[name])),
+        ParameterModel('value', _inferTValue(aggregate, values[name])),
+        ParameterModel('state', _inferTState(aggregate, states[name])),
       ];
       json['parameters'] = params.map((e) => e.toJson()).toList();
       annotations.add(AnnotationModel.fromJson(json));
 
-      // Add commands, events and values for given aggregate
+      // Add apps, commands, events and values for given aggregate
+      annotations.addAll(
+        List<AnnotationModel>.from(apps[name] ?? <AnnotationModel>{})
+            .map((e) => AnnotationModel.fromJson(e.toJson()
+              ..addAll({
+                // replace with inferred data if not defined
+                'parameters': [...params, ParameterModel('aggregate', name)]
+                    .map((e) => e.toJson())
+                    .toList(),
+              }))),
+      );
       annotations.addAll(commands[name] ?? []);
       annotations.addAll(events[name] ?? []);
       annotations.addAll(values[name] ?? []);
@@ -265,9 +300,9 @@ class InferenceBuilder implements Builder {
       // Perform introspections of value type in states of given aggregate
       for (var state in (states[name] ?? {})) {
         final json = state.toJson();
-        final params = <ParameterizedTypeModel>[
-          ParameterizedTypeModel('aggregate', name),
-          ParameterizedTypeModel('value', _inferTValue(state, values[name])),
+        final params = <ParameterModel>[
+          ParameterModel('aggregate', name),
+          ParameterModel('value', _inferTValue(state, values[name])),
         ];
         json['parameters'] = params.map((e) => e.toJson()).toList();
         annotations.add(AnnotationModel.fromJson(json));
@@ -285,6 +320,16 @@ class InferenceBuilder implements Builder {
       configs.isNotEmpty ? configs.first : ConfigModel.fromJson(config),
       annotations: annotations,
     );
+  }
+
+  String _inferTData(
+    AnnotationModel aggregate,
+    Iterable<AnnotationModel>? candidates,
+  ) {
+    return _inferTypeName(aggregate, 'data', candidates,
+        onDefault: (usesJsonSerializable) =>
+            usesJsonSerializable ? 'JsonMap' : 'Object',
+        onInfer: (event) => event.usesJsonSerializable ? 'JsonMap' : 'Object');
   }
 
   String _inferTEvent(
@@ -323,7 +368,7 @@ class InferenceBuilder implements Builder {
     required String Function(bool) onDefault,
     required String Function(AnnotationModel) onInfer,
   }) {
-    final state = aggregate[parameterName] as ParameterizedTypeModel?;
+    final state = aggregate[parameterName] as ParameterModel?;
     final usesJsonSerializable = aggregate.usesJsonSerializable ||
         candidates?.any((v) => v.usesJsonSerializable) == true;
     final inferredType = _shouldInfer(state, usesJsonSerializable)
@@ -341,6 +386,6 @@ class InferenceBuilder implements Builder {
     return inferredType;
   }
 
-  bool _shouldInfer(ParameterizedTypeModel? value, bool usesJsonSerializable) =>
+  bool _shouldInfer(ParameterModel? value, bool usesJsonSerializable) =>
       value == null || value.value == 'Object' || usesJsonSerializable;
 }

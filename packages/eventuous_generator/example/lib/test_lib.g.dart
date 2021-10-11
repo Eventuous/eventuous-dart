@@ -6,4 +6,20 @@ part of example;
 // ConfigGenerator
 // **************************************************************************
 
-void _$configureEventuous(GetIt getIt) {}
+GetIt _$configureEventuous(StreamEventStore eventStore) {
+  final getIt = GetIt.instance;
+  getIt.registerLazySingleton<FooApp>(
+    () => FooApp(FooStore(
+      eventStore,
+      onNew: (id, [state]) => Foo(id, state),
+    )),
+  );
+  getIt.registerLazySingleton<BarApp>(
+    () => BarApp(BarStore(
+      eventStore,
+      onNew: (id, [state]) => Bar(id, state),
+    )),
+  );
+
+  return getIt;
+}

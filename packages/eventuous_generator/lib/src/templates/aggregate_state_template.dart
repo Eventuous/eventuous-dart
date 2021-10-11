@@ -33,8 +33,8 @@ class AggregateStateTemplate {
       name: element.displayName,
       events: events,
       aggregate: aggregate,
-      event: parameterValueAt('event', state, annotation),
-      value: parameterValueAt('value', state, annotation, '${aggregate}Value'),
+      event: parameterTypeAt('event', state, annotation),
+      value: parameterTypeAt('value', state, annotation, '${aggregate}Value'),
       usesJsonSerializable:
           (state?.usesJsonSerializable ?? element.usesJsonSerializable) ||
               events.any((e) => e.usesJsonSerializable),

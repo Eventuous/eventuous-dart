@@ -10,21 +10,21 @@ class BookingService extends ApplicationServiceBase<JsonMap, JsonObject,
   BookingService(
     BookingStore store,
   ) : super(store) {
-    OnNew<BookRoom>(
+    onNew<BookRoom>(
       (cmd) => BookingId(cmd.bookingId),
       (cmd, booking) => booking.bookRoom(
         cmd.roomId,
         cmd.price,
       ),
     );
-    OnExisting<RecordPayment>(
+    onExisting<RecordPayment>(
       (cmd) => BookingId(cmd.bookingId),
       (cmd, booking) => booking.recordPayment(
         cmd.paymentId,
         cmd.amountPaid,
       ),
     );
-    OnAny<ImportBooking>(
+    onAny<ImportBooking>(
       (cmd) => BookingId(cmd.bookingId),
       (cmd, booking) => booking.importBooking(
         cmd.roomId,

@@ -1,9 +1,5 @@
 import '../json/json_typedefs.dart';
 
-// TODO: Switch to generic metadata annotations
-//  - when https://github.com/dart-lang/language/issues/1297
-//    has landed on stable (in beta)
-
 class AggregateType {
   const AggregateType({
     required this.id,
@@ -20,9 +16,9 @@ class AggregateType {
   JsonMap toJson(String aggregate) => {
         'aggregate': aggregate,
         'annotation': '$AggregateType',
-        if (id != null) 'id': id?.toString(),
-        if (event != null) 'event': event?.toString(),
-        if (value != null) 'value': value?.toString(),
-        if (state != null) 'state': state?.toString(),
+        'id': id?.toString(),
+        'event': event?.toString(),
+        'value': value?.toString(),
+        'state': state?.toString(),
       };
 }

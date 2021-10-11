@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:collection/collection.dart';
 import 'package:eventuous/eventuous.dart';
+import 'package:eventuous_generator/src/builders/models/method_model.dart';
 
-import 'parameterized_type_model.dart';
+import 'argument_model.dart';
+import 'parameter_model.dart';
 
 class AnnotationModel extends JsonObject {
   AnnotationModel(
@@ -15,7 +19,7 @@ class AnnotationModel extends JsonObject {
   final String? location;
   final String annotationOf;
   final bool usesJsonSerializable;
-  final List<ParameterizedTypeModel> parameters;
+  final List<ParameterModel> parameters;
 
   bool isAnnotationExact<T>() => type == '${typeOf<T>()}';
   bool hasParameter(String name, String value) =>
@@ -29,7 +33,7 @@ class AnnotationModel extends JsonObject {
 
   String getTName(String type) {
     final parameter = this[type];
-    if (parameter is ParameterizedTypeModel) {
+    if (parameter is ParameterModel) {
       return parameter.value;
     }
     throw ArgumentError.value(parameter, type, 'type not found');
@@ -40,9 +44,17 @@ class AnnotationModel extends JsonObject {
   Object? operator [](Object? name) =>
       toJson()[name] ?? parameters.firstWhereOrNull((p) => p.name == name);
 
-  T elementAt<T>(Object? name) => this[name] as T;
-  String parameterValueAt<T>(Object? name) =>
-      elementAt<ParameterizedTypeModel>(name).value;
+  T elementAt<T>(Object name) => this[name] as T;
+
+  String parameterValueAt(Object name) => elementAt<ParameterModel>(name).value;
+
+  MethodModel methodAt(Object name) {
+    return MethodModel(
+        name.toString(),
+        (jsonDecode(elementAt<ParameterModel>(name).value) as List)
+            .map((e) => ArgumentModel.fromJson(Map.from(e as Map)))
+            .toList());
+  }
 
   /// Factory constructor for creating a new `AnnotationModel` instance
   factory AnnotationModel.fromJson(Map<String, dynamic> json) =>
@@ -50,7 +62,7 @@ class AnnotationModel extends JsonObject {
           location: json['location'] as String?,
           usesJsonSerializable: json['usesJsonSerializable'] as bool,
           parameters: List.from(json['parameters'] ?? [])
-              .map((p) => ParameterizedTypeModel.fromJson(p))
+              .map((p) => ParameterModel.fromJson(p))
               .toList());
 
   /// Declare support for serialization to JSON

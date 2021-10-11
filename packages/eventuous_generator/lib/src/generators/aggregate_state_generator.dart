@@ -11,8 +11,8 @@ class AggregateStateGenerator extends CodeGenerator<AggregateStateType> {
   AggregateStateGenerator(Map<String, Object?> config) : super(config);
 
   @override
-  String generateForType(
-      InferenceModel inference, Element element, ConstantReader annotation) {
+  String generateForClass(InferenceModel inference, ClassElement element,
+      ConstantReader annotation) {
     return AggregateStateTemplate.from(inference, element, annotation)
         .toString();
   }

@@ -70,18 +70,38 @@ final getIt = GetIt.instance;
 void initEventuous() => _\$configureEventuous(getId);
 ''';
 
-const ConfigGeneratedCodeDefaults = '''
+const ConfigGeneratedCodeDefaults = r'''
 // **************************************************************************
 // ConfigGenerator
 // **************************************************************************
 
-void _\$initEventuous(GetIt getIt) {}
+GetIt _$initEventuous(StreamEventStore eventStore) {
+  final getIt = GetIt.instance;
+  getIt.registerLazySingleton<ExampleApp>(
+    () => ExampleApp(ExampleStore(
+      eventStore,
+      onNew: (id, [state]) => Example(id, state),
+    )),
+  );
+
+  return getIt;
+}
 ''';
 
-const ConfigGeneratedCodeInitializerGiven = '''
+const ConfigGeneratedCodeInitializerGiven = r'''
 // **************************************************************************
 // ConfigGenerator
 // **************************************************************************
 
-void _\$configureEventuous(GetIt getIt) {}
+GetIt _$configureEventuous(StreamEventStore eventStore) {
+  final getIt = GetIt.instance;
+  getIt.registerLazySingleton<ExampleApp>(
+    () => ExampleApp(ExampleStore(
+      eventStore,
+      onNew: (id, [state]) => Example(id, state),
+    )),
+  );
+
+  return getIt;
+}
 ''';

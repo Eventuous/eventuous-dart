@@ -8,6 +8,7 @@ import 'package:path/path.dart' as p;
 import 'package:source_gen/source_gen.dart';
 
 import '../builders/models/inference_model.dart';
+import '../extensions.dart';
 
 abstract class CodeGenerator<T> extends GeneratorForAnnotation<T> {
   CodeGenerator(this.config);
@@ -20,13 +21,18 @@ abstract class CodeGenerator<T> extends GeneratorForAnnotation<T> {
     ConstantReader annotation,
     BuildStep buildStep,
   ) async {
+    if (element is! ClassElement) {
+      throw InvalidGenerationSourceError(
+        '${annotation.typeValue.toTypeName()} is only allowed on classes',
+      );
+    }
     final inference = await _read(element, buildStep);
-    return generateForType(inference, element, annotation).toString();
+    return generateForClass(inference, element, annotation).toString();
   }
 
-  String generateForType(
+  String generateForClass(
     InferenceModel inference,
-    Element element,
+    ClassElement element,
     ConstantReader annotation,
   );
 

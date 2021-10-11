@@ -2,6 +2,7 @@
 library eventuous_generator;
 
 import 'package:build/build.dart';
+import 'package:eventuous_generator/src/generators/application_generator.dart';
 import 'package:source_gen/source_gen.dart';
 
 import 'src/builders/inference_builder.dart';
@@ -22,6 +23,7 @@ Builder codeBuilder(BuilderOptions options) {
   return SharedPartBuilder(
     [
       AggregateGenerator(options.config),
+      ApplicationGenerator(options.config),
       AggregateCommandGenerator(options.config),
       AggregateEventGenerator(options.config),
       AggregateValueGenerator(options.config),

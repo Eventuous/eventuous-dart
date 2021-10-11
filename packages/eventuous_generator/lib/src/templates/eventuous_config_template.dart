@@ -2,10 +2,7 @@ import 'package:eventuous/eventuous.dart';
 
 import '../extensions.dart';
 import '../builders/models/inference_model.dart';
-import 'aggregate_event_template.dart';
-import 'aggregate_state_template.dart';
-import 'aggregate_template.dart';
-import 'aggregate_value_template.dart';
+import 'application_template.dart';
 
 class EventuousConfigTemplate {
   EventuousConfigTemplate({
@@ -25,16 +22,8 @@ class EventuousConfigTemplate {
   final Eventuous config;
   final InferenceModel inference;
 
-  List<AggregateTemplate> get aggregates => inference.aggregates
-      .map((e) => e.toAggregateTemplate(e.annotationOf, inference))
-      .toList();
-  List<AggregateEventTemplate> get events =>
-      inference.events.map((e) => e.toAggregateEventTemplate()).toList();
-  List<AggregateValueTemplate> get values =>
-      inference.values.map((e) => e.toAggregateValueTemplate()).toList();
-  List<AggregateStateTemplate> get states => inference.states
-      .map((e) => e.toAggregateStateTemplate(inference))
-      .toList();
+  List<ApplicationTemplate> get apps =>
+      inference.apps.map((e) => e.toApplicationTemplate(inference)).toList();
 
   @override
   String toString() {
@@ -44,6 +33,19 @@ class EventuousConfigTemplate {
   }
 
   String toInitializerString() {
-    return '''void ${config.initializerName}(GetIt getIt) {}''';
+    return '''GetIt ${config.initializerName}(StreamEventStore eventStore) {
+  final getIt = GetIt.instance;
+  ${apps.map((a) => toRegisterLazySingleton(a)).join()}
+  return getIt;
+}''';
   }
+
+  String toRegisterLazySingleton(ApplicationTemplate a) =>
+      '''getIt.registerLazySingleton<${a.name}>(() =>
+  ${a.name}(${a.aggregate}Store(
+    eventStore,
+    onNew: (id, [state]) => ${a.aggregate}(id, state),
+  )),
+);
+''';
 }

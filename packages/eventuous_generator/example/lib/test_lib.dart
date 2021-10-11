@@ -3,11 +3,14 @@ library example;
 import 'package:eventuous/eventuous.dart';
 import 'package:get_it/get_it.dart';
 
-part 'test_lib.g.dart';
+import 'src/bar/bar.dart';
+import 'src/bar/bar_app.dart';
+import 'src/foo.dart';
 
-final getIt = GetIt.instance;
+part 'test_lib.g.dart';
 
 @Eventuous(
   initializerName: r'_$configureEventuous',
 )
-void configureEventuous() => _$configureEventuous(getIt);
+void configureEventuous(StreamEventStore eventStore) =>
+    _$configureEventuous(eventStore);

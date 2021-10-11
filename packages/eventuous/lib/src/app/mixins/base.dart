@@ -26,6 +26,13 @@ mixin ApplicationServiceMixin<
   // Internal map of aggregate id resolvers
   final AggregateIdMap<Object, TId> _resolvers = {};
 
+  /// True when configuration is frozen (no changes are allowed)
+  bool get isFrozen => _frozen;
+  bool _frozen = false;
+
+  /// Call when configuration is complete to prevent modifications later
+  void freeze() => _frozen = true;
+
   /// The generic command handler. Call this function from your edge (API).
   /// Use parameter [command] to execute
   /// Returns the [AggregateCommandResult] of the execution

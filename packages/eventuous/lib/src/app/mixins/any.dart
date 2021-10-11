@@ -14,10 +14,12 @@ mixin OnAnyAggregateMixin<
   /// Use parameter [action] to performed actions on the aggregate,
   /// given the aggregate instance and the command
   /// * Type parameter [TCommand] - Command type
-  void OnAny<TCommand extends Object>(
+  void onAny<TCommand extends Object>(
       AggregateIdResolver<TCommand, TId> toId,
       AggregateCommandHandler<TCommand, TEvent, TValue, TId, TState, TAggregate>
           action) {
+    assert(!isFrozen, 'Aggregate handlers has been frozen');
+
     _handlers.putIfAbsent(
       typeOf<TCommand>(),
       () => RegisteredAggregateCommandHandler<TCommand, TEvent, TValue, TId,
