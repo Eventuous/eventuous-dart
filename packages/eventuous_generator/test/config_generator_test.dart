@@ -21,6 +21,7 @@ void main() {
       );
       expect(result, isNull);
     });
+
     test('create configuration with given initializer', () async {
       final result = await testBuilder(
         configBuilder(BuilderOptions({
@@ -33,6 +34,24 @@ void main() {
         outputs: {
           'test_lib|eventuous.config.g.part':
               ConfigGeneratedCodeInitializerGiven,
+        },
+        reader: await PackageAssetReader.currentIsolate(),
+      );
+      expect(result, isNull);
+    });
+
+    test('create configuration without lazy service registration', () async {
+      final result = await testBuilder(
+        configBuilder(BuilderOptions({
+          'lazy_service': false,
+        })),
+        {
+          'test_lib|eventuous.dart': ConfigSourceCodeInitializerGiven,
+          'test_lib|lib/inference.json': '$InferenceGeneratedJsonInferred',
+        },
+        outputs: {
+          'test_lib|eventuous.config.g.part':
+              ConfigGeneratedCodeNotLazyServiceRegistration,
         },
         reader: await PackageAssetReader.currentIsolate(),
       );
@@ -97,6 +116,24 @@ GetIt _$configureEventuous(StreamEventStore eventStore) {
   final getIt = GetIt.instance;
   getIt.registerLazySingleton<ExampleApp>(
     () => ExampleApp(ExampleStore(
+      eventStore,
+      onNew: (id, [state]) => Example(id, state),
+    )),
+  );
+
+  return getIt;
+}
+''';
+
+const ConfigGeneratedCodeNotLazyServiceRegistration = r'''
+// **************************************************************************
+// ConfigGenerator
+// **************************************************************************
+
+GetIt _$configureEventuous(StreamEventStore eventStore) {
+  final getIt = GetIt.instance;
+  getIt.registerSingleton<ExampleApp>(
+    ExampleApp(ExampleStore(
       eventStore,
       onNew: (id, [state]) => Example(id, state),
     )),

@@ -35,17 +35,26 @@ class EventuousConfigTemplate {
   String toInitializerString() {
     return '''GetIt ${config.initializerName}(StreamEventStore eventStore) {
   final getIt = GetIt.instance;
-  ${apps.map((a) => toRegisterLazySingleton(a)).join()}
+  ${apps.map((a) => config.lazyService ? toRegisterLazySingleton(a) : toRegisterSingleton(a)).join()}
   return getIt;
 }''';
   }
 
-  String toRegisterLazySingleton(ApplicationTemplate a) =>
-      '''getIt.registerLazySingleton<${a.name}>(() =>
-  ${a.name}(${a.aggregate}Store(
-    eventStore,
-    onNew: (id, [state]) => ${a.aggregate}(id, state),
-  )),
+  String toRegisterSingleton(ApplicationTemplate a) =>
+      '''getIt.registerSingleton<${a.name}>(
+  ${toNewAggregateStoreInstanceString(a)},
 );
 ''';
+
+  String toRegisterLazySingleton(ApplicationTemplate a) =>
+      '''getIt.registerLazySingleton<${a.name}>(() =>
+  ${toNewAggregateStoreInstanceString(a)},
+);
+''';
+
+  String toNewAggregateStoreInstanceString(ApplicationTemplate a) =>
+      '''${a.name}(${a.aggregate}Store(
+    eventStore,
+    onNew: (id, [state]) => ${a.aggregate}(id, state),
+  ))''';
 }

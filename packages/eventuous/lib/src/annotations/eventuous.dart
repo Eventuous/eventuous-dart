@@ -3,6 +3,7 @@ import 'package:eventuous/eventuous.dart';
 class Eventuous {
   const Eventuous({
     this.inferTypes = true,
+    this.lazyService = true,
     this.initializerName = r'_$initEventuous',
   });
 
@@ -61,8 +62,12 @@ class Eventuous {
   ///
   final bool inferTypes;
 
+  /// Application services are registered lazily
+  final bool lazyService;
+
   JsonMap toJson() => {
         'infer_types': inferTypes,
+        'lazy_service': lazyService,
         'initializer_name': initializerName,
       };
 }

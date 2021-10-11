@@ -36,6 +36,7 @@ class InferenceBuilder implements Builder {
   Map<String, Object?> get config {
     return <String, Object?>{
       'infer_types': (_config['infer_types'] ?? true) as bool,
+      'lazy_service': (_config['lazy_service'] ?? true) as bool,
       'inspect_path': (_config['inspect_path'] ?? r'$lib$') as String,
       'inspect_pattern': (_config['inspect_pattern'] ?? '**.dart') as String,
     };

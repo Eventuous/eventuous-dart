@@ -7,16 +7,20 @@ import 'builders/models/parameter_model.dart';
 import 'extensions.dart';
 
 Eventuous parseConfig(Map<String, Object?> config, [DartObject? annotation]) {
-  final inferTypes = annotation?.getField('inferTypes')?.toBoolValue() ??
-      config['infer_types'] as bool? ??
+  final inferTypes = config['infer_types'] as bool? ??
+      annotation?.getField('inferTypes')?.toBoolValue() ??
       true;
-  final initializerName =
+
+  final lazyService = config['lazy_service'] as bool? ??
+      annotation?.getField('lazyService')?.toBoolValue() ??
+      true;
+  final initializerName = config['initializer_name'] as String? ??
       annotation?.getField('initializerName')?.toStringValue() ??
-          config['initializer_name'] as String? ??
-          r'_$initEventuous';
+      r'_$initEventuous';
 
   return Eventuous(
     inferTypes: inferTypes,
+    lazyService: lazyService,
     initializerName: initializerName,
   );
 }
