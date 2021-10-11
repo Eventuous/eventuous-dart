@@ -1,3 +1,7 @@
+# 0.0.8
+- Added lazy service registration flag
+- Added generation of application service code
+
 # 0.0.7
 - Added code generation for commands
 

@@ -1,5 +1,5 @@
 name: eventuous_generator
-version: 0.0.7
+version: 0.0.8
 homepage: https://eventuous.dev
 description: Code generator for Eventuous - a lightweight and open-souce Event Sourcing library for Dart.
 repository: https://github.com/Eventuous/eventuous-dart
