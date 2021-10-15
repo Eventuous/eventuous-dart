@@ -3,8 +3,8 @@ import 'package:eventuous/eventuous.dart';
 
 import '../../extensions.dart';
 
-class ArgumentModel extends JsonObject {
-  ArgumentModel(
+class ItemModel extends JsonObject {
+  ItemModel(
     this.type,
     this.name,
     this.isNamed,
@@ -22,10 +22,23 @@ class ArgumentModel extends JsonObject {
   bool get isOptional => !isRequired;
   bool get hasDefaultValueCode => defaultValueCode != null;
 
+  /// Create a new `ArgumentModel` instance from [PropertyAccessorElement]
+  factory ItemModel.fromProperty(PropertyAccessorElement element) {
+    // TODO: Validate property accessor
+    return ItemModel(
+      element.returnType.toTypeName(),
+      element.displayName.toMemberCase(),
+      false,
+      false,
+      false,
+      null,
+    );
+  }
+
   /// Create a new `ArgumentModel` instance from [ParameterElement]
-  factory ArgumentModel.from(ParameterElement element) {
+  factory ItemModel.fromParameter(ParameterElement element) {
     // TODO: Validate constructor
-    return ArgumentModel(
+    return ItemModel(
       element.type.toTypeName(),
       element.displayName.toMemberCase(),
       element.isNamed || element.isRequiredNamed || element.isOptionalNamed,
@@ -36,7 +49,7 @@ class ArgumentModel extends JsonObject {
   }
 
   /// Factory constructor for creating a new `ArgumentModel` instance
-  factory ArgumentModel.fromJson(Map<String, dynamic> json) => ArgumentModel(
+  factory ItemModel.fromJson(Map<String, dynamic> json) => ItemModel(
         json['type'] as String,
         json['name'] as String,
         json['isNamed'] as bool,

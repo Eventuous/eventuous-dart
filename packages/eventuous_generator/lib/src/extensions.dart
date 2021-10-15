@@ -3,7 +3,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:eventuous/eventuous.dart';
 import 'package:eventuous_generator/src/builders/models/inference_model.dart';
-import 'package:eventuous_generator/src/builders/models/method_model.dart';
+import 'package:eventuous_generator/src/builders/models/element_model.dart';
 import 'package:eventuous_generator/src/helpers.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:source_gen/source_gen.dart';
@@ -26,7 +26,7 @@ extension AnnotationModelX on AnnotationModel {
   ApplicationTemplate toApplicationTemplate(
     InferenceModel inference,
   ) {
-    final aggregate = parameterValueAt('aggregate');
+    final aggregate = valueAt('aggregate');
     final commands = inference
         .annotationsOf<AggregateCommandType>(aggregate)
         .map((a) => a.toAggregateCommandTemplate(inference))
@@ -36,42 +36,45 @@ extension AnnotationModelX on AnnotationModel {
       name: annotationOf,
       commands: commands,
       aggregate: aggregate,
-      id: parameterValueAt('id'),
-      data: parameterValueAt('data'),
-      event: parameterValueAt('event'),
-      value: parameterValueAt('value'),
-      state: parameterValueAt('state'),
+      id: valueAt('id'),
+      data: valueAt('data'),
+      event: valueAt('event'),
+      value: valueAt('value'),
+      state: valueAt('state'),
     );
   }
 
   AggregateTemplate toAggregateTemplate(
     InferenceModel inference,
   ) {
+    final aggregate = valueAt('aggregate');
     final commands = inference
         .annotationsOf<AggregateCommandType>(annotationOf)
         .map((a) => a.toAggregateCommandTemplate(inference))
         .toList();
+    final value = inference.firstAnnotationOf<AggregateValueType>(aggregate);
 
     return AggregateTemplate(
       name: annotationOf,
       commands: commands,
-      id: parameterValueAt('id'),
-      data: parameterValueAt('data'),
-      event: parameterValueAt('event'),
-      value: parameterValueAt('value'),
-      state: parameterValueAt('state'),
+      id: valueAt('id'),
+      data: valueAt('data'),
+      event: valueAt('event'),
+      value: valueAt('value'),
+      state: valueAt('state'),
+      getters: value?.elementAt('getters'),
     );
   }
 
   AggregateCommandTemplate toAggregateCommandTemplate(
       InferenceModel inference) {
-    final event = parameterValueAt('event');
-    final expected = parameterValueAt('expected');
-    final aggregate = parameterValueAt('aggregate');
+    final event = valueAt('event');
+    final expected = valueAt('expected');
+    final aggregate = valueAt('aggregate');
     return AggregateCommandTemplate(
       name: annotationOf,
       aggregate: aggregate,
-      data: parameterValueAt('data'),
+      data: valueAt('data'),
       event: inference
           .where<AggregateEventType>(aggregate)
           .firstWhere(
@@ -80,14 +83,14 @@ extension AnnotationModelX on AnnotationModel {
               '$AggregateEventType',
               event,
               parameters: [
-                elementAt<ParameterModel>('data'),
+                typedAt<ParameterModel>('data'),
                 ParameterModel('aggregate', aggregate),
-                elementAt<ParameterModel>('constructor'),
+                typedAt<ParameterModel>('constructor'),
               ],
             ),
           )
           .toAggregateEventTemplate(),
-      constructor: methodAt('constructor'),
+      constructor: elementAt('constructor'),
       usesJsonSerializable: usesJsonSerializable,
       expected: ExpectedState.values.firstWhere((e) => enumName(e) == expected,
           orElse: () => ExpectedState.any),
@@ -97,9 +100,9 @@ extension AnnotationModelX on AnnotationModel {
   AggregateEventTemplate toAggregateEventTemplate() {
     return AggregateEventTemplate(
       name: annotationOf,
-      data: parameterValueAt('data'),
-      constructor: methodAt('constructor'),
-      aggregate: parameterValueAt('aggregate'),
+      data: valueAt('data'),
+      constructor: elementAt('constructor'),
+      aggregate: valueAt('aggregate'),
       usesJsonSerializable: usesJsonSerializable,
     );
   }
@@ -107,8 +110,8 @@ extension AnnotationModelX on AnnotationModel {
   AggregateValueTemplate toAggregateValueTemplate() {
     return AggregateValueTemplate(
       name: annotationOf,
-      data: parameterValueAt('data'),
-      aggregate: parameterValueAt('aggregate'),
+      data: valueAt('data'),
+      aggregate: valueAt('aggregate'),
       usesJsonSerializable: usesJsonSerializable,
     );
   }
@@ -116,17 +119,19 @@ extension AnnotationModelX on AnnotationModel {
   AggregateStateTemplate toAggregateStateTemplate(
     InferenceModel inference,
   ) {
-    final aggregate = parameterValueAt('aggregate');
+    final aggregate = valueAt('aggregate');
     final events = inference
         .annotationsOf<AggregateEventType>()
         .map((a) => a.toAggregateEventTemplate())
         .toList();
+    final value = inference.firstAnnotationOf<AggregateValueType>(aggregate);
     final event = inference.firstAnnotationOf<AggregateEventType>(aggregate);
     return AggregateStateTemplate(
       events: events,
       name: annotationOf,
       aggregate: aggregate,
-      value: parameterValueAt('value'),
+      value: valueAt('value'),
+      getters: value?.elementAt('getters'),
       event: event?.usesJsonSerializable == true ? 'JsonObject' : 'Object',
       usesJsonSerializable:
           usesJsonSerializable || events.any((e) => e.usesJsonSerializable),
@@ -181,8 +186,13 @@ extension ElementX on Element {
 }
 
 extension ClassElementX on ClassElement {
-  MethodModel toConstructorArgumentsModel() {
+  ElementModel toGettersModel() {
     // TODO: Validate constructor
-    return MethodModel.from('constructor', constructors.first);
+    return ElementModel.fromGetters(this);
+  }
+
+  ElementModel toConstructorModel() {
+    // TODO: Validate constructor
+    return ElementModel.fromConstructor(constructors.first);
   }
 }

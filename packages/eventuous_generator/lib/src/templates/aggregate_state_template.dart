@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:eventuous/eventuous.dart';
+import 'package:eventuous_generator/src/builders/models/element_model.dart';
 import 'package:source_gen/source_gen.dart';
 
 import '../builders/models/inference_model.dart';
@@ -14,8 +15,9 @@ class AggregateStateTemplate {
     required this.value,
     required this.events,
     required this.aggregate,
+    required ElementModel? getters,
     required this.usesJsonSerializable,
-  });
+  }) : getters = getters ?? ElementModel('getters', []);
 
   factory AggregateStateTemplate.from(
     InferenceModel inference,
@@ -24,6 +26,7 @@ class AggregateStateTemplate {
   ) {
     final aggregate = annotation.toFieldTypeName('aggregate');
     final state = inference.firstAnnotationOf<AggregateType>(aggregate);
+    final value = inference.firstAnnotationOf<AggregateValueType>(aggregate);
     final events = inference
         .annotationsOf<AggregateEventType>(aggregate)
         .map((a) => a.toAggregateEventTemplate())
@@ -33,8 +36,9 @@ class AggregateStateTemplate {
       name: element.displayName,
       events: events,
       aggregate: aggregate,
-      event: parameterTypeAt('event', state, annotation),
-      value: parameterTypeAt('value', state, annotation, '${aggregate}Value'),
+      getters: value?.elementAt('getters'),
+      event: fieldTypeNameAt('event', state, annotation),
+      value: fieldTypeNameAt('value', state, annotation, '${aggregate}Value'),
       usesJsonSerializable:
           (state?.usesJsonSerializable ?? element.usesJsonSerializable) ||
               events.any((e) => e.usesJsonSerializable),
@@ -45,6 +49,7 @@ class AggregateStateTemplate {
   final String event;
   final String value;
   final String aggregate;
+  final ElementModel getters;
   final bool usesJsonSerializable;
   final List<AggregateEventTemplate> events;
 
@@ -62,7 +67,9 @@ abstract class _\$$name extends AggregateState<$value>{
     ${toDefineAggregateStateTypeString()}
     ${_toAggregatePatchString()}
   }
-    
+
+  ${toAggregateValueGettersString()}
+
   ${toAggregateEventPatchMethodString()}
 }
 ''';
@@ -92,5 +99,11 @@ $name patch($event event, $value value) {
   ));
 }
 ''';
+  }
+
+  String toAggregateValueGettersString() {
+    return '''${getters.toInvocationGettersString(
+          invoke: (name) => 'value.$name',
+        ).join('\n')}''';
   }
 }

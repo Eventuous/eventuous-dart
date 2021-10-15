@@ -35,11 +35,11 @@ class ApplicationTemplate {
       aggregate: name,
       commands: commands,
       name: element.displayName,
-      data: parameterTypeAt('data', application, annotation),
-      event: parameterTypeAt('event', application, annotation),
-      id: parameterTypeAt('id', application, annotation, '${name}Id'),
-      value: parameterTypeAt('value', application, annotation, '${name}Value'),
-      state: parameterTypeAt('state', application, annotation, '${name}State'),
+      data: fieldTypeNameAt('data', application, annotation),
+      event: fieldTypeNameAt('event', application, annotation),
+      id: fieldTypeNameAt('id', application, annotation, '${name}Id'),
+      value: fieldTypeNameAt('value', application, annotation, '${name}Value'),
+      state: fieldTypeNameAt('state', application, annotation, '${name}State'),
     );
   }
 
@@ -73,10 +73,10 @@ abstract class _\$$name extends ApplicationServiceBase<$data,
   }
 
   String toAggregateCommandMethodString(AggregateCommandTemplate template) {
-    final arguments = template.constructor.toArgumentsDeclarationString();
+    final arguments = template.constructor.toDeclarationArgumentsString();
     // TODO: Support AggregateIdField to indicate id-field in commands and events
     // TODO: Support mapping between with @AggregateEventField(name:'something') on command fields
-    final invocation = template.event.constructor.toArgumentsInvocationString();
+    final invocation = template.event.constructor.toInvocationArgumentsString();
     return '''FutureOr<${aggregate}Result> ${template.name.toMemberCase()}($arguments){
   return handle(${template.name}($invocation));
 }''';

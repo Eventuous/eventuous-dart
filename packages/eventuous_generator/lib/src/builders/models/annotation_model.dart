@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:collection/collection.dart';
 import 'package:eventuous/eventuous.dart';
-import 'package:eventuous_generator/src/builders/models/method_model.dart';
+import 'package:eventuous_generator/src/builders/models/element_model.dart';
 
-import 'argument_model.dart';
+import 'item_model.dart';
 import 'parameter_model.dart';
 
 class AnnotationModel extends JsonObject {
@@ -44,15 +44,15 @@ class AnnotationModel extends JsonObject {
   Object? operator [](Object? name) =>
       toJson()[name] ?? parameters.firstWhereOrNull((p) => p.name == name);
 
-  T elementAt<T>(Object name) => this[name] as T;
+  T typedAt<T>(Object name) => this[name] as T;
 
-  String parameterValueAt(Object name) => elementAt<ParameterModel>(name).value;
+  String valueAt(Object name) => typedAt<ParameterModel>(name).value;
 
-  MethodModel methodAt(Object name) {
-    return MethodModel(
+  ElementModel elementAt(Object name) {
+    return ElementModel(
         name.toString(),
-        (jsonDecode(elementAt<ParameterModel>(name).value) as List)
-            .map((e) => ArgumentModel.fromJson(Map.from(e as Map)))
+        (jsonDecode(typedAt<ParameterModel>(name).value) as List)
+            .map((e) => ItemModel.fromJson(Map.from(e as Map)))
             .toList());
   }
 

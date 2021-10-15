@@ -1,7 +1,7 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:eventuous/eventuous.dart';
 import 'package:eventuous_generator/src/builders/models/annotation_model.dart';
-import 'package:eventuous_generator/src/builders/models/method_model.dart';
+import 'package:eventuous_generator/src/builders/models/element_model.dart';
 import 'package:eventuous_generator/src/builders/models/parameter_model.dart';
 import 'package:eventuous_generator/src/templates/aggregate_event_template.dart';
 import 'package:source_gen/source_gen.dart';
@@ -35,26 +35,29 @@ class AggregateCommandTemplate {
       annotation,
       model: command,
     );
-    final data = parameterTypeAt('data', command, annotation);
-    final event = parameterTypeAt('event', command, annotation);
+    final data = fieldTypeNameAt('data', command, annotation);
+    final event = fieldTypeNameAt('event', command, annotation);
 
     return AggregateCommandTemplate(
       name: name,
       data: data,
       expected: expected,
       aggregate: aggregate,
-      constructor: element.toConstructorArgumentsModel(),
+      constructor: element.toConstructorModel(),
       event: inference
           .where<AggregateEventType>(aggregate)
           .firstWhere(
             (e) => e.annotationOf == event,
-            orElse: () =>
-                AnnotationModel('$AggregateEventType', event, parameters: [
-              element.toConstructorArgumentsModel(),
-              ParameterModel('aggregate', aggregate),
-              command?.elementAt<ParameterModel>('data') ??
-                  ParameterModel('data', data),
-            ]),
+            orElse: () => AnnotationModel(
+              '$AggregateEventType',
+              event,
+              parameters: [
+                element.toConstructorModel(),
+                ParameterModel('aggregate', aggregate),
+                command?.typedAt<ParameterModel>('data') ??
+                    ParameterModel('data', data),
+              ],
+            ),
           )
           .toAggregateEventTemplate(),
       usesJsonSerializable:
@@ -66,7 +69,7 @@ class AggregateCommandTemplate {
   final String data;
   final String aggregate;
   final ExpectedState expected;
-  final MethodModel constructor;
+  final ElementModel constructor;
   final bool usesJsonSerializable;
   final AggregateEventTemplate event;
 
@@ -107,9 +110,9 @@ JsonMap toJson() => _\$${name}ToJson(this as $name);
 
   String toAggregateCommandHandlerString(String tid) {
     final _aggregate = aggregate.toMemberCase();
-    final methodArgs = constructor.toArgumentsInvocationString(
+    final methodArgs = constructor.toInvocationArgumentsString(
       where: (e) => '${_aggregate}Id' != e.name,
-      use: constructor.arguments.fold(
+      use: constructor.items.fold(
           {}, (use, e) => use..putIfAbsent(e.name, () => 'cmd.${e.name}')),
     );
 

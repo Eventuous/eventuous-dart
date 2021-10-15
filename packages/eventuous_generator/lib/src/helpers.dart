@@ -33,7 +33,7 @@ ExpectedState parameterExpectedStateAt(
   AnnotationModel? model,
 }) {
   return toExpectedState(
-    parameterObjectAt(field, annotation, model: model, toString: (o) {
+    fieldObjectAt(field, annotation, model: model, toString: (o) {
       return enumName(ExpectedState.values[int.parse(
           rx.firstMatch(o.toString())?.group(1) ??
               ExpectedState.any.index.toString())]);
@@ -42,7 +42,7 @@ ExpectedState parameterExpectedStateAt(
   );
 }
 
-Object parameterObjectAt(
+Object fieldObjectAt(
   String field,
   ConstantReader annotation, {
   AnnotationModel? model,
@@ -54,7 +54,7 @@ Object parameterObjectAt(
       (o == null || toString == null ? defaultValue : toString(o));
 }
 
-String parameterTypeAt(
+String fieldTypeNameAt(
   String field,
   AnnotationModel? model,
   ConstantReader annotation, [

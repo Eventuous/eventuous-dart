@@ -31,6 +31,8 @@ abstract class _$Foo
   // ignore: unused_element
   static Foo from(String id) => Foo(FooId(id));
 
+  String? get title => current.title;
+  String? get author => current.author;
   FooState1Result createFoo({required String title, required String author}) {
     ensureDoesntExists();
     return apply(FooCreated(fooId: id.value, title: title, author: author));
@@ -204,6 +206,8 @@ abstract class _$FooState1 extends AggregateState<FooStateModel1> {
     on<FooImported>(patch);
   }
 
+  String? get title => value.title;
+  String? get author => value.author;
   FooState1 patch(JsonObject event, FooStateModel1 value) {
     return FooState1(AggregateValueTypes.create<JsonMap, FooStateModel1>(
       JsonUtils.patch(

@@ -2,32 +2,27 @@ import 'dart:convert';
 
 import 'package:analyzer/dart/element/element.dart';
 import 'package:eventuous/eventuous.dart';
-import 'package:eventuous_generator/src/builders/models/argument_model.dart';
+import 'package:eventuous_generator/src/builders/models/item_model.dart';
 import 'package:source_gen/source_gen.dart';
 
 import 'parameter_model.dart';
 
-class MethodModel extends JsonObject implements ParameterModel {
-  MethodModel(this.name, this.arguments) : super([name, arguments]);
+class ElementModel extends JsonObject implements ParameterModel {
+  ElementModel(this.name, this.items) : super([name, items]);
 
   @override
   final String name;
 
   @override
-  String get value => jsonEncode(arguments.map((a) => a.toJson()).toList());
+  String get value => jsonEncode(items.map((a) => a.toJson()).toList());
 
-  final List<ArgumentModel> arguments;
+  final List<ItemModel> items;
 
-  Iterable<ArgumentModel> toArgumentsDeclaration(
-      [bool Function(ArgumentModel)? where]) {
-    return arguments.where((e) => where == null || where(e));
-  }
-
-  String toArgumentsDeclarationString([bool Function(ArgumentModel)? where]) {
+  String toDeclarationArgumentsString([bool Function(ItemModel)? where]) {
     final named = <String>[];
     final optional = <String>[];
     final positional = <String>[];
-    for (var arg in toArgumentsDeclaration(where)) {
+    for (var arg in _filter(where)) {
       if (arg.isNamed) {
         named.add(
           '${arg.isRequired ? 'required ' : ''}${arg.type} ${arg.name}${arg.hasDefaultValueCode ? '=${arg.defaultValueCode}' : ''}',
@@ -56,14 +51,14 @@ class MethodModel extends JsonObject implements ParameterModel {
     ].join(',');
   }
 
-  String toArgumentsInvocationString({
+  String toInvocationArgumentsString({
+    bool Function(ItemModel)? where,
     Map<String, String> use = const {},
-    bool Function(ArgumentModel)? where,
     Map<String, String> names = const {},
   }) {
     final named = <String>[];
     final positional = <String>[];
-    for (var arg in toArgumentsDeclaration(where)) {
+    for (var arg in _filter(where)) {
       if (arg.isNamed) {
         named.add(
           '${names[arg.name] ?? arg.name}: ${use[arg.name] ?? arg.name}',
@@ -78,20 +73,47 @@ class MethodModel extends JsonObject implements ParameterModel {
     ].join(',');
   }
 
-  /// Create a new `MethodModel` instance from [ConstructorElement]
-  factory MethodModel.from(String name, ConstructorElement element) {
-    return MethodModel(
-        name,
-        element.declaration.parameters
-            .map((p) => ArgumentModel.from(p))
+  List<String> toInvocationGettersString({
+    bool Function(ItemModel)? where,
+    required String Function(String name) invoke,
+  }) {
+    final getters = <String>[];
+    for (var arg in _filter(where)) {
+      getters.add(
+        '${arg.type} get ${arg.name} => ${invoke(arg.name)};',
+      );
+    }
+    return getters;
+  }
+
+  Iterable<ItemModel> _filter([bool Function(ItemModel)? where]) {
+    return items.where((e) => where == null || where(e));
+  }
+
+  /// Create a new `ElementModel` instance from [ClassElement.accessors]
+  factory ElementModel.fromGetters(ClassElement element) {
+    return ElementModel(
+        'getters',
+        element.accessors
+            .where((e) => e.isGetter)
+            .map((g) => ItemModel.fromProperty(g))
             .toList());
   }
 
-  /// Factory constructor for creating a new `MethodModel` instance
-  factory MethodModel.fromJson(Map<String, dynamic> json) => MethodModel(
+  /// Create a new `ElementModel` instance from [ConstructorElement]
+  factory ElementModel.fromConstructor(ConstructorElement element) {
+    return ElementModel(
+        'constructor',
+        element.declaration.parameters
+            .map((p) => ItemModel.fromParameter(p))
+            .toList());
+  }
+
+  /// Factory constructor for creating a new `ElementModel` instance
+  factory ElementModel.fromJson(Map<String, dynamic> json) => ElementModel(
         json['name'] as String,
         (jsonDecode(json['value']) as List)
-            .map((e) => ArgumentModel.fromJson(
+            .map((e) => ItemModel.fromJson(
                   Map<String, dynamic>.from(e as Map),
                 ))
             .toList(),
@@ -101,6 +123,6 @@ class MethodModel extends JsonObject implements ParameterModel {
   @override
   JsonMap toJson() => {
         'name': name,
-        'value': jsonEncode(arguments.map((a) => a.toJson()).toList()),
+        'value': jsonEncode(items.map((a) => a.toJson()).toList()),
       };
 }

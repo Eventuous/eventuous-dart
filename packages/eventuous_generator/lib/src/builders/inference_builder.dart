@@ -112,6 +112,7 @@ class InferenceBuilder implements Builder {
                     location: clz.location?.encoding,
                     usesJsonSerializable: usesJsonSerializable,
                     parameters: [
+                      clz.toGettersModel(),
                       reader.toTypeModel('aggregate'),
                       reader.toTypeModel(
                         'data',
@@ -127,7 +128,7 @@ class InferenceBuilder implements Builder {
                     usesJsonSerializable: usesJsonSerializable,
                     parameters: [
                       reader.toTypeModel('aggregate'),
-                      clz.toConstructorArgumentsModel(),
+                      clz.toConstructorModel(),
                       reader.toTypeModel(
                         'data',
                         usesJsonSerializable ? 'JsonMap' : 'Object',
@@ -154,7 +155,7 @@ class InferenceBuilder implements Builder {
                     parameters: [
                       reader.toTypeModel('event'),
                       reader.toTypeModel('aggregate'),
-                      clz.toConstructorArgumentsModel(),
+                      clz.toConstructorModel(),
                       reader.toExpectedStateModel('expected'),
                       reader.toTypeModel(
                         'data',
@@ -217,7 +218,7 @@ class InferenceBuilder implements Builder {
           final annotation = AnnotationModel.fromJson(
             inference,
           );
-          final aggregate = annotation.parameterValueAt('aggregate');
+          final aggregate = annotation.valueAt('aggregate');
           switch (inference['type']) {
             case 'ApplicationType':
               apps.update(

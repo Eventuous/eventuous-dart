@@ -90,7 +90,9 @@ class Example extends _$Example {}
 @JsonSerializable()
 @AggregateValueType(Example)
 class ExampleValue extends _$ExampleValue {
-  ExampleValue() : super([]);
+  ExampleValue(this.title,this.author) : super([title,author]);
+  final String title;
+  final String author;
 }
 
 @AggregateStateType(Example)
@@ -201,7 +203,9 @@ class ExampleId1 extends AggregateId {
 @JsonSerializable()
 @AggregateValueType(Example, data: JsonMap)
 class ExampleStateModel1 extends _$ExampleStateModel1 {
-  ExampleStateModel1() : super([]);
+  ExampleStateModel1(this.title,this.author) : super([title,author]);
+  final String title;
+  final String author;
 }
 
 @AggregateStateType(Example, value: ExampleStateModel1)
@@ -482,6 +486,9 @@ abstract class _$Example
   // ignore: unused_element
   static Example from(String id) => Example(ExampleId(id));
 
+  String get title => current.title;
+  String get author => current.author;
+
   ExampleStateResult createExample(
       {required String title, required String author}) {
     ensureDoesntExists();
@@ -665,6 +672,9 @@ abstract class _$ExampleState extends AggregateState<ExampleValue> {
     on<ExampleImported>(patch);
   }
 
+  String get title => value.title;
+  String get author => value.author;
+
   ExampleState patch(JsonObject event, ExampleValue value) {
     return ExampleState(AggregateValueTypes.create<JsonMap, ExampleValue>(
       JsonUtils.patch(
@@ -707,6 +717,9 @@ abstract class _$Example extends Aggregate<JsonObject, ExampleStateModel1,
   }
   // ignore: unused_element
   static Example from(String id) => Example(ExampleId1(id));
+
+  String get title => current.title;
+  String get author => current.author;
 
   ExampleState1Result createExample(
       {required String title, required String author}) {
@@ -890,6 +903,9 @@ abstract class _$ExampleState1 extends AggregateState<ExampleStateModel1> {
 
     on<ExampleImported>(patch);
   }
+
+  String get title => value.title;
+  String get author => value.author;
 
   ExampleState1 patch(JsonObject event, ExampleStateModel1 value) {
     return ExampleState1(

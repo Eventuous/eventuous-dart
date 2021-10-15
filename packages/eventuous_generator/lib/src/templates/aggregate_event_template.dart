@@ -1,6 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:eventuous/eventuous.dart';
-import 'package:eventuous_generator/src/builders/models/method_model.dart';
+import 'package:eventuous_generator/src/builders/models/element_model.dart';
 import 'package:source_gen/source_gen.dart';
 
 import '../extensions.dart';
@@ -27,8 +27,8 @@ class AggregateEventTemplate {
     return AggregateEventTemplate(
       name: name,
       aggregate: aggregate,
-      data: parameterTypeAt('data', event, annotation),
-      constructor: element.toConstructorArgumentsModel(),
+      data: fieldTypeNameAt('data', event, annotation),
+      constructor: element.toConstructorModel(),
       usesJsonSerializable:
           event?.usesJsonSerializable ?? element.usesJsonSerializable,
     );
@@ -37,7 +37,7 @@ class AggregateEventTemplate {
   final String name;
   final String data;
   final String aggregate;
-  final MethodModel constructor;
+  final ElementModel constructor;
   final bool usesJsonSerializable;
 
   bool get withJsonObject =>
