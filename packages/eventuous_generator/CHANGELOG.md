@@ -1,3 +1,6 @@
+# 0.0.9
+- Added generation of value getters to aggregate and state
+
 # 0.0.8
 - Added lazy service registration flag
 - Added generation of application service code
