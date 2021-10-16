@@ -1,2 +1,3 @@
 eventuous: .
+eventuous_test: ../eventuous_test
 eventuous_generator: ../eventuous_generator
