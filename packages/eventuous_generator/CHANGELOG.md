@@ -1,3 +1,6 @@
+# 0.0.10
+- Moved test code to own library for easy testing
+
 # 0.0.9
 - Added generation of value getters to aggregate and state
 
