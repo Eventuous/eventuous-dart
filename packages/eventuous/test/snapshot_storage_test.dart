@@ -1,7 +1,7 @@
 import 'package:eventuous/eventuous.dart';
 import 'package:test/test.dart';
 
-import 'fixtures/harness.dart';
+import 'domain/booking/booking.dart';
 
 void main() {
   group('When saving aggregate state', () {

@@ -1,0 +1,9 @@
+dart:
+  - stable
+
+stages:
+  - analyze_and_format:
+      - group:
+          - analyze: --fatal-infos .
+          - format: --output=none --set-exit-if-changed .
+

@@ -1,8 +1,9 @@
 import 'package:eventuous/eventuous.dart';
+import 'package:eventuous_test/eventuous_test.dart';
 import 'package:test/test.dart';
 
-import 'fixtures/esdb/server_single_node.dart';
-import 'fixtures/harness.dart';
+import 'domain/booking/booking.dart';
+import 'harness.dart';
 
 void main() {
   group('When using a service with eventstore db', () {

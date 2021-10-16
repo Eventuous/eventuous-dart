@@ -1,7 +1,7 @@
 import 'package:eventuous/eventuous.dart';
 
 import 'exceptions.dart';
-import 'stored_event.dart';
+import 'in_memory_event.dart';
 
 class InMemoryStream {
   InMemoryStream(this.name);
@@ -11,19 +11,19 @@ class InMemoryStream {
   int get version => _version;
   int _version = -1;
 
-  List<StoredEvent> get events => _events.toList();
-  final List<StoredEvent> _events = [];
+  List<InMemoryEvent> get events => _events.toList();
+  final List<InMemoryEvent> _events = [];
 
-  Iterable<StoredEvent> appendEvents(
+  Iterable<InMemoryEvent> appendEvents(
     Iterable<StreamEvent> events,
     ExpectedStreamVersion expected,
   ) {
     checkVersion(expected);
 
-    final stored = <StoredEvent>[];
+    final stored = <InMemoryEvent>[];
     for (var event in events) {
       stored.add(
-        StoredEvent(event, ++_version),
+        InMemoryEvent(event, ++_version),
       );
       _events.add(stored.last);
     }

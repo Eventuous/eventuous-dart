@@ -1,13 +1,10 @@
 import 'package:equatable/equatable.dart';
 import 'package:eventuous/eventuous.dart';
+import 'package:eventuous_test/eventuous_test.dart';
 import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 
-import '../domain/booking/booking.dart';
-import '../fakes/in_memory_event_store.dart';
-
-export '../domain/booking/booking.dart';
-export '../fakes/in_memory_event_store.dart';
+import 'domain/booking/booking.dart';
 
 class TestHarness {
   TestHarness() {
@@ -15,8 +12,8 @@ class TestHarness {
     EquatableConfig.stringify = true;
   }
 
-  late final StreamEventStore eventStore;
   late final BookingStore bookingStore;
+  late final StreamEventStore eventStore;
   late final BookingService bookingService;
   late final BookingStateStorage bookingStateStorage;
 

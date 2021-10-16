@@ -10,7 +10,7 @@ in [package:eventuous].
 Please file feature requests and bugs at the [issue tracker][tracker].
 
 [Dart Build System]: https://github.com/dart-lang/build
+[package:eventuous]: https://pub.dev/packages/eventuous
 [tracker]: https://github.com/eventuous/eventuous-dart/issues
 [eventuous_generator]: https://pub.dev/packages/eventuous_generator
 [example]: https://github.com/eventuous/eventuous-dart/tree/master/example
-[package:eventuous]: https://pub.dev/packages/eventuous_annotation

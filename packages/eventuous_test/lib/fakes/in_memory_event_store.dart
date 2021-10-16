@@ -2,10 +2,10 @@ import 'package:eventuous/eventuous.dart';
 
 import 'exceptions.dart';
 import 'in_memory_stream.dart';
-import 'stored_event.dart';
+import 'in_memory_event.dart';
 
 class InMemoryEventStore extends StreamEventStore {
-  final _global = <StoredEvent>[];
+  final _global = <InMemoryEvent>[];
   final _storage = <StreamName, InMemoryStream>{};
 
   @override

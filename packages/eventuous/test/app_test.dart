@@ -1,7 +1,8 @@
 import 'package:eventuous/eventuous.dart';
 import 'package:test/test.dart';
 
-import 'fixtures/harness.dart';
+import 'domain/booking/booking.dart';
+import 'harness.dart';
 
 void main() {
   group('When using a service', () {
