@@ -5,7 +5,7 @@ description: A library with utilities for testing eventuous
 repository: https://github.com/Eventuous/eventuous-dart
 environment: 
   sdk: '>=2.13.0 <3.0.0'
-dependencies:
+dependencies: 
   path: ^1.8.0
   logging: ^1.0.1
   eventuous: ^0.0.10
