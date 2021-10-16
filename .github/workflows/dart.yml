@@ -35,16 +35,16 @@ jobs:
       - name: mono_repo self validate
         run: dart pub global run mono_repo generate --validate
   job_002:
-    name: "analyze_and_format; PKGS: packages/eventuous, packages/eventuous_generator; `dart analyze --fatal-infos .`, `dart format --output=none --set-exit-if-changed .`"
+    name: "analyze_and_format; PKGS: packages/eventuous, packages/eventuous_generator, packages/eventuous_test; `dart analyze --fatal-infos .`, `dart format --output=none --set-exit-if-changed .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@v2.1.6
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:packages/eventuous-packages/eventuous_generator;commands:analyze-format"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:packages/eventuous-packages/eventuous_generator-packages/eventuous_test;commands:analyze-format"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:packages/eventuous-packages/eventuous_generator
+            os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:packages/eventuous-packages/eventuous_generator-packages/eventuous_test
             os:ubuntu-latest;pub-cache-hosted;dart:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
@@ -78,6 +78,19 @@ jobs:
       - name: "packages/eventuous_generator; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.packages_eventuous_generator_pub_upgrade.conclusion == 'success'"
         working-directory: packages/eventuous_generator
+        run: "dart format --output=none --set-exit-if-changed ."
+      - id: packages_eventuous_test_pub_upgrade
+        name: packages/eventuous_test; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: packages/eventuous_test
+        run: dart pub upgrade
+      - name: "packages/eventuous_test; dart analyze --fatal-infos ."
+        if: "always() && steps.packages_eventuous_test_pub_upgrade.conclusion == 'success'"
+        working-directory: packages/eventuous_test
+        run: dart analyze --fatal-infos .
+      - name: "packages/eventuous_test; dart format --output=none --set-exit-if-changed ."
+        if: "always() && steps.packages_eventuous_test_pub_upgrade.conclusion == 'success'"
+        working-directory: packages/eventuous_test
         run: "dart format --output=none --set-exit-if-changed ."
     needs:
       - job_001
