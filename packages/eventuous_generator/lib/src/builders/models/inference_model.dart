@@ -54,9 +54,9 @@ class InferenceModel extends JsonObject {
 
   /// Factory constructor for creating a new `InferenceModel` instance
   factory InferenceModel.fromJson(Map<String, dynamic> json) => InferenceModel(
-        ConfigModel.fromJson(json['config'] ?? <String, dynamic>{}),
-        annotations: List.from(json['annotations'] ?? <JsonMap>[])
-            .map((a) => AnnotationModel.fromJson(a))
+        ConfigModel.fromJson(json.mapAt('config') ?? {}),
+        annotations: List.from(json.listAt('annotations') ?? [])
+            .map((a) => AnnotationModel.fromJson(a as JsonMap))
             .toList(),
       );
 

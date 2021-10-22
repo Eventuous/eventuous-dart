@@ -7,10 +7,11 @@
 configure:
 	dart pub global activate pub_release
 	dart pub global activate critical_test
-	pub global activate dcli
-	pub global activate dartdoc
-	pub global activate dhttpd
+	dart pub global activate dcli
+	dart pub global activate dartdoc
+	dart pub global activate dhttpd
 	dart pub global activate mono_repo
+	dart pub global activate eventstore_client_test
 	brew install act
 
 generate:

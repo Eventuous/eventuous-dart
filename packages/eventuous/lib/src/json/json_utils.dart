@@ -106,6 +106,8 @@ class JsonUtils {
     JsonMapList patches, {
     bool strict = false,
   }) {
-    return JsonPatch.apply(oldJson, patches, strict: strict);
+    return JsonMap.from(
+      JsonPatch.apply(oldJson, patches, strict: strict) as Map,
+    );
   }
 }

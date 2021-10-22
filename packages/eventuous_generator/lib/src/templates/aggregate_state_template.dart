@@ -84,7 +84,7 @@ $AggregateStateTypes.define<$value, $name>(
 
   String _toAggregatePatchString() {
     return usesJsonSerializable && events.isNotEmpty
-        ? '''${events.map((e) => e.toAggregateEventPatchString()).join('\n')}'''
+        ? events.map((e) => e.toAggregateEventPatchString()).join('\n')
         : '';
   }
 
@@ -102,8 +102,10 @@ $name patch($event event, $value value) {
   }
 
   String toAggregateValueGettersString() {
-    return '''${getters.toInvocationGettersString(
+    return getters
+        .toInvocationGettersString(
           invoke: (name) => 'value.$name',
-        ).join('\n')}''';
+        )
+        .join('\n');
   }
 }

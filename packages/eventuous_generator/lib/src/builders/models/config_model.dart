@@ -11,8 +11,8 @@ class ConfigModel extends JsonObject {
 
   /// Factory constructor for creating a new `ConfigModel` instance
   factory ConfigModel.fromJson(Map<String, dynamic> json) => ConfigModel(
-        json['infer_types'] ?? true,
-        json['initialize_name'] ?? r'_$initEventuous',
+        json.elementAt('infer_types') ?? true,
+        json.elementAt('initialize_name') ?? r'_$initEventuous',
       );
 
   /// Declare support for serialization to JSON

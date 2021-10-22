@@ -12,7 +12,7 @@ void main() {
         codeBuilder(BuilderOptions({'infer_types': false})),
         {
           'test_lib|example.dart': ExampleSourceCodeDefaults,
-          'test_lib|lib/inference.json': '$InferenceGeneratedJsonDefaults',
+          'test_lib|lib/inference.json': InferenceGeneratedJsonDefaults,
         },
         outputs: {
           'test_lib|example.aggregate.g.part': ExampleGeneratedCodeDefaults,
@@ -27,7 +27,7 @@ void main() {
         codeBuilder(BuilderOptions({'infer_types': true})),
         {
           'test_lib|example.dart': ExampleSourceCodeDefaults,
-          'test_lib|lib/inference.json': '$InferenceGeneratedJsonInferred',
+          'test_lib|lib/inference.json': InferenceGeneratedJsonInferred,
         },
         outputs: {
           'test_lib|example.aggregate.g.part': ExampleGeneratedCodeInferred,
@@ -42,7 +42,7 @@ void main() {
         codeBuilder(BuilderOptions({'infer_types': true})),
         {
           'test_lib|example.dart': ExampleSourceCodeTyped,
-          'test_lib|lib/inference.json': '$InferenceGeneratedJsonTyped',
+          'test_lib|lib/inference.json': InferenceGeneratedJsonTyped,
         },
         outputs: {
           'test_lib|example.aggregate.g.part': ExampleGeneratedCodeTyped,
@@ -57,7 +57,7 @@ void main() {
         codeBuilder(BuilderOptions({'infer_types': false})),
         {
           'test_lib|example.dart': ExampleSourceCodeTyped,
-          'test_lib|lib/inference.json': '$InferenceGeneratedJsonTyped',
+          'test_lib|lib/inference.json': InferenceGeneratedJsonTyped,
         },
         outputs: {
           'test_lib|example.aggregate.g.part': ExampleGeneratedCodeTyped,

@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
-import 'package:build/src/builder/build_step.dart';
 import 'package:collection/collection.dart';
 import 'package:eventuous/eventuous.dart';
 import 'package:eventuous_generator/src/builders/models/config_model.dart';
@@ -300,7 +299,7 @@ class InferenceBuilder implements Builder {
       annotations.addAll(values[name] ?? []);
 
       // Perform introspections of value type in states of given aggregate
-      for (var state in (states[name] ?? {})) {
+      for (var state in (states[name] ?? <AnnotationModel>{})) {
         final json = state.toJson();
         final params = <ParameterModel>[
           ParameterModel('aggregate', name),

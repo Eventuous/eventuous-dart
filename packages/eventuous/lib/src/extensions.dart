@@ -33,8 +33,7 @@ extension StringX on String {
 
   /// Convert [String] into delimited lower case string
   String toDelimiterCase(String delimiter) {
-    return '${this}'
-        .split(RegExp('(?<=[a-z0-9])(?=[A-Z0-9])'))
+    return split(RegExp('(?<=[a-z0-9])(?=[A-Z0-9])'))
         .join(delimiter)
         .toLowerCase();
   }

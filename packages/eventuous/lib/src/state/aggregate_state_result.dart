@@ -6,11 +6,9 @@ abstract class AggregateStateResult<
     TId extends AggregateId,
     TState extends AggregateState<TValue>> {
   AggregateStateResult(
-    TState previous,
-    TState current,
-  )   : previous = previous,
-        current = current,
-        version = current.version;
+    this.previous,
+    this.current,
+  ) : version = (current ?? previous).version;
 
   factory AggregateStateResult.ok({
     required TState current,

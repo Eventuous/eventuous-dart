@@ -4,7 +4,7 @@ Type typeOf<TAggregate>() => TAggregate;
 /// Get enum value name
 String enumName(Object o) => o.toString().split('.').last;
 
-extension MapX on Map {
+extension MapX<K, V> on Map<K, V> {
   /// Check if map contains data at given path
   bool hasPath(String ref) => elementAt(ref) != null;
 
@@ -35,13 +35,13 @@ extension MapX on Map {
   List<TAggregate>? listAt<TAggregate>(String path,
       {List<TAggregate>? defaultList}) {
     final list = elementAt(path);
-    return list == null ? defaultList : List<TAggregate>.from(list);
+    return list == null ? defaultList : List<TAggregate>.from(list as List);
   }
 
   /// Get [Map] with keys of type [TState] and values of type [TAggregate] at given path
   Map<TState, TAggregate>? mapAt<TState, TAggregate>(String path,
       {Map<TState, TAggregate>? defaultMap}) {
     final map = elementAt(path);
-    return map == null ? defaultMap : Map<TState, TAggregate>.from(map);
+    return map == null ? defaultMap : Map<TState, TAggregate>.from(map as Map);
   }
 }

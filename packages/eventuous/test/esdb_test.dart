@@ -29,26 +29,31 @@ void main() {
         use: EventStoreDB.parse('esdb://localhost:2113?tls=false'),
       );
 
-    test('operation on new succeeds when not exist', () async {
-      // Arrange
-      final bookingId = nextBookingId();
+    test(
+      'operation on new succeeds when not exist',
+      () async {
+        // Arrange
+        final bookingId = nextBookingId();
 
-      // Act
-      final roomBooked = await harness.bookingService.bookRoom(
-        bookingId,
-        RoomId,
-        Price,
-      );
-      final loaded = await harness.bookingService.store.load(
-        BookingId(bookingId),
-      );
+        // Act
+        final roomBooked = await harness.bookingService.bookRoom(
+          bookingId,
+          RoomId,
+          Price,
+        );
+        final loaded = await harness.bookingService.store.load(
+          BookingId(bookingId),
+        );
 
-      // Assert
-      expect(roomBooked.isOk, isTrue, reason: '$roomBooked');
-      expect(roomBooked.current?.roomId, RoomId);
-      expect(loaded.original, roomBooked.current);
-      expect(loaded.changes, roomBooked.changes);
-    });
+        // Assert
+        expect(roomBooked.isOk, isTrue, reason: '$roomBooked');
+        expect(roomBooked.current?.roomId, RoomId);
+        expect(loaded.original, roomBooked.current);
+        expect(loaded.changes, roomBooked.changes);
+      },
+      // TODO: Solve unstable test
+      retry: 1,
+    );
 
     test('operation on new fails when exists', () async {
       // Arrange

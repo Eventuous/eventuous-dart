@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
-import 'package:build/src/builder/build_step.dart';
 import 'package:eventuous/eventuous.dart';
 import 'package:eventuous_generator/src/builders/models/inference_model.dart';
 import 'package:eventuous_generator/src/templates/eventuous_config_template.dart';
@@ -31,7 +30,7 @@ class ConfigGenerator extends GeneratorForAnnotation<Eventuous> {
 
   Future<InferenceModel> _read(Element element, BuildStep buildStep) async {
     final json = await buildStep.readAsString(_toInferenceAssetId(buildStep));
-    return InferenceModel.fromJson(jsonDecode(json));
+    return InferenceModel.fromJson(JsonMap.from(jsonDecode(json) as Map));
   }
 
   AssetId _toInferenceAssetId(BuildStep buildStep) {

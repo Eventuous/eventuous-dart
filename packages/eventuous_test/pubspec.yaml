@@ -12,10 +12,7 @@ dependencies:
   equatable: ^2.0.0
   universal_io: ^2.0.4
   eventstore_client: ^0.2.1
-dev_dependencies:
-  pedantic: ^1.10.0
-  test: ^1.16.0
   eventstore_client_test: ^0.2.1
-dependency_overrides: 
-  eventuous: 
-    path: ../eventuous
+dev_dependencies:
+  lints: ^1.0.0
+  test: ^1.16.0

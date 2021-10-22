@@ -84,7 +84,7 @@ abstract class _\$$name extends Aggregate<$event,$value,$id,$state>{
       (e) => e.name != idName,
     );
     final eventArgs = template.constructor.toInvocationArgumentsString(
-      use: {'$idName': 'id.value'},
+      use: {idName: 'id.value'},
     );
     return '''${state}Result ${template.name.toMemberCase()}($methodArgs){
   ${_assert(template)}
@@ -127,8 +127,10 @@ typedef ${state}NoOp = AggregateStateNoOp<$event,$value,$id,$state>;
   }
 
   String toAggregateValueGettersString() {
-    return '''${getters.toInvocationGettersString(
+    return getters
+        .toInvocationGettersString(
           invoke: (name) => 'current.$name',
-        ).join('\n')}''';
+        )
+        .join('\n');
   }
 }

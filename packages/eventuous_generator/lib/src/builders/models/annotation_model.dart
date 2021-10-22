@@ -61,8 +61,8 @@ class AnnotationModel extends JsonObject {
       AnnotationModel(json['type'] as String, json['annotationOf'] as String,
           location: json['location'] as String?,
           usesJsonSerializable: json['usesJsonSerializable'] as bool,
-          parameters: List.from(json['parameters'] ?? [])
-              .map((p) => ParameterModel.fromJson(p))
+          parameters: List.from(json.listAt('parameters') ?? [])
+              .map((p) => ParameterModel.fromJson(p as JsonMap))
               .toList());
 
   /// Declare support for serialization to JSON

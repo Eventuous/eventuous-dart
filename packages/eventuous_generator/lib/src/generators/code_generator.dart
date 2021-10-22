@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
-import 'package:build/src/builder/build_step.dart';
+import 'package:eventuous/eventuous.dart';
 import 'package:path/path.dart' as p;
 import 'package:source_gen/source_gen.dart';
 
@@ -38,7 +38,7 @@ abstract class CodeGenerator<T> extends GeneratorForAnnotation<T> {
 
   Future<InferenceModel> _read(Element element, BuildStep buildStep) async {
     final json = await buildStep.readAsString(_toInferenceAssetId(buildStep));
-    return InferenceModel.fromJson(jsonDecode(json));
+    return InferenceModel.fromJson(JsonMap.from(jsonDecode(json) as Map));
   }
 
   AssetId _toInferenceAssetId(BuildStep buildStep) {

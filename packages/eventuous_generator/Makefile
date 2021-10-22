@@ -1,15 +1,8 @@
 .PHONY: \
-	configure models test doc release
+	models test doc release
 
 .SILENT: \
-	configure models test doc release
-
-configure:
-	dart pub global activate pub_release
-	dart pub global activate critical_test
-	pub global activate dcli
-	pub global activate dartdoc
-	pub global activate dhttpd
+	models test doc release
 
 test:
 	dart test -j 1

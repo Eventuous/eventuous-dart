@@ -28,15 +28,15 @@ class DefaultEventSerializer<TData extends Object, TEvent extends Object>
   }
 
   @override
-  List<int> encodeMetaData(Metadata data) {
-    return utf8.encode(json.encode(data));
+  List<int> encodeMetaData(Metadata event) {
+    return utf8.encode(json.encode(event));
   }
 
   @override
-  TEvent decode(List<int> bytes, String eventType) {
+  TEvent decode(List<int> bytes, String type) {
     return AggregateEventTypes.create<TData, TEvent>(
-      eventType,
-      json.decode(utf8.decode(bytes)),
+      type,
+      json.decode(utf8.decode(bytes)) as TData,
     );
   }
 }

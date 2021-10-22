@@ -1,21 +1,14 @@
 .PHONY: \
-	configure certs models test doc release
+	certs models test doc release
 
 .SILENT: \
-	configure certs models test doc release
-
-configure:
-	dart pub global activate pub_release
-	dart pub global activate critical_test
-	pub global activate dcli
-	pub global activate dartdoc
-	pub global activate dhttpd
+	certs models test doc release
 
 certs:
-	sh tool/gencert.sh . --secure
+	esdbtcli certs test
 
 test:
-	if [ ! -d test/certs ]; then . tool/gencert.sh test; fi
+	if [ ! -d test/certs ]; then esdbtcli certs test; fi
 	dart test -j 1
 
 models:

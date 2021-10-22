@@ -1,15 +1,8 @@
 .PHONY: \
-	configure doc release
+	doc release
 
 .SILENT: \
-	configure doc release
-
-configure:
-	dart pub global activate pub_release
-	dart pub global activate critical_test
-	pub global activate dcli
-	pub global activate dartdoc
-	pub global activate dhttpd
+	doc release
 
 doc:
 	rm -rf doc

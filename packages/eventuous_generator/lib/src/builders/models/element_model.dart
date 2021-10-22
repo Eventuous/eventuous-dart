@@ -64,7 +64,7 @@ class ElementModel extends JsonObject implements ParameterModel {
           '${names[arg.name] ?? arg.name}: ${use[arg.name] ?? arg.name}',
         );
       } else {
-        positional.add('${use[arg.name] ?? arg.name}');
+        positional.add(use[arg.name] ?? arg.name);
       }
     }
     return [
@@ -108,16 +108,6 @@ class ElementModel extends JsonObject implements ParameterModel {
             .map((p) => ItemModel.fromParameter(p))
             .toList());
   }
-
-  /// Factory constructor for creating a new `ElementModel` instance
-  factory ElementModel.fromJson(Map<String, dynamic> json) => ElementModel(
-        json['name'] as String,
-        (jsonDecode(json['value']) as List)
-            .map((e) => ItemModel.fromJson(
-                  Map<String, dynamic>.from(e as Map),
-                ))
-            .toList(),
-      );
 
   /// Declare support for serialization to JSON
   @override
