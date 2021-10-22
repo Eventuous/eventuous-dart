@@ -21,6 +21,9 @@ verify:
 	echo "Verifying packages..."
 	mono_repo check
 	mono_repo presubmit
+	cd packages/eventuous && dart pub publish --dry-run
+	cd packages/eventuous_test && dart pub publish --dry-run
+	cd packages/eventuous_generator && dart pub publish --dry-run
 
 upgrade:
 	echo "Updating packages..."

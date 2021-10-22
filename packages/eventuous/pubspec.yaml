@@ -21,5 +21,6 @@ dev_dependencies:
   test: ^1.17.12
   build_runner: ^2.1.2
   json_serializable: ^5.0.0
-  eventuous_test: 
+  eventstore_client_test: ^0.2.1
+  eventuous_test:
     path: ../eventuous_test
