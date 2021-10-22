@@ -1,5 +1,5 @@
 name: eventuous_test
-version: 0.0.10
+version: 0.0.11
 homepage: https://eventuous.dev
 description: A library with utilities for testing eventuous
 repository: https://github.com/Eventuous/eventuous-dart
@@ -13,6 +13,6 @@ dependencies:
   universal_io: ^2.0.4
   eventstore_client: ^0.2.1
   eventstore_client_test: ^0.2.1
-dev_dependencies:
+dev_dependencies: 
   lints: ^1.0.0
   test: ^1.16.0
