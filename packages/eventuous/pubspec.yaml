@@ -15,12 +15,12 @@ dependencies:
   collection: ^1.15.0
   universal_io: ^2.0.4
   json_annotation: ^4.1.0
-  eventstore_client: ^0.2.1
+  eventstore_client: ^0.2.2
 dev_dependencies: 
   lints: ^1.0.0
   test: ^1.16.0
   build_runner: ^2.1.2
-  json_serializable: ^5.0.0
+  json_serializable: ^6.0.1
   eventstore_client_test: ^0.2.1
   eventuous_test: 
     path: ../eventuous_test
