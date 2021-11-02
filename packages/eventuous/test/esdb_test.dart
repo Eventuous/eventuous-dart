@@ -52,7 +52,7 @@ void main() {
         expect(loaded.changes, roomBooked.changes);
       },
       // TODO: Solve unstable test
-      retry: 1,
+      retry: 2,
     );
 
     test('operation on new fails when exists', () async {

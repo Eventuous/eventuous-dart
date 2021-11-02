@@ -28,18 +28,23 @@ void main() {
       await server.stop();
     });
 
-    test('snapshots are not saved eagerly', () async {
-      // Arrange
-      final storage = EsdbBookingStateStorage(esdb.client);
-      final name = StreamName(nextStreamId());
-      final state = storage.newInstance();
+    test(
+      'snapshots are not saved eagerly',
+      () async {
+        // Arrange
+        final storage = EsdbBookingStateStorage(esdb.client);
+        final name = StreamName(nextStreamId());
+        final state = storage.newInstance();
 
-      // Act
-      await storage.save(name, state);
+        // Act
+        await storage.save(name, state);
 
-      // Assert
-      expect(storage.contains(name), isFalse);
-    });
+        // Assert
+        expect(storage.contains(name), isFalse);
+      },
+      // TODO: Solve unstable test
+      retry: 2,
+    );
 
     test('snapshots are not cached', () async {
       // Arrange
