@@ -8,6 +8,7 @@ environment:
 dependencies: 
   analyzer: ^4.0.0
   build: ^2.1.0
+  file: ^6.1.4
   build_resolvers: ^2.0.0
   eventuous: ^0.0.12
   get_it: ^7.2.0

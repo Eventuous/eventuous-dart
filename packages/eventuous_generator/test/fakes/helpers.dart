@@ -39,7 +39,7 @@ String loadAnnotationsJsonAsString(
   return JsonEncoder().convert(jsonDecode(File(path).readAsStringSync()));
 }
 
-// {{library}}_{{mode}}.dart methods
+// {{library}}_{{mode}}.src methods
 
 String get exampleSourceGiven =>
     loadSourceAsString('example', toInference(true, true));
@@ -51,11 +51,11 @@ String get exampleSourceDefaults =>
     loadSourceAsString('example', toInference(false, false));
 
 String loadSourceAsString(String library, String suffix) {
-  final path = 'test/fakes/libraries/${library}_$suffix.dart';
+  final path = 'test/fakes/libraries/${library}_$suffix.src';
   return File(path).readAsStringSync();
 }
 
-// {{library}}_{{method}}.g.dart methods
+// {{library}}_{{method}}.g.src methods
 
 String get exampleGeneratedSourceGiven =>
     loadGeneratedSourceAsString('example', toInference(true, true));
@@ -67,11 +67,11 @@ String get exampleGeneratedSourceDefaults =>
     loadGeneratedSourceAsString('example', toInference(false, false));
 
 String loadGeneratedSourceAsString(String library, String suffix) {
-  final path = 'test/fakes/libraries/${library}_$suffix.g.dart';
+  final path = 'test/fakes/libraries/${library}_$suffix.g.src';
   return File(path).readAsStringSync();
 }
 
-// {{library}}_config_{{case}}.dart methods
+// {{library}}_config_{{case}}.src methods
 
 String get exampleConfigSourceDefault =>
     loadSourceAsString('example', 'config_default');
@@ -82,7 +82,7 @@ String get exampleConfigSourceInitializer =>
 String get exampleConfigSourceNotLazy =>
     loadSourceAsString('example', 'config_not_lazy');
 
-// {{library}}_config_{{case}}.g.dart methods
+// {{library}}_config_{{case}}.g.src methods
 
 String get exampleConfigGeneratedSourceDefault =>
     loadGeneratedSourceAsString('example', 'config_default');

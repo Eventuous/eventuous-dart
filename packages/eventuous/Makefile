@@ -1,8 +1,8 @@
 .PHONY: \
-	certs models test doc release
+	certs models test doc verify release
 
 .SILENT: \
-	certs models test doc release
+	certs models test doc verify release
 
 certs:
 	esdbtcli certs test
@@ -21,6 +21,10 @@ doc:
 	dartdoc
 	echo "Starting server at http://localhost:8080"
 	dhttpd --path doc/api
+
+verify:
+	echo "Verifying package..."
+	pub publish --dry-run
 
 release:
 	echo 'Release to pub.dev...'

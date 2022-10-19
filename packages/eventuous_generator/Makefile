@@ -1,8 +1,8 @@
 .PHONY: \
-	models test doc release
+	models test doc verify release
 
 .SILENT: \
-	models test doc release
+	models test doc verify release
 
 test:
 	dart test -j 1
@@ -17,6 +17,10 @@ doc:
 	dartdoc
 	echo "Starting server at http://localhost:8080"
 	dhttpd --path doc/api
+
+verify:
+	echo "Verifying package..."
+	dart pub publish --dry-run
 
 release:
 	echo 'Release to pub.dev...'

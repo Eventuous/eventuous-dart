@@ -1,8 +1,8 @@
 .PHONY: \
-	configure generate verify update action
+	configure generate test verify update action
 
 .SILENT: \
-	configure generate verify update action
+	configure generate test verify update action
 
 configure:
 	dart pub global activate pub_release
