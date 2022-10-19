@@ -22,10 +22,21 @@ environment:
 dependencies:
   get_it: ^7.2.0
   eventuous: ^0.0.4
-  json_annotation: ^4.1.0
+  json_annotation: ^4.3.0
 
 dev_dependencies:
   build_runner: ^2.1.4
   eventuous_generator: ^0.0.6
   json_serializable: ^5.0.2
 ```
+
+You also need to install the [prerequisites](https://grpc.io/docs/languages/dart/quickstart/#prerequisites) 
+for generating gRPC service. 
+
+### Generating code
+
+Code is generated with the following command 
+```bash
+pub run build_runner build
+```
+

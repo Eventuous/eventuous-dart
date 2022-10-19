@@ -18,6 +18,12 @@ generate:
 	echo "Generating github actions for all packages..."
 	mono_repo generate
 
+test:
+	echo "Test packages..."
+	cd packages/eventuous && dart test
+	cd packages/eventuous_test && dart test
+	cd packages/eventuous_generator && dart test
+
 verify:
 	echo "Verifying packages..."
 	mono_repo check

@@ -13,6 +13,7 @@ class AggregateStateTemplate {
     required this.name,
     required this.event,
     required this.value,
+    required this.query,
     required this.events,
     required this.aggregate,
     required ElementModel? getters,
@@ -24,8 +25,10 @@ class AggregateStateTemplate {
     Element element,
     ConstantReader annotation,
   ) {
+    final name = element.displayName;
+    final query = annotation.toFieldBool('query');
     final aggregate = annotation.toFieldTypeName('aggregate');
-    final state = inference.firstAnnotationOf<AggregateType>(aggregate);
+    final model = inference.firstAnnotationOf<AggregateType>(aggregate);
     final value = inference.firstAnnotationOf<AggregateValueType>(aggregate);
     final events = inference
         .annotationsOf<AggregateEventType>(aggregate)
@@ -33,18 +36,18 @@ class AggregateStateTemplate {
         .toList();
 
     return AggregateStateTemplate(
-      name: element.displayName,
+      name: name,
       events: events,
       aggregate: aggregate,
+      query: query == true,
       getters: value?.elementAt('getters'),
-      event: fieldTypeNameAt('event', state, annotation),
-      value: fieldTypeNameAt('value', state, annotation, '${aggregate}Value'),
-      usesJsonSerializable:
-          (state?.usesJsonSerializable ?? element.usesJsonSerializable) ||
-              events.any((e) => e.usesJsonSerializable),
+      usesJsonSerializable: element.usesJsonSerializable,
+      event: fieldTypeNameAt('event', model, annotation),
+      value: fieldTypeNameAt('value', model, annotation, '${aggregate}Value'),
     );
   }
 
+  final bool query;
   final String name;
   final String event;
   final String value;

@@ -11,8 +11,11 @@ class ApplicationGenerator extends CodeGenerator<ApplicationType> {
   ApplicationGenerator(Map<String, Object?> config) : super(config);
 
   @override
-  String generateForClass(InferenceModel inference, ClassElement element,
-      ConstantReader annotation) {
+  String generateForClass(
+    InferenceModel inference,
+    ClassElement element,
+    ConstantReader annotation,
+  ) {
     return ApplicationTemplate.from(inference, element, annotation).toString();
   }
 }

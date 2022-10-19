@@ -4,11 +4,13 @@ library eventuous;
 
 export 'src/annotations/aggregate_command_type.dart';
 export 'src/annotations/aggregate_event_type.dart';
+export 'src/annotations/aggregate_id_type.dart';
 export 'src/annotations/aggregate_state_type.dart';
 export 'src/annotations/aggregate_type.dart';
 export 'src/annotations/aggregate_value_type.dart';
 export 'src/annotations/application_type.dart';
 export 'src/annotations/eventuous.dart';
+export 'src/annotations/grpc_service_type.dart';
 export 'src/app/enums.dart';
 export 'src/app/handlers.dart';
 export 'src/app/result.dart';

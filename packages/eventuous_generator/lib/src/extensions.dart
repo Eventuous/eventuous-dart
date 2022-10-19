@@ -5,6 +5,7 @@ import 'package:eventuous/eventuous.dart';
 import 'package:eventuous_generator/src/builders/models/inference_model.dart';
 import 'package:eventuous_generator/src/builders/models/element_model.dart';
 import 'package:eventuous_generator/src/helpers.dart';
+import 'package:eventuous_generator/src/templates/grpc_service_template.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:source_gen/source_gen.dart';
 
@@ -23,9 +24,19 @@ extension StringX on String {
 }
 
 extension AnnotationModelX on AnnotationModel {
-  ApplicationTemplate toApplicationTemplate(
-    InferenceModel inference,
-  ) {
+  GrpcServiceTemplate toGrpcServiceTemplate(
+    InferenceModel inference, {
+    Map<String, Object?> config = const {},
+  }) {
+    return GrpcServiceTemplate.from(
+      config,
+      inference,
+      annotationOf,
+      valueAt('aggregate'),
+    );
+  }
+
+  ApplicationTemplate toApplicationTemplate(InferenceModel inference) {
     final aggregate = valueAt('aggregate');
     final commands = inference
         .annotationsOf<AggregateCommandType>(aggregate)
@@ -67,7 +78,8 @@ extension AnnotationModelX on AnnotationModel {
   }
 
   AggregateCommandTemplate toAggregateCommandTemplate(
-      InferenceModel inference) {
+    InferenceModel inference,
+  ) {
     final event = valueAt('event');
     final expected = valueAt('expected');
     final aggregate = valueAt('aggregate');
@@ -90,8 +102,10 @@ extension AnnotationModelX on AnnotationModel {
             ),
           )
           .toAggregateEventTemplate(),
+      getters: elementAt('getters'),
       constructor: elementAt('constructor'),
       usesJsonSerializable: usesJsonSerializable,
+      documentationComment: documentationComment,
       expected: ExpectedState.values.firstWhere((e) => enumName(e) == expected,
           orElse: () => ExpectedState.any),
     );
@@ -131,6 +145,7 @@ extension AnnotationModelX on AnnotationModel {
       name: annotationOf,
       aggregate: aggregate,
       value: valueAt('value'),
+      query: valueAt('query') == 'true',
       getters: value?.elementAt('getters'),
       event: event?.usesJsonSerializable == true ? 'JsonObject' : 'Object',
       usesJsonSerializable:
@@ -163,8 +178,16 @@ extension ConstantReaderX on ConstantReader {
     return reader == null || reader.isNull ? null : reader.objectValue;
   }
 
+  bool? toFieldBool(String field) {
+    final reader = peek(field);
+    return reader == null || reader.isNull ? null : reader.boolValue;
+  }
+
   ParameterModel toTypeModel(String field, [String defaultName = 'Object']) =>
       ParameterModel(field, toFieldTypeName(field, defaultName));
+
+  ParameterModel toBoolModel(String field, [bool defaultValue = false]) =>
+      ParameterModel(field, "${toFieldBool(field) ?? defaultValue}");
 
   ParameterModel toExpectedStateModel(String field) {
     return ParameterModel(

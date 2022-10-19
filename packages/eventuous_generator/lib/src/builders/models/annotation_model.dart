@@ -13,12 +13,21 @@ class AnnotationModel extends JsonObject {
     this.annotationOf, {
     this.location,
     this.parameters = const [],
+    this.documentationComment,
     this.usesJsonSerializable = false,
-  }) : super([type, annotationOf, location, parameters, usesJsonSerializable]);
+  }) : super([
+          type,
+          annotationOf,
+          location,
+          parameters,
+          documentationComment,
+          usesJsonSerializable,
+        ]);
   final String type;
   final String? location;
   final String annotationOf;
   final bool usesJsonSerializable;
+  final String? documentationComment;
   final List<ParameterModel> parameters;
 
   bool isAnnotationExact<T>() => type == '${typeOf<T>()}';
@@ -44,16 +53,29 @@ class AnnotationModel extends JsonObject {
   Object? operator [](Object? name) =>
       toJson()[name] ?? parameters.firstWhereOrNull((p) => p.name == name);
 
-  T typedAt<T>(Object name) => this[name] as T;
+  T typedAt<T>(Object name, [T? defaultValue]) =>
+      (this[name] ?? defaultValue) as T;
 
-  String valueAt(Object name) => typedAt<ParameterModel>(name).value;
+  String valueAt(Object name, [String defaultValue = '']) =>
+      typedAt<ParameterModel?>(name)?.value ?? defaultValue;
+
+  ParameterModel parameterAt(String name, [String defaultValue = '']) {
+    final param = typedAt<ParameterModel?>(name);
+    return param ?? ParameterModel(name, defaultValue);
+  }
 
   ElementModel elementAt(Object name) {
     return ElementModel(
-        name.toString(),
-        (jsonDecode(typedAt<ParameterModel>(name).value) as List)
-            .map((e) => ItemModel.fromJson(Map.from(e as Map)))
-            .toList());
+      name.toString(),
+      (jsonDecode(
+        typedAt<ParameterModel>(
+          name,
+          ParameterModel(name.toString(), '[]'),
+        ).value,
+      ) as List)
+          .map((e) => ItemModel.fromJson(Map.from(e as Map)))
+          .toList(),
+    );
   }
 
   /// Factory constructor for creating a new `AnnotationModel` instance
@@ -61,6 +83,7 @@ class AnnotationModel extends JsonObject {
       AnnotationModel(json['type'] as String, json['annotationOf'] as String,
           location: json['location'] as String?,
           usesJsonSerializable: json['usesJsonSerializable'] as bool,
+          documentationComment: json['documentationComment'] as String?,
           parameters: List.from(json.listAt('parameters') ?? [])
               .map((p) => ParameterModel.fromJson(p as JsonMap))
               .toList());
@@ -73,5 +96,7 @@ class AnnotationModel extends JsonObject {
         if (location != null) 'location': location,
         'usesJsonSerializable': usesJsonSerializable,
         'parameters': parameters.map((e) => e.toJson()).toList(),
+        if (documentationComment != null)
+          'documentationComment': documentationComment,
       };
 }

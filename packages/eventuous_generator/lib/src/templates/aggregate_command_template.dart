@@ -15,9 +15,11 @@ class AggregateCommandTemplate {
     required this.name,
     required this.data,
     required this.event,
+    required this.getters,
     required this.aggregate,
     required this.constructor,
     required this.usesJsonSerializable,
+    this.documentationComment,
     this.expected = ExpectedState.any,
   });
 
@@ -43,7 +45,9 @@ class AggregateCommandTemplate {
       data: data,
       expected: expected,
       aggregate: aggregate,
+      getters: element.toGettersModel(),
       constructor: element.toConstructorModel(),
+      documentationComment: toDocumentation(element),
       event: inference
           .where<AggregateEventType>(aggregate)
           .firstWhere(
@@ -60,8 +64,7 @@ class AggregateCommandTemplate {
             ),
           )
           .toAggregateEventTemplate(),
-      usesJsonSerializable:
-          command?.usesJsonSerializable ?? element.usesJsonSerializable,
+      usesJsonSerializable: element.usesJsonSerializable,
     );
   }
 
@@ -70,7 +73,9 @@ class AggregateCommandTemplate {
   final String aggregate;
   final ExpectedState expected;
   final ElementModel constructor;
+  final ElementModel getters;
   final bool usesJsonSerializable;
+  final String? documentationComment;
   final AggregateEventTemplate event;
 
   bool get withJsonObject =>

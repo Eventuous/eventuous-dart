@@ -1,6 +1,7 @@
 library example;
 
 import 'package:eventuous/eventuous.dart';
+import 'package:grpc/grpc.dart' as grpc;
 import 'package:get_it/get_it.dart';
 
 import 'src/bar/bar.dart';
@@ -9,8 +10,7 @@ import 'src/foo.dart';
 
 part 'test_lib.g.dart';
 
-@Eventuous(
-  initializerName: r'_$configureEventuous',
-)
-void configureEventuous(StreamEventStore eventStore) =>
-    _$configureEventuous(eventStore);
+@Eventuous(initializerName: r'_$configureEventuous')
+void configureEventuous(StreamEventStore eventStore) => _$configureEventuous(
+      eventStore,
+    );

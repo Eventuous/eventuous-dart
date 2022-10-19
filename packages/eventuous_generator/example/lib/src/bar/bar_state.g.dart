@@ -20,7 +20,8 @@ abstract class _$BarState extends AggregateState<BarValue> {
   }
 
   String? get title => value.title;
-  String? get author => value.author;
+  BarAuthor? get author => value.author;
+
   BarState patch(JsonObject event, BarValue value) {
     return BarState(AggregateValueTypes.create<JsonMap, BarValue>(
       JsonUtils.patch(

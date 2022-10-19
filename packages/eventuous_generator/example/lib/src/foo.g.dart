@@ -3,48 +3,148 @@
 part of 'foo.dart';
 
 // **************************************************************************
-// AggregateGenerator
+// GrpcServiceGenerator
 // **************************************************************************
 
-typedef FooStore = AggregateStore<JsonMap, JsonObject, FooStateModel1, FooId,
-    FooState1, Foo>;
+// The following imports must be added /eventuous_generator/example/lib/src/foo.dart:
+//
+// import 'TODO: rootPath/generated/foo.pbgrpc.dart';
+// import 'TODO: rootPath/generated/google/protobuf/empty.pb.dart';
+//
+class _$FooGrpcCommandService extends FooGrpcCommandServiceBase {
+  _$FooGrpcCommandService(this.app);
 
-typedef FooState1Result
-    = AggregateStateResult<JsonObject, FooStateModel1, FooId, FooState1>;
+  final FooApp app;
 
-typedef FooState1Ok
-    = AggregateStateOk<JsonObject, FooStateModel1, FooId, FooState1>;
-
-typedef FooState1Error
-    = AggregateStateError<JsonObject, FooStateModel1, FooId, FooState1>;
-
-typedef FooState1NoOp
-    = AggregateStateNoOp<JsonObject, FooStateModel1, FooId, FooState1>;
-
-abstract class _$Foo
-    extends Aggregate<JsonObject, FooStateModel1, FooId, FooState1> {
-  _$Foo(FooId id, FooState1? state) : super(id, state ?? FooState1()) {
-    AggregateTypes.define<JsonObject, FooStateModel1, FooId, FooState1, Foo>(
-      (id, [state]) => Foo(id, state),
+  @override
+  Future<CreateFooResponse> executeCreateFoo(
+    ServiceCall call,
+    CreateFooRequest request,
+  ) async {
+    final result = await app.createFoo(
+      fooId: request.fooId,
+      title: request.title,
+      author: request.author,
     );
-  }
-  // ignore: unused_element
-  static Foo from(String id) => Foo(FooId(id));
-
-  String? get title => current.title;
-  String? get author => current.author;
-  FooState1Result createFoo({required String title, required String author}) {
-    ensureDoesntExists();
-    return apply(FooCreated(fooId: id.value, title: title, author: author));
-  }
-
-  FooState1Result updateFoo(String title, String? author) {
-    ensureExists();
-    return apply(FooUpdated(id.value, title, author));
+    return result is FooError
+        ? (CreateFooResponse()
+          ..error = _toCommandError(
+            call,
+            result,
+            (code, phrase) => CreateFooResponse_Error(
+              statusCode: code,
+              reasonPhrase: phrase,
+            ),
+          ))
+        : (CreateFooResponse()..success = CreateFooResponse_Success());
   }
 
-  FooState1Result importFoo(String title, [String? author = 'user']) {
-    return apply(FooImported(id.value, title, author));
+  @override
+  Future<UpdateFooResponse> executeUpdateFoo(
+    ServiceCall call,
+    UpdateFooRequest request,
+  ) async {
+    final result = await app.updateFoo(
+      request.fooId,
+      request.title,
+      request.author,
+    );
+    return result is FooError
+        ? (UpdateFooResponse()
+          ..error = _toCommandError(
+            call,
+            result,
+            (code, phrase) => UpdateFooResponse_Error(
+              statusCode: code,
+              reasonPhrase: phrase,
+            ),
+          ))
+        : (UpdateFooResponse()..success = UpdateFooResponse_Success());
+  }
+
+  @override
+  Future<ImportFooResponse> executeImportFoo(
+    ServiceCall call,
+    ImportFooRequest request,
+  ) async {
+    final result = await app.importFoo(
+      request.fooId,
+      request.title,
+      request.author,
+    );
+    return result is FooError
+        ? (ImportFooResponse()
+          ..error = _toCommandError(
+            call,
+            result,
+            (code, phrase) => ImportFooResponse_Error(
+              statusCode: code,
+              reasonPhrase: phrase,
+            ),
+          ))
+        : (ImportFooResponse()..success = ImportFooResponse_Success());
+  }
+
+  T _toCommandError<T>(
+    ServiceCall call,
+    FooError error,
+    T Function(int code, String phrase) create,
+  ) {
+    toError(int code, String phrase) {
+      call.sendTrailers(status: code, message: phrase);
+      return create(code, phrase);
+    }
+
+    switch (error.cause) {
+      case StreamNotFoundException:
+        return toError(404, error.cause.toString());
+      case AggregateNotFoundException:
+        return toError(404, 'Foo ${error.aggregate?.id} not found');
+      case AggregateExistsException:
+        return toError(409, 'Foo ${error.aggregate?.id} exists');
+      case ConcurrentModificationException:
+        return toError(409, 'Concurrent modification');
+    }
+    return toError(500, 'Internal error: ${error.cause.toString()}');
+  }
+}
+
+class _$FooGrpcQueryService extends FooGrpcQueryServiceBase {
+  _$FooGrpcQueryService(this.app);
+
+  final FooApp app;
+  @override
+  Stream<FooIdEvent> getFooIds(ServiceCall call, Empty request) {
+    // TODO: implement getFooIds
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<FooState1Response> getFooState1(
+    ServiceCall call,
+    FooState1Request request,
+  ) async {
+    try {
+      final result = await app.store.load(FooId(request.id));
+      return FooState1Response()
+        ..state = FooState1Response_FooState1(
+          title: result.title,
+          author: result.author,
+        );
+    } on AggregateNotFoundException catch (e) {
+      return FooState1Response()
+        ..error = FooState1Response_Error(
+          statusCode: 404,
+          reasonPhrase: e.message,
+        );
+    }
+  }
+
+  @override
+  Stream<FooEvent> subscribeToFooEvents(
+      ServiceCall call, SubscribeToFooEventsRequest request) {
+    // TODO: implement subscribeToFooEvents
+    throw UnimplementedError();
   }
 }
 
@@ -91,6 +191,53 @@ abstract class _$FooApp extends ApplicationServiceBase<JsonMap, JsonObject,
   FutureOr<FooResult> importFoo(String fooId, String title,
       [String? author = 'user']) {
     return handle(ImportFoo(fooId, title, author));
+  }
+}
+
+// **************************************************************************
+// AggregateGenerator
+// **************************************************************************
+
+typedef FooStore = AggregateStore<JsonMap, JsonObject, FooStateModel1, FooId,
+    FooState1, Foo>;
+
+typedef FooState1Result
+    = AggregateStateResult<JsonObject, FooStateModel1, FooId, FooState1>;
+
+typedef FooState1Ok
+    = AggregateStateOk<JsonObject, FooStateModel1, FooId, FooState1>;
+
+typedef FooState1Error
+    = AggregateStateError<JsonObject, FooStateModel1, FooId, FooState1>;
+
+typedef FooState1NoOp
+    = AggregateStateNoOp<JsonObject, FooStateModel1, FooId, FooState1>;
+
+abstract class _$Foo
+    extends Aggregate<JsonObject, FooStateModel1, FooId, FooState1> {
+  _$Foo(FooId id, FooState1? state) : super(id, state ?? FooState1()) {
+    AggregateTypes.define<JsonObject, FooStateModel1, FooId, FooState1, Foo>(
+      (id, [state]) => Foo(id, state),
+    );
+  }
+  // ignore: unused_element
+  static Foo from(String id) => Foo(FooId(id));
+
+  String? get title => current.title;
+  String? get author => current.author;
+
+  FooState1Result createFoo({required String title, required String author}) {
+    ensureDoesntExists();
+    return apply(FooCreated(fooId: id.value, title: title, author: author));
+  }
+
+  FooState1Result updateFoo(String title, String? author) {
+    ensureExists();
+    return apply(FooUpdated(id.value, title, author));
+  }
+
+  FooState1Result importFoo(String title, [String? author = 'user']) {
+    return apply(FooImported(id.value, title, author));
   }
 }
 
@@ -208,6 +355,7 @@ abstract class _$FooState1 extends AggregateState<FooStateModel1> {
 
   String? get title => value.title;
   String? get author => value.author;
+
   FooState1 patch(JsonObject event, FooStateModel1 value) {
     return FooState1(AggregateValueTypes.create<JsonMap, FooStateModel1>(
       JsonUtils.patch(

@@ -1,24 +1,32 @@
 import 'package:eventuous/eventuous.dart';
+import 'package:eventuous_generator/src/helpers.dart';
 
 class ConfigModel extends JsonObject {
   ConfigModel(
     this.inferTypes,
-    this.initializeName,
-  ) : super([inferTypes, initializeName]);
+    this.lazyService,
+    this.initializerName,
+  ) : super([inferTypes, initializerName]);
 
   final bool inferTypes;
-  final String initializeName;
+  final bool lazyService;
+  final String initializerName;
 
   /// Factory constructor for creating a new `ConfigModel` instance
-  factory ConfigModel.fromJson(Map<String, dynamic> json) => ConfigModel(
-        json.elementAt('infer_types') ?? true,
-        json.elementAt('initialize_name') ?? r'_$initEventuous',
-      );
+  factory ConfigModel.fromJson(Map<String, dynamic> json) {
+    final options = toEventuousOptions(json);
+    return ConfigModel(
+      options.inferTypes,
+      options.lazyService,
+      options.initializerName,
+    );
+  }
 
   /// Declare support for serialization to JSON
   @override
   JsonMap toJson() => {
-        'infer_types': inferTypes,
-        'initialize_name': initializeName,
+        Eventuous.inferTypesField: inferTypes,
+        Eventuous.lazyServiceField: lazyService,
+        Eventuous.initializerNameField: initializerName,
       };
 }

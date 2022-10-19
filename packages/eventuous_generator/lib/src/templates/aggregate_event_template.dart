@@ -29,8 +29,7 @@ class AggregateEventTemplate {
       aggregate: aggregate,
       data: fieldTypeNameAt('data', event, annotation),
       constructor: element.toConstructorModel(),
-      usesJsonSerializable:
-          event?.usesJsonSerializable ?? element.usesJsonSerializable,
+      usesJsonSerializable: element.usesJsonSerializable,
     );
   }
 

@@ -1,0 +1,338 @@
+[
+  {
+    "type": "AggregateType",
+    "annotationOf": "Example",
+    "location": "/test_lib/lib/example.dart",
+    "usesJsonSerializable": false,
+    "parameters": [
+      {
+        "name": "id",
+        "value": "ExampleId1"
+      },
+      {
+        "name": "data",
+        "value": "JsonMap"
+      },
+      {
+        "name": "event",
+        "value": "JsonObject"
+      },
+      {
+        "name": "value",
+        "value": "ExampleStateModel1"
+      },
+      {
+        "name": "state",
+        "value": "ExampleState1"
+      }
+    ]
+  },
+  {
+    "type": "GrpcServiceType",
+    "annotationOf": "ExampleGrpcQueryService",
+    "location": "/test_lib/lib/example.dart",
+    "usesJsonSerializable": false,
+    "parameters": [
+      {
+        "name": "id",
+        "value": "ExampleId1"
+      },
+      {
+        "name": "data",
+        "value": "JsonMap"
+      },
+      {
+        "name": "event",
+        "value": "JsonObject"
+      },
+      {
+        "name": "value",
+        "value": "ExampleStateModel1"
+      },
+      {
+        "name": "state",
+        "value": "ExampleState1"
+      },
+      {
+        "name": "aggregate",
+        "value": "Example"
+      }
+    ]
+  },
+  {
+    "type": "GrpcServiceType",
+    "annotationOf": "ExampleGrpcCommandService",
+    "location": "/test_lib/lib/example.dart",
+    "usesJsonSerializable": false,
+    "parameters": [
+      {
+        "name": "id",
+        "value": "ExampleId1"
+      },
+      {
+        "name": "data",
+        "value": "JsonMap"
+      },
+      {
+        "name": "event",
+        "value": "JsonObject"
+      },
+      {
+        "name": "value",
+        "value": "ExampleStateModel1"
+      },
+      {
+        "name": "state",
+        "value": "ExampleState1"
+      },
+      {
+        "name": "aggregate",
+        "value": "Example"
+      }
+    ]
+  },
+  {
+    "type": "ApplicationType",
+    "annotationOf": "ExampleApp",
+    "location": "/test_lib/lib/example.dart",
+    "usesJsonSerializable": false,
+    "parameters": [
+      {
+        "name": "id",
+        "value": "ExampleId1"
+      },
+      {
+        "name": "data",
+        "value": "JsonMap"
+      },
+      {
+        "name": "event",
+        "value": "JsonObject"
+      },
+      {
+        "name": "value",
+        "value": "ExampleStateModel1"
+      },
+      {
+        "name": "state",
+        "value": "ExampleState1"
+      },
+      {
+        "name": "aggregate",
+        "value": "Example"
+      }
+    ]
+  },
+  {
+    "type": "AggregateCommandType",
+    "annotationOf": "CreateExample",
+    "location": "/test_lib/lib/example.dart",
+    "usesJsonSerializable": true,
+    "parameters": [
+      {
+        "name": "event",
+        "value": "ExampleCreated"
+      },
+      {
+        "name": "aggregate",
+        "value": "Example"
+      },
+      {
+        "name": "getters",
+        "value": "[{\"type\":\"String\",\"name\":\"exampleId\",\"isNamed\":false,\"isRequired\":false,\"isPositional\":false},{\"type\":\"String\",\"name\":\"title\",\"isNamed\":false,\"isRequired\":false,\"isPositional\":false},{\"type\":\"String\",\"name\":\"author\",\"isNamed\":false,\"isRequired\":false,\"isPositional\":false}]"
+      },
+      {
+        "name": "constructor",
+        "value": "[{\"type\":\"dynamic\",\"name\":\"exampleId\",\"isNamed\":true,\"isRequired\":true,\"isPositional\":false},{\"type\":\"String\",\"name\":\"title\",\"isNamed\":true,\"isRequired\":true,\"isPositional\":false},{\"type\":\"String\",\"name\":\"author\",\"isNamed\":true,\"isRequired\":true,\"isPositional\":false}]"
+      },
+      {
+        "name": "expected",
+        "value": "notExists"
+      },
+      {
+        "name": "data",
+        "value": "JsonMap"
+      }
+    ]
+  },
+  {
+    "type": "AggregateCommandType",
+    "annotationOf": "UpdateExample",
+    "location": "/test_lib/lib/example.dart",
+    "usesJsonSerializable": true,
+    "parameters": [
+      {
+        "name": "event",
+        "value": "ExampleUpdated"
+      },
+      {
+        "name": "aggregate",
+        "value": "Example"
+      },
+      {
+        "name": "getters",
+        "value": "[{\"type\":\"String\",\"name\":\"exampleId\",\"isNamed\":false,\"isRequired\":false,\"isPositional\":false},{\"type\":\"String\",\"name\":\"title\",\"isNamed\":false,\"isRequired\":false,\"isPositional\":false},{\"type\":\"String?\",\"name\":\"author\",\"isNamed\":false,\"isRequired\":false,\"isPositional\":false}]"
+      },
+      {
+        "name": "constructor",
+        "value": "[{\"type\":\"String\",\"name\":\"exampleId\",\"isNamed\":false,\"isRequired\":true,\"isPositional\":true},{\"type\":\"String\",\"name\":\"title\",\"isNamed\":false,\"isRequired\":true,\"isPositional\":true},{\"type\":\"String?\",\"name\":\"author\",\"isNamed\":false,\"isRequired\":true,\"isPositional\":true}]"
+      },
+      {
+        "name": "expected",
+        "value": "exists"
+      },
+      {
+        "name": "data",
+        "value": "JsonMap"
+      }
+    ]
+  },
+  {
+    "type": "AggregateCommandType",
+    "annotationOf": "ImportExample",
+    "location": "/test_lib/lib/example.dart",
+    "usesJsonSerializable": true,
+    "parameters": [
+      {
+        "name": "event",
+        "value": "ExampleImported"
+      },
+      {
+        "name": "aggregate",
+        "value": "Example"
+      },
+      {
+        "name": "getters",
+        "value": "[{\"type\":\"String\",\"name\":\"exampleId\",\"isNamed\":false,\"isRequired\":false,\"isPositional\":false},{\"type\":\"String\",\"name\":\"title\",\"isNamed\":false,\"isRequired\":false,\"isPositional\":false},{\"type\":\"String?\",\"name\":\"author\",\"isNamed\":false,\"isRequired\":false,\"isPositional\":false}]"
+      },
+      {
+        "name": "constructor",
+        "value": "[{\"type\":\"String\",\"name\":\"exampleId\",\"isNamed\":false,\"isRequired\":true,\"isPositional\":true},{\"type\":\"String\",\"name\":\"title\",\"isNamed\":false,\"isRequired\":true,\"isPositional\":true},{\"type\":\"String?\",\"name\":\"author\",\"isNamed\":false,\"isRequired\":false,\"isPositional\":true,\"defaultValueCode\":\"'user'\"}]"
+      },
+      {
+        "name": "expected",
+        "value": "any"
+      },
+      {
+        "name": "data",
+        "value": "JsonMap"
+      }
+    ]
+  },
+  {
+    "type": "AggregateIdType",
+    "annotationOf": "ExampleId1",
+    "location": "/test_lib/lib/example.dart",
+    "usesJsonSerializable": false,
+    "parameters": [
+      {
+        "name": "aggregate",
+        "value": "Example"
+      },
+      {
+        "name": "query",
+        "value": "false"
+      }
+    ]
+  },
+  {
+    "type": "AggregateEventType",
+    "annotationOf": "ExampleCreated",
+    "location": "/test_lib/lib/example.dart",
+    "usesJsonSerializable": true,
+    "parameters": [
+      {
+        "name": "aggregate",
+        "value": "Example"
+      },
+      {
+        "name": "constructor",
+        "value": "[{\"type\":\"String\",\"name\":\"exampleId\",\"isNamed\":true,\"isRequired\":true,\"isPositional\":false},{\"type\":\"String\",\"name\":\"title\",\"isNamed\":true,\"isRequired\":true,\"isPositional\":false},{\"type\":\"String\",\"name\":\"author\",\"isNamed\":true,\"isRequired\":true,\"isPositional\":false}]"
+      },
+      {
+        "name": "data",
+        "value": "JsonMap"
+      }
+    ]
+  },
+  {
+    "type": "AggregateEventType",
+    "annotationOf": "ExampleUpdated",
+    "location": "/test_lib/lib/example.dart",
+    "usesJsonSerializable": true,
+    "parameters": [
+      {
+        "name": "aggregate",
+        "value": "Example"
+      },
+      {
+        "name": "constructor",
+        "value": "[{\"type\":\"String\",\"name\":\"exampleId\",\"isNamed\":false,\"isRequired\":true,\"isPositional\":true},{\"type\":\"String\",\"name\":\"title\",\"isNamed\":false,\"isRequired\":true,\"isPositional\":true},{\"type\":\"String?\",\"name\":\"author\",\"isNamed\":false,\"isRequired\":true,\"isPositional\":true}]"
+      },
+      {
+        "name": "data",
+        "value": "JsonMap"
+      }
+    ]
+  },
+  {
+    "type": "AggregateEventType",
+    "annotationOf": "ExampleImported",
+    "location": "/test_lib/lib/example.dart",
+    "usesJsonSerializable": true,
+    "parameters": [
+      {
+        "name": "aggregate",
+        "value": "Example"
+      },
+      {
+        "name": "constructor",
+        "value": "[{\"type\":\"String\",\"name\":\"exampleId\",\"isNamed\":false,\"isRequired\":true,\"isPositional\":true},{\"type\":\"String\",\"name\":\"title\",\"isNamed\":false,\"isRequired\":true,\"isPositional\":true},{\"type\":\"String?\",\"name\":\"author\",\"isNamed\":false,\"isRequired\":false,\"isPositional\":true}]"
+      },
+      {
+        "name": "data",
+        "value": "JsonMap"
+      }
+    ]
+  },
+  {
+    "type": "AggregateValueType",
+    "annotationOf": "ExampleStateModel1",
+    "location": "/test_lib/lib/example.dart",
+    "usesJsonSerializable": true,
+    "parameters": [
+      {
+        "name": "getters",
+        "value": "[{\"type\":\"String\",\"name\":\"title\",\"isNamed\":false,\"isRequired\":false,\"isPositional\":false},{\"type\":\"String\",\"name\":\"author\",\"isNamed\":false,\"isRequired\":false,\"isPositional\":false}]"
+      },
+      {
+        "name": "aggregate",
+        "value": "Example"
+      },
+      {
+        "name": "data",
+        "value": "JsonMap"
+      }
+    ]
+  },
+  {
+    "type": "AggregateStateType",
+    "annotationOf": "ExampleState1",
+    "location": "/test_lib/lib/example.dart",
+    "usesJsonSerializable": false,
+    "parameters": [
+      {
+        "name": "aggregate",
+        "value": "Example"
+      },
+      {
+        "name": "query",
+        "value": "false"
+      },
+      {
+        "name": "value",
+        "value": "ExampleStateModel1"
+      }
+    ]
+  }
+]

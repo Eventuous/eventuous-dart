@@ -14,7 +14,7 @@ dependencies:
   json_patch: ^3.0.0
   collection: ^1.15.0
   universal_io: ^2.0.4
-  json_annotation: ^4.1.0
+  json_annotation: ^4.6.0
   eventstore_client: ^0.2.2
 dev_dependencies: 
   lints: ^1.0.0

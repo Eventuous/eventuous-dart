@@ -1,31 +1,92 @@
+import 'dart:convert';
+
 import 'package:analyzer/dart/constant/value.dart';
+import 'package:analyzer/dart/element/element.dart';
+import 'package:build/build.dart';
+import 'package:path/path.dart' as p;
 import 'package:eventuous/eventuous.dart';
 import 'package:source_gen/source_gen.dart';
 
 import 'builders/models/annotation_model.dart';
+import 'builders/models/inference_model.dart';
 import 'builders/models/parameter_model.dart';
 import 'extensions.dart';
 
-Eventuous parseConfig(Map<String, Object?> config, [DartObject? annotation]) {
-  final inferTypes = config['infer_types'] as bool? ??
-      annotation?.getField('inferTypes')?.toBoolValue() ??
-      true;
+final docPrefix = RegExp(r'/+\s+');
+String? toDocumentation(Element element) {
+  final doc = element is PropertyAccessorElement
+      ? (element.documentationComment ?? element.variable.documentationComment)
+      : element.documentationComment;
+  return doc != null
+      ? LineSplitter.split(doc)
+          .map((e) => e.replaceFirst(docPrefix, ''))
+          .join('\n')
+      : null;
+}
 
-  final lazyService = config['lazy_service'] as bool? ??
-      annotation?.getField('lazyService')?.toBoolValue() ??
-      true;
-  final initializerName = config['initializer_name'] as String? ??
-      annotation?.getField('initializerName')?.toStringValue() ??
-      r'_$initEventuous';
+String toInferenceJsonAsString({
+  bool inferTypes = true,
+  bool lazyService = true,
+  List<String> annotations = const [],
+  String initializeName = r'_$initEventuous',
+}) {
+  final pattern = RegExp(r'\[(.*)\]');
+  final items = annotations
+      .map((a) => pattern.firstMatch(a))
+      .where((e) => e != null)
+      .map((e) => e!.group(1))
+      .join(',');
 
-  return Eventuous(
-    inferTypes: inferTypes,
-    lazyService: lazyService,
-    initializerName: initializerName,
+  return '{"config":{"${Eventuous.inferTypesField}":$inferTypes,'
+      '"${Eventuous.lazyServiceField}":$lazyService,'
+      '"${Eventuous.initializerNameField}":"$initializeName"},'
+      '"annotations":[$items]}';
+}
+
+Future<InferenceModel> readInference(
+  Map<String, Object?> config,
+  BuildStep buildStep, [
+  bool ensure = false,
+]) async {
+  final id = toInferenceAssetId(buildStep);
+  if (await buildStep.canRead(id)) {
+    final json = await buildStep.readAsString(toInferenceAssetId(buildStep));
+    return InferenceModel.fromJson(JsonMap.from(jsonDecode(json) as Map));
+  }
+  throw InvalidGenerationSourceError(
+    "Asset $id not found.\n\nVerify that target "
+    "'eventuous_generator|inference_builder' "
+    "is enabled in build.xml",
   );
 }
 
-final rx = RegExp(r'\((\d)\)');
+AssetId toInferenceAssetId(BuildStep buildStep) {
+  return AssetId(
+    buildStep.inputId.package,
+    p.join('lib', 'inference.json'),
+  );
+}
+
+Eventuous toEventuousOptions(
+  Map<String, Object?> config, [
+  DartObject? annotation,
+]) {
+  config.putIfAbsent(
+    Eventuous.inferTypesField,
+    () => annotation?.getField('inferTypes')?.toBoolValue(),
+  );
+  config.putIfAbsent(
+    Eventuous.lazyServiceField,
+    () => annotation?.getField('lazyService')?.toBoolValue(),
+  );
+  config.putIfAbsent(
+    Eventuous.initializerNameField,
+    () => annotation?.getField('initializerName')?.toStringValue(),
+  );
+  return Eventuous.fromJson(config);
+}
+
+final _pattern = RegExp(r'\((\d)\)');
 
 ExpectedState parameterExpectedStateAt(
   String field,
@@ -35,7 +96,7 @@ ExpectedState parameterExpectedStateAt(
   return toExpectedState(
     fieldObjectAt(field, annotation, model: model, toString: (o) {
       return enumName(ExpectedState.values[int.parse(
-          rx.firstMatch(o.toString())?.group(1) ??
+          _pattern.firstMatch(o.toString())?.group(1) ??
               ExpectedState.any.index.toString())]);
     }, defaultValue: enumName(ExpectedState.any))
         .toString(),

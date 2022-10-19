@@ -1,5 +1,10 @@
 targets:
   $default:
+    sources:
+      exclude:
+        - "test/**"
+        - "lib/**.dart"
+        - "**/generated**"
     builders:
       source_gen|combining_builder:
         enabled: true
@@ -9,8 +14,24 @@ targets:
         enabled: true
       eventuous_generator|code_builder:
         enabled: true
+        dev_options:
+          build_extensions: {
+            "^example/lib/{{}}.dart": [ "lib/{{}}.code.g.dart" ]
+          }
+      eventuous_generator|grpc_spec_builder:
+        enabled: true
+        dev_options:
+          build_extensions: {
+            "^example/lib/src/{{}}.dart": [ "example/protos/{{}}.proto" ]
+          }
       eventuous_generator|config_builder:
         enabled: true
+      eventuous_generator|shell_builder:
+        enabled: true
+        dev_options:
+          proto_src_path: "example/lib/src"
+          proto_import_path: "example/protos"
+          proto_dst_path: "example/lib/src/generated"
 
 builders:
   # Analyse all code in target libraries for inference
@@ -18,26 +39,45 @@ builders:
   inference_builder:
     import: "package:eventuous_generator/eventuous_generator.dart"
     builder_factories: ["inferenceBuilder"]
-    build_extensions: { ".dart": [".inference.json"] }
+    build_extensions: {
+      ".dart": [".inference.json"]
+    }
     auto_apply: dependents
     build_to: cache
     applies_builders: ["eventuous_generator|code_builder"]
     runs_before:
       - "eventuous_generator|code_builder"
+      - "eventuous_generator|grpc_spec_builder"
       - "eventuous_generator|config_builder"
   code_builder:
     import: "package:eventuous_generator/eventuous_generator.dart"
     builder_factories: ["codeBuilder"]
-    build_extensions: { ".dart": [".code.g.dart"] }
+    build_extensions: {
+      "^lib/{{}}.dart": ["lib/{{}}.code.g.dart"]
+    }
     auto_apply: dependents
     build_to: cache
+    applies_builders: ["eventuous_generator|grpc_spec_builder"]
+    runs_before:
+      - "eventuous_generator|grpc_spec_builder"
+      - "eventuous_generator|config_builder"
+  grpc_spec_builder:
+    import: "package:eventuous_generator/eventuous_generator.dart"
+    builder_factories: ["grpcSpecBuilder"]
+    build_extensions: {
+      "^lib/{{}}.dart": [ "protos/{{}}.proto" ]
+    }
+    auto_apply: dependents
+    build_to: source
     applies_builders: ["eventuous_generator|config_builder"]
     runs_before:
       - "eventuous_generator|config_builder"
   config_builder:
     import: "package:eventuous_generator/eventuous_generator.dart"
     builder_factories: ["configBuilder"]
-    build_extensions: { ".dart": [".config.g.dart"] }
+    build_extensions: {
+      "^lib/{{}}.dart": ["lib/{{}}.config.g.dart"]
+    }
     auto_apply: dependents
     build_to: cache
     applies_builders:
@@ -46,22 +86,23 @@ builders:
       - "json_serializable|json_serializable"
       - "source_gen|combining_builder"
       - "eventuous_generator|cleanup_builder"
-#  json_serializable:
-#    import: "package:json_serializable/builder.dart"
-#    builder_factories: ["jsonSerializable"]
-#    build_extensions: {".dart": [".json_serializable.g.part"]}
-#    auto_apply: dependents
-#    build_to: cache
-#    applies_builders:
-#      - "source_gen|combining_builder"
-#      - "eventuous_generator|cleanup_builder"
-#    runs_before:
-#      - "source_gen|combining_builder"
-#      - "eventuous_generator|cleanup_builder"
+      - "eventuous_generator|shell_builder"
 post_process_builders:
+  shell_builder:
+    import: "package:eventuous_generator/eventuous_generator.dart"
+    builder_factory: "shellBuilder"
+    defaults:
+      options:
+        enabled: true
+        proto_src_path: "lib"
+        proto_import_path: "protos"
+        proto_dst_path: "lib/generated"
+
   cleanup_builder:
     import: "package:eventuous_generator/eventuous_generator.dart"
     builder_factory: "cleanupBuilder"
     defaults:
+      options:
+        enabled: false
       release_options:
-        enabled: true
+        enabled: false

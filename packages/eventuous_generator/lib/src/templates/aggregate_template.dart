@@ -80,9 +80,11 @@ abstract class _\$$name extends Aggregate<$event,$value,$id,$state>{
 
   String toAggregateCommandMethodString(AggregateCommandTemplate template) {
     final idName = '${name}Id'.toMemberCase();
-    final methodArgs = template.constructor.toDeclarationArgumentsString(
-      (e) => e.name != idName,
-    );
+    final methodArgs = template.constructor
+        .toDeclarationArguments(
+          where: (e) => e.name != idName,
+        )
+        .join(',');
     final eventArgs = template.constructor.toInvocationArgumentsString(
       use: {idName: 'id.value'},
     );

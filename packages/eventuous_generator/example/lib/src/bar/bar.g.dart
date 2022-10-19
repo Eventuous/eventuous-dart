@@ -30,7 +30,8 @@ abstract class _$Bar extends Aggregate<JsonObject, BarValue, BarId1, BarState> {
   static Bar from(String id) => Bar(BarId1(id));
 
   String? get title => current.title;
-  String? get author => current.author;
+  BarAuthor? get author => current.author;
+
   BarStateResult createBar({required String title, required String author}) {
     ensureDoesntExists();
     return apply(BarCreated(barId: id.value, title: title, author: author));

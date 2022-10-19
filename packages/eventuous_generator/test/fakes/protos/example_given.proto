@@ -1,0 +1,164 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+service ExampleGrpcCommandService {
+  // Execute command CreateExample
+  rpc ExecuteCreateExample(CreateExampleRequest) returns (CreateExampleResponse) {}
+  // Execute command UpdateExample
+  rpc ExecuteUpdateExample(UpdateExampleRequest) returns (UpdateExampleResponse) {}
+  // Execute command ImportExample
+  rpc ExecuteImportExample(ImportExampleRequest) returns (ImportExampleResponse) {}
+}
+// Command CreateExample request
+message CreateExampleRequest {
+  // Field exampleId
+  string exampleId = 1;
+  // Field title
+  string title = 2;
+  // Field author
+  string author = 3;
+}
+  
+// Command CreateExample response
+message CreateExampleResponse {
+  
+  // CreateExample execution result
+  oneof result {
+    Success success = 1;
+    Error error = 2;
+  }
+
+  // Returned on success
+  message Success {}
+  
+  // Returned on error
+  message Error {
+    int32 statusCode = 1;
+    string reasonPhrase = 2;
+  }
+}
+
+// Command UpdateExample request
+message UpdateExampleRequest {
+  // Field exampleId
+  string exampleId = 1;
+  // Field title
+  string title = 2;
+  // Field author
+  string author = 3;
+}
+  
+// Command UpdateExample response
+message UpdateExampleResponse {
+  
+  // UpdateExample execution result
+  oneof result {
+    Success success = 1;
+    Error error = 2;
+  }
+
+  // Returned on success
+  message Success {}
+  
+  // Returned on error
+  message Error {
+    int32 statusCode = 1;
+    string reasonPhrase = 2;
+  }
+}
+
+// Command ImportExample request
+message ImportExampleRequest {
+  // Field exampleId
+  string exampleId = 1;
+  // Field title
+  string title = 2;
+  // Field author
+  string author = 3;
+}
+  
+// Command ImportExample response
+message ImportExampleResponse {
+  
+  // ImportExample execution result
+  oneof result {
+    Success success = 1;
+    Error error = 2;
+  }
+
+  // Returned on success
+  message Success {}
+  
+  // Returned on error
+  message Error {
+    int32 statusCode = 1;
+    string reasonPhrase = 2;
+  }
+}
+
+service ExampleGrpcQueryService {
+    // Subscribe to public Example events
+  rpc SubscribeToExampleEvents(SubscribeToExampleEventsRequest) returns (stream ExampleEvent){}
+}
+
+
+// Example id
+message ExampleId1Event {
+  string id = 1;
+}
+
+// Example event
+message ExampleEvent {
+  // Field Example id
+  string id = 1;
+  // Field Example state
+  ExampleState1 state = 2;
+  message ExampleState1 {
+    // Field title
+    string title = 1;
+    // Field author
+    string author = 2;
+  }
+}
+
+// Subscribe to events from Example
+message SubscribeToExampleEventsRequest {
+  // Subscribe to events
+  oneof from {  
+    // Example with given id
+    string id = 1;        
+    // all Examples
+    google.protobuf.Empty all = 2;
+  }
+}
+
+// Get ExampleState1 request
+message ExampleState1Request {
+  // Example id
+  string id = 1;
+}
+
+// Get ExampleState1 response
+message ExampleState1Response {
+
+  // Get ExampleState1 request result
+  oneof result {
+    ExampleState1 state = 1;
+    Error error = 2;
+  }
+
+  // Returned on success
+  message ExampleState1 {
+    // Field title
+    string title = 1;
+    // Field author
+    string author = 2;
+  }
+  
+  // Returned on error
+  message Error {
+    int32 statusCode = 1;
+    string reasonPhrase = 2;
+  }
+}

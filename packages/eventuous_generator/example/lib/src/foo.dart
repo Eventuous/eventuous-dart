@@ -1,9 +1,23 @@
 import 'dart:async';
 
 import 'package:eventuous/eventuous.dart';
+import 'package:grpc/grpc.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import 'generated/foo.pbgrpc.dart';
+import 'generated/google/protobuf/empty.pb.dart';
+
 part 'foo.g.dart';
+
+@GrpcServiceType(Foo)
+class FooGrpcQueryService extends _$FooGrpcQueryService {
+  FooGrpcQueryService(FooApp app) : super(app);
+}
+
+@GrpcServiceType(Foo)
+class FooGrpcCommandService extends _$FooGrpcCommandService {
+  FooGrpcCommandService(FooApp app) : super(app);
+}
 
 @ApplicationType(Foo)
 class FooApp extends _$FooApp {
@@ -20,6 +34,7 @@ class Foo extends _$Foo {
   Foo(FooId id, [FooState1? state]) : super(id, state);
 }
 
+@AggregateIdType(Foo, query: true)
 class FooId extends AggregateId {
   FooId(String id) : super(id);
 }
@@ -35,7 +50,10 @@ class FooStateModel1 extends _$FooStateModel1 {
   final String? author;
 }
 
-@AggregateStateType(Foo, value: FooStateModel1)
+@AggregateStateType(
+  Foo,
+  query: true,
+)
 class FooState1 extends _$FooState1 {
   FooState1([FooStateModel1? value, int? version]) : super(value, version);
 }

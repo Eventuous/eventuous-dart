@@ -6,6 +6,7 @@ import 'bar_events.dart';
 
 part 'bar_commands.g.dart';
 
+/// Doc CreateBar
 @JsonSerializable()
 @AggregateCommandType(Bar, BarCreated, expected: ExpectedState.notExists)
 class CreateBar extends _$CreateBar {
@@ -14,19 +15,30 @@ class CreateBar extends _$CreateBar {
     required this.title,
     required this.author,
   }) : super([barId, title, author]);
+
+  /// Doc barId
   final String barId;
+
+  /// Doc title
   final String title;
+
+  /// Doc author
   final String author;
 }
 
 @JsonSerializable()
 @AggregateCommandType(Bar, BarUpdated, expected: ExpectedState.exists)
 class UpdateBar extends _$UpdateBar {
-  UpdateBar(this.barId, this.title, this.author)
-      : super([barId, title, author]);
+  UpdateBar(this.barId, this.title, String? author)
+      : _author = author,
+        super([barId, title, author]);
   final String barId;
   final String title;
-  final String? author;
+
+  /// Doc author getter
+  String? get author => _author;
+
+  final String? _author;
 }
 
 @JsonSerializable()

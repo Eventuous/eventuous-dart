@@ -1,0 +1,168 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+service FooGrpcCommandService {
+  // Execute command CreateFoo
+  rpc ExecuteCreateFoo(CreateFooRequest) returns (CreateFooResponse) {}
+  // Execute command UpdateFoo
+  rpc ExecuteUpdateFoo(UpdateFooRequest) returns (UpdateFooResponse) {}
+  // Execute command ImportFoo
+  rpc ExecuteImportFoo(ImportFooRequest) returns (ImportFooResponse) {}
+}
+// Command CreateFoo request
+message CreateFooRequest {
+  // Field fooId
+  string fooId = 1;
+  // Field title
+  string title = 2;
+  // Field author
+  string author = 3;
+}
+  
+// Command CreateFoo response
+message CreateFooResponse {
+  
+  // CreateFoo execution result
+  oneof result {
+    Success success = 1;
+    Error error = 2;
+  }
+
+  // Returned on success
+  message Success {}
+  
+  // Returned on error
+  message Error {
+    int32 statusCode = 1;
+    string reasonPhrase = 2;
+  }
+}
+
+// Command UpdateFoo request
+message UpdateFooRequest {
+  // Field fooId
+  string fooId = 1;
+  // Field title
+  string title = 2;
+  // Field author
+  string author = 3;
+}
+  
+// Command UpdateFoo response
+message UpdateFooResponse {
+  
+  // UpdateFoo execution result
+  oneof result {
+    Success success = 1;
+    Error error = 2;
+  }
+
+  // Returned on success
+  message Success {}
+  
+  // Returned on error
+  message Error {
+    int32 statusCode = 1;
+    string reasonPhrase = 2;
+  }
+}
+
+// Command ImportFoo request
+message ImportFooRequest {
+  // Field fooId
+  string fooId = 1;
+  // Field title
+  string title = 2;
+  // Field author
+  string author = 3;
+}
+  
+// Command ImportFoo response
+message ImportFooResponse {
+  
+  // ImportFoo execution result
+  oneof result {
+    Success success = 1;
+    Error error = 2;
+  }
+
+  // Returned on success
+  message Success {}
+  
+  // Returned on error
+  message Error {
+    int32 statusCode = 1;
+    string reasonPhrase = 2;
+  }
+}
+
+service FooGrpcQueryService {
+    // Get stream of FooIdEvents
+  rpc GetFooIds(google.protobuf.Empty) returns (stream FooIdEvent){}
+  // Get FooState1 for given Foo id
+  rpc GetFooState1(FooState1Request) returns (FooState1Response){}
+  // Subscribe to public Foo events
+  rpc SubscribeToFooEvents(SubscribeToFooEventsRequest) returns (stream FooEvent){}
+}
+
+
+// Foo id
+message FooIdEvent {
+  string id = 1;
+}
+
+// Foo event
+message FooEvent {
+  // Field Foo id
+  string id = 1;
+  // Field Foo state
+  FooState1 state = 2;
+  message FooState1 {
+    // Field title
+    string title = 1;
+    // Field author
+    string author = 2;
+  }
+}
+
+// Subscribe to events from Foo
+message SubscribeToFooEventsRequest {
+  // Subscribe to events
+  oneof from {  
+    // Foo with given id
+    string id = 1;        
+    // all Foos
+    google.protobuf.Empty all = 2;
+  }
+}
+
+// Get FooState1 request
+message FooState1Request {
+  // Foo id
+  string id = 1;
+}
+
+// Get FooState1 response
+message FooState1Response {
+
+  // Get FooState1 request result
+  oneof result {
+    FooState1 state = 1;
+    Error error = 2;
+  }
+
+  // Returned on success
+  message FooState1 {
+    // Field title
+    string title = 1;
+    // Field author
+    string author = 2;
+  }
+  
+  // Returned on error
+  message Error {
+    int32 statusCode = 1;
+    string reasonPhrase = 2;
+  }
+}

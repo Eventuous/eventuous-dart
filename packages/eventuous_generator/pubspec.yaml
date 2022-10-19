@@ -6,15 +6,22 @@ repository: https://github.com/Eventuous/eventuous-dart
 environment: 
   sdk: '>=2.13.0 <3.0.0'
 dependencies: 
-  analyzer: ^2.0.0
+  analyzer: ^4.0.0
   build: ^2.1.0
-  eventuous: ^0.0.11
+  build_resolvers: ^2.0.0
+  eventuous: ^0.0.12
   get_it: ^7.2.0
   glob: ^2.0.0
   path: ^1.8.0
   collection: ^1.15.0
-  json_annotation: ^4.1.0
+  json_annotation: ^4.6.0
   source_gen: ^1.1.0
+  shell: ^2.0.0
+
+dependency_overrides:
+  eventuous:
+    path: ../eventuous
+
 dev_dependencies: 
   lints: ^1.0.0
   test: ^1.16.0
@@ -22,3 +29,4 @@ dev_dependencies:
   build_runner: ^2.0.1
   source_gen_test: ^1.0.0
   json_serializable: ^6.0.1
+

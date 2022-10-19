@@ -73,7 +73,7 @@ abstract class _\$$name extends ApplicationServiceBase<$data,
   }
 
   String toAggregateCommandMethodString(AggregateCommandTemplate template) {
-    final arguments = template.constructor.toDeclarationArgumentsString();
+    final arguments = template.constructor.toDeclarationArguments().join(',');
     // TODO: Support AggregateIdField to indicate id-field in commands and events
     // TODO: Support mapping between with @AggregateEventField(name:'something') on command fields
     final invocation = template.event.constructor.toInvocationArgumentsString();

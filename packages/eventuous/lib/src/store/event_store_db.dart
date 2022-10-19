@@ -89,7 +89,6 @@ class EventStoreDB extends StreamEventStore {
       final events = await read.events;
       return events.map(_toStreamEvent).toList();
     } on StreamNotFoundException {
-      print('error');
       throw $e.StreamNotFoundException(name);
     }
   }

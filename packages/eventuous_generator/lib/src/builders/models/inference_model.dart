@@ -14,6 +14,7 @@ class InferenceModel extends JsonObject {
   final List<AnnotationModel> annotations;
 
   List<AnnotationModel> get apps => where<ApplicationType>();
+  List<AnnotationModel> get grpc => where<GrpcServiceType>();
   List<AnnotationModel> get aggregates => where<AggregateType>();
   List<AnnotationModel> get events => where<AggregateEventType>();
   List<AnnotationModel> get values => where<AggregateValueType>();

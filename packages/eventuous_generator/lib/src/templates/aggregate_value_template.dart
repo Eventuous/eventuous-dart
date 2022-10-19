@@ -27,8 +27,7 @@ class AggregateValueTemplate {
       name: name,
       aggregate: aggregate,
       data: fieldTypeNameAt('data', value, annotation),
-      usesJsonSerializable:
-          value?.usesJsonSerializable ?? element.usesJsonSerializable,
+      usesJsonSerializable: element.usesJsonSerializable,
     );
   }
 
