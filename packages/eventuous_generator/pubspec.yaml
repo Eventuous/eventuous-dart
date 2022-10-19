@@ -10,7 +10,7 @@ dependencies:
   build: ^2.1.0
   file: ^6.1.4
   build_resolvers: ^2.0.0
-  eventuous: ^0.0.12
+  eventuous: ^0.1.0
   get_it: ^7.2.0
   glob: ^2.0.0
   path: ^1.8.0
@@ -19,9 +19,9 @@ dependencies:
   source_gen: ^1.1.0
   shell: ^2.0.0
 
-dependency_overrides:
-  eventuous:
-    path: ../eventuous
+#dependency_overrides:
+#  eventuous:
+#    path: ../eventuous
 
 dev_dependencies: 
   lints: ^1.0.0
