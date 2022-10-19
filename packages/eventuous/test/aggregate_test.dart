@@ -31,7 +31,7 @@ void main() {
 void _doAll(TestHarness harness) {
   const Price = 1000;
   const RoomId = 'room-1';
-  const _BookingId = 'booking-1';
+  const ActualBookingId = 'booking-1';
   test('Initial state is empty', () async {
     // Arrange
     final original = Booking.from('is_empty');
@@ -47,7 +47,7 @@ void _doAll(TestHarness harness) {
     final event = RoomBooked(
       price: Price,
       roomId: RoomId,
-      bookingId: _BookingId,
+      bookingId: ActualBookingId,
     );
 
     // Act
@@ -86,7 +86,7 @@ void _doAll(TestHarness harness) {
     final event = RoomBooked(
       price: Price,
       roomId: RoomId,
-      bookingId: _BookingId,
+      bookingId: ActualBookingId,
     );
     final local = original.apply(event);
 
@@ -154,7 +154,7 @@ void _doAll(TestHarness harness) {
     final event = RoomBooked(
       price: Price,
       roomId: RoomId,
-      bookingId: _BookingId,
+      bookingId: ActualBookingId,
     );
     final local = original.apply(event);
     await harness.bookingStore.save(original);

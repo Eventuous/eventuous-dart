@@ -19,7 +19,7 @@ void main() {
       AggregateEventTypes.define<JsonMap, BookingStateModel>(
         (data) => BookingStateModel.fromJson(data),
       );
-      server = EventStoreServerSingleNode();
+      server = EventStoreServerSingleNode(EventStoreImage.LTS);
       await server.start();
       esdb = EventStoreDB.parse('esdb://localhost:2113?tls=false');
       return server;

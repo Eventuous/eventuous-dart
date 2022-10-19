@@ -15,10 +15,10 @@ class AggregateTypes {
     String? name,
   }) {
     final type = typeOf<TAggregate>();
-    final _name = name ?? type.toString();
-    if (!containsTypeName(_name)) {
-      _reverseMap[_name] = type;
-      _map[type] = _name;
+    final actual = name ?? type.toString();
+    if (!containsTypeName(actual)) {
+      _reverseMap[actual] = type;
+      _map[type] = actual;
       _creators[type] = creator;
     }
   }

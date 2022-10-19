@@ -112,9 +112,9 @@ class ItemModel extends JsonObject {
 
   static ElementModel? _toArchetype(String type, DartType dartType) {
     return !IntrinsicTypes.contains(type.replaceAll(r'?', '')) &&
-            dartType.element is ClassElement
+            dartType.element2 is ClassElement
         ? ElementModel.fromConstructor(
-            (dartType.element as ClassElement).constructors.first)
+            (dartType.element2 as ClassElement).constructors.first)
         : null;
   }
 

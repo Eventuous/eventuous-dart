@@ -13,7 +13,7 @@ configure:
 	dart pub global activate mono_repo
 	dart pub global activate eventstore_client_test
 	brew install act
-	brew install protoc
+	brew install protobuf
 	brew install watch
 	brew install docker
 	brew install colima

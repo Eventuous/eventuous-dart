@@ -21,7 +21,7 @@ void main() {
       ..withBookingService()
       ..install<EventStoreServerSingleNode>(
         setup: () async {
-          final server = EventStoreServerSingleNode();
+          final server = EventStoreServerSingleNode(EventStoreImage.LTS);
           await server.start();
           return server;
         },
