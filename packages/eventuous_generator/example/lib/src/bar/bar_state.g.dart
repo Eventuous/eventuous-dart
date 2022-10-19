@@ -12,11 +12,6 @@ abstract class _$BarState extends AggregateState<BarValue> {
     AggregateStateTypes.define<BarValue, BarState>(
       ([value, version]) => BarState(value, version),
     );
-    on<BarCreated>(patch);
-
-    on<BarUpdated>(patch);
-
-    on<BarImported>(patch);
   }
 
   String? get title => value.title;

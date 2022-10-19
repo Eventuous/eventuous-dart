@@ -346,11 +346,6 @@ abstract class _$FooState1 extends AggregateState<FooStateModel1> {
     AggregateStateTypes.define<FooStateModel1, FooState1>(
       ([value, version]) => FooState1(value, version),
     );
-    on<FooCreated>(patch);
-
-    on<FooUpdated>(patch);
-
-    on<FooImported>(patch);
   }
 
   String? get title => value.title;
