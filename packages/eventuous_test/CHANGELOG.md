@@ -1,3 +1,6 @@
+# 0.1.0
+- Bumped version in step with eventuous
+
 # 0.0.12
 - Upgraded dependencies
 - Added badges to all READMEs

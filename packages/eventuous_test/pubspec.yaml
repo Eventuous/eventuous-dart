@@ -1,5 +1,5 @@
 name: eventuous_test
-version: 0.0.12
+version: 0.1.0
 homepage: https://eventuous.dev
 description: A library with utilities for testing eventuous
 repository: https://github.com/Eventuous/eventuous-dart
