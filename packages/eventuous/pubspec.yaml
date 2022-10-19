@@ -24,3 +24,7 @@ dev_dependencies:
   eventstore_client_test: ^0.6.1
   eventuous_test: 
     path: ../eventuous_test
+false_secrets:
+  - test/certs/ca/ca.pem
+  - test/certs/ca/ca.key
+  - test/certs/node/node.key
