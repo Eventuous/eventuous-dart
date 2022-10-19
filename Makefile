@@ -20,8 +20,7 @@ generate:
 
 test:
 	echo "Test packages..."
-	cd packages/eventuous && dart test
-	cd packages/eventuous_test && dart test
+	cd packages/eventuous && dart test -j 1
 	cd packages/eventuous_generator && dart test
 
 verify:
