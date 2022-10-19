@@ -1,3 +1,6 @@
+# 0.1.1
+- Upgraded to eventstore_client 0.6.0
+
 # 0.1.0
 - Added support for grpc service generation
 
