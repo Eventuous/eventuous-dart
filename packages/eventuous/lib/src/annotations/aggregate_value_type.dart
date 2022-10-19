@@ -1,4 +1,4 @@
-import '../json/json_typedefs.dart';
+import 'package:eventuous/eventuous.dart';
 
 class AggregateValueType {
   const AggregateValueType(

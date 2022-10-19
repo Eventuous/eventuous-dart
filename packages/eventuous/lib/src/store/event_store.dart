@@ -1,7 +1,5 @@
 import 'package:eventuous/eventuous.dart';
 
-import 'event_store_result.dart';
-
 /// Store of [StreamEvent]s used by [AggregateStore].
 abstract class StreamEventStore {
   /// Append one or more events to a stream

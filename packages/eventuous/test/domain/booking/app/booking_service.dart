@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:eventuous/eventuous.dart';
 
 import '../booking.dart';
-import 'booking_commands.dart';
 
 class BookingService extends ApplicationServiceBase<JsonMap, JsonObject,
     BookingStateModel, BookingId, BookingState, Booking> {

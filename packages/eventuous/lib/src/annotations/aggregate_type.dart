@@ -1,7 +1,5 @@
 import 'package:eventuous/eventuous.dart';
 
-import '../json/json_typedefs.dart';
-
 /// Use [AggregateType] to define aggregates
 ///
 /// Optional [AggregateType] fields for [parameterized types](https://dart.dev/guides/language/language-tour#restricting-the-parameterized-type)

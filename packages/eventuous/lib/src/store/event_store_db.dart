@@ -3,8 +3,6 @@ import 'package:eventuous/eventuous.dart'
     hide StreamNotFoundException, WrongExpectedVersionResult;
 import 'package:eventuous/eventuous.dart' as $e;
 
-import 'esdb/extensions.dart';
-
 export 'esdb/extensions.dart';
 
 class EventStoreDB extends StreamEventStore {

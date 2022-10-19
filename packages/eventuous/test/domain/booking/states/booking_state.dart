@@ -1,5 +1,4 @@
 import 'package:eventuous/eventuous.dart';
-import 'package:eventuous/src/json/json_utils.dart';
 
 import '../booking.dart';
 

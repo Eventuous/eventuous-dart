@@ -2,7 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:eventuous/eventuous.dart';
 import 'package:json_patch/json_patch.dart';
 
-import 'json_object.dart';
 import 'models/conflict_model.dart';
 
 class JsonUtils {
@@ -52,7 +51,7 @@ class JsonUtils {
             if (elements.length > 1) {
               // Get path to list by removing index
               final path = elements.take(elements.length - 1).join('/');
-              if (current is Map && path.isNotEmpty) {
+              if (path.isNotEmpty) {
                 final value = current.elementAt(path);
                 isRemove = value is! List;
               }

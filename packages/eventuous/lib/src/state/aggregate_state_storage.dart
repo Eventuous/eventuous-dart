@@ -88,12 +88,12 @@ abstract class AggregateStateStorage<TValue extends Object,
 
   Future<TState?> _read(StreamName name) async {
     final snapshot = await read(name);
-    if (snapshot != null) {
-      return newInstance(
-        snapshot.value,
-        snapshot.version,
-      );
-    }
+    return snapshot != null
+        ? newInstance(
+            snapshot.value,
+            snapshot.version,
+          )
+        : null;
   }
 
   /// Save [AggregateState] of type [TState] for given [StreamName].

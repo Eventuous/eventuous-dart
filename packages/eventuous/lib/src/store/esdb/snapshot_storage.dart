@@ -45,6 +45,7 @@ class EsdbSnapshotStorage<TData extends Object, TValue extends Object,
         );
       }
     }
+    return null;
   }
 
   @override
