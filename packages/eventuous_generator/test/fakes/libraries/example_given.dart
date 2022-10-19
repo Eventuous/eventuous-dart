@@ -43,7 +43,7 @@ class ExampleId1 extends AggregateId {
 @JsonSerializable()
 @AggregateValueType(Example, data: JsonMap)
 class ExampleStateModel1 extends _$ExampleStateModel1 {
-  ExampleStateModel1(this.title,this.author) : super([title,author]);
+  ExampleStateModel1(this.title, this.author) : super([title, author]);
   final String title;
   final String author;
 }
@@ -55,7 +55,8 @@ class ExampleState1 extends _$ExampleState1 {
 }
 
 @JsonSerializable()
-@AggregateCommandType(Example, ExampleCreated, expected: ExpectedState.notExists)
+@AggregateCommandType(Example, ExampleCreated,
+    expected: ExpectedState.notExists)
 class CreateExample extends _$CreateExample {
   CreateExample({
     required this.exampleId,
@@ -104,10 +105,10 @@ class ExampleCreated extends _$ExampleCreated {
 @AggregateEventType(Example, data: JsonMap)
 class ExampleUpdated extends _$ExampleUpdated {
   ExampleUpdated(
-      this.exampleId,
-      this.title,
-      this.author,
-      ) : super([exampleId, title, author]);
+    this.exampleId,
+    this.title,
+    this.author,
+  ) : super([exampleId, title, author]);
   final String exampleId;
   final String title;
   final String? author;
