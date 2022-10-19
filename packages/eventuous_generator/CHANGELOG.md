@@ -1,3 +1,6 @@
+# 0.1.0
+- Added support for grpc service generation
+
 # 0.0.12
 - Upgraded dependencies
 - Added badges to all READMEs
