@@ -1,3 +1,6 @@
+# 0.1.1
+- Upgraded to eventstore_client 0.6.1
+
 # 0.1.0
 - Bumped version in step with eventuous
 

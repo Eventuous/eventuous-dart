@@ -114,17 +114,17 @@ JsonMap toJson() => _\$${name}ToJson(this as $name);
   }
 
   String toAggregateCommandHandlerString(String tid) {
-    final name = aggregate.toMemberCase();
+    final member = aggregate.toMemberCase();
     final methodArgs = constructor.toInvocationArgumentsString(
-      where: (e) => '${name}Id' != e.name,
+      where: (e) => '${member}Id' != e.name,
       use: constructor.items.fold(
           {}, (use, e) => use..putIfAbsent(e.name, () => 'cmd.${e.name}')),
     );
 
     return '''
 $_on<$name>(
-  (cmd) => $tid(cmd.${name}Id),
-  (cmd, $name) => $name.${name.toMemberCase()}($methodArgs),
+  (cmd) => $tid(cmd.${member}Id),
+  (cmd, $member) => $member.${name.toMemberCase()}($methodArgs),
 );
 ''';
   }

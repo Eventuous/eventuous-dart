@@ -16,7 +16,7 @@ void main() {
   late EventStoreServerSingleNode server;
 
   setUpAll(() {
-    server = EventStoreServerSingleNode();
+    server = EventStoreServerSingleNode(EventStoreImage.LTS);
     return server.start();
   });
 
