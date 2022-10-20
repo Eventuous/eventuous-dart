@@ -146,11 +146,11 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v1.2
+      - uses: dart-lang/setup-dart@v1.3
         with:
           sdk: stable
       - id: checkout
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v2.4.2
       - name: "packages/eventuous; dart pub upgrade && pub global activate coverage"
         run: "dart pub upgrade && pub global activate coverage"
         working-directory: packages/eventuous
