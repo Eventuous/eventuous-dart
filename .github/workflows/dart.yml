@@ -140,25 +140,21 @@ jobs:
         uses: actions/cache@v2.1.6
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:packages/eventuous;commands:test"
-          restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:packages/eventuous
-            os:ubuntu-latest;pub-cache-hosted;dart:stable
-            os:ubuntu-latest;pub-cache-hosted
-            os:ubuntu-latest
+          key: eventuousgi
+          restore-keys: eventuous
       - uses: dart-lang/setup-dart@v1.3
         with:
           sdk: stable
       - id: checkout
         uses: actions/checkout@v2.4.2
       - name: "packages/eventuous; dart pub upgrade && pub global activate coverage"
-        run: "dart pub upgrade && pub global activate coverage"
+        run: "dart pub upgrade && dart pub global activate coverage"
         working-directory: packages/eventuous
       - name: packages/eventuous; Run tests with coverage
         run: "dart test -j 1 --reporter=expanded --coverage=\"coverage\""
         working-directory: packages/eventuous
       - name: packages/eventuous; Collect test coverage
-        run: "format_coverage --lcov --in=coverage --out=coverage.lcov --packages=.packages --report-on=lib"
+        run: "dart pub global run coverage:format_coverage --lcov --in=coverage --out=coverage.lcov --packages=.dart_tool/package_config.json --report-on=lib"
         working-directory: packages/eventuous
       - name: Publish test coverage
         uses: codecov/codecov-action@v1.0.2

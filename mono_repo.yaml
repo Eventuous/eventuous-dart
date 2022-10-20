@@ -10,7 +10,7 @@ github:
           uses: actions/cache@v2.1.6
           with:
             path: "~/.pub-cache/hosted"
-            key: "eventuous"
+            key: "eventuousgi"
             restore-keys: eventuous
         - uses: dart-lang/setup-dart@v1.3
           with:
